@@ -2,7 +2,7 @@
   "name": "@eliware/discord-template",
   "type": "module",
   "version": "1.1.0",
-  "description": "A template for starting new Node.js projects.",
+  "description": "A modern Discord app built with Node.js, based on the eliware/discord foundation.",
   "main": "discord-template.mjs",
   "scripts": {
     "start": "node discord-template.mjs",
@@ -12,10 +12,13 @@
     "type": "git",
     "url": "git+https://github.com/eliware/discord-template.git"
   },
-    "keywords": [
-        "discord-template",
-        "nodejs"
-    ],
+  "keywords": [
+    "discord-template",
+    "discord",
+    "discord-bot",
+    "discord-app",
+    "nodejs"
+  ],
   "author": "Eli Sterling, eliware.org <eli@eliware.org>",
   "license": "MIT",
   "bugs": {
@@ -23,7 +26,7 @@
   },
   "homepage": "https://github.com/eliware/discord-template#readme",
   "devDependencies": {
-    "jest": "^30.0.4"
+    "jest": "^30.2.0"
   },
   "jest": {
     "testEnvironment": "node",
@@ -35,6 +38,7 @@
   },
   "dependencies": {
     "@eliware/common": "^1.1.1",
-    "dotenv": "^17.2.0"
+    "@eliware/discord": "^1.1.1",
+    "dotenv": "^17.2.3"
   }
 }
