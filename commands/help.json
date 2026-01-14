@@ -48,12 +48,12 @@
         "es-ES": "Proporciona información sobre los comandos disponibles y su uso.",
         "fi": "Tarjoaa tietoa käytettävissä olevista komennoista ja niiden käytöstä.",
         "fr": "Fournit des informations sur les commandes disponibles et leur utilisation.",
-        "hi": "उपलब्ध कमांड और उनके उपयोग के बारे में जानकारी प्रदान करता है।",
+        "hi": "उपलब्ध कमांड और उनके उपयोग के बारे में जानकारी प्रदान करती है।",
         "hr": "Pruža informacije o dostupnim naredbama i njihovoj upotrebi.",
         "hu": "Információt nyújt az elérhető parancsokról és azok használatáról.",
         "id": "Memberikan informasi tentang perintah yang tersedia dan penggunaannya.",
         "it": "Fornisce informazioni sui comandi disponibili e sul loro utilizzo.",
-        "ja": "利用可能なコマンドとその使い方についての情報を提供します。",
+        "ja": "利用可能なコマンドとその使用方法に関する情報を提供します。",
         "ko": "사용 가능한 명령어와 사용법에 대한 정보를 제공합니다.",
         "lt": "Pateikia informaciją apie galimas komandas ir jų naudojimą.",
         "nl": "Biedt informatie over beschikbare commando's en het gebruik ervan.",
@@ -63,18 +63,25 @@
         "ro": "Oferă informații despre comenzile disponibile și utilizarea acestora.",
         "ru": "Предоставляет информацию о доступных командах и их использовании.",
         "sv-SE": "Ger information om tillgängliga kommandon och deras användning.",
-        "th": "ให้ข้อมูลเกี่ยวกับคำสั่งที่มีอยู่และวิธีการใช้งาน",
+        "th": "ให้ข้อมูลเกี่ยวกับคำสั่งที่มีและวิธีการใช้งาน",
         "tr": "Mevcut komutlar ve kullanımları hakkında bilgi sağlar.",
-        "uk": "Надає інформацію про доступні команди та їх використання.",
+        "uk": "Надання інформації про доступні команди та їх використання.",
         "vi": "Cung cấp thông tin về các lệnh có sẵn và cách sử dụng chúng.",
-        "zh-CN": "提供可用命令及其用法的信息。",
-        "zh-TW": "提供可用指令及其用法的資訊。"
+        "zh-CN": "提供有关可用命令及其用法的信息。",
+        "zh-TW": "提供有關可用指令及其用法的資訊。"
     },
+
     "default_permission": true,
+    "dm_permission": true,
+
     "permissions": {
         "user_permissions": [
             "VIEW_CHANNEL",
             "SEND_MESSAGES"
         ]
-    }
+    },
+
+    "integration_types": [0, 1],
+
+    "contexts": [0, 1, 2]
 }

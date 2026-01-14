@@ -1,3 +1,3 @@
 {
-    "help": "이것은 도움말 텍스트입니다."
+  "help": "📘 **Ask — 빠른 도우미**\n\n당신은 /ask — 빠른 답변, 웹 검색, 이미지 생성을 위한 Discord 앱을 사용하고 있습니다. /ask <anything> 를 사용해 질문을 하거나 요약을 받고, 아이디어를 브레인스토밍하거나 문서를 초안 작성하거나 이미지를 생성하세요.\n\n• 일반적인 사용 사례:\n  • 간단한 설명 및 정의\n  • 요약 및 재작성\n  • 초안(이메일, 메시지, 안건)\n  • 짧은 코드 스니펫 및 디버깅 힌트\n  • 브레인스토밍 및 아이디어 생성\n  • 빠른 사실 확인과 출처를 위한 웹 검색\n  • 간단한 설명용 이미지 생성\n\n• 예시:\n  • /ask explain recursion in simple terms\n  • /ask summarize the last 3 messages\n  • /ask draft a 3-item meeting agenda about onboarding\n  • /ask generate a simple red circle on a white background --image\n\n• 작동하는 위치:\n  • 서버 채널 (GUILD_TEXT)\n  • 그룹 DM (GROUP_DM)\n  • 앱과의 직접 메시지 (APP_DM)\n\n• 참고:\n  • 비밀번호나 기타 민감한 개인 정보를 보내지 마세요.\n  • 답변은 여기서 제공한 입력에만 기반합니다.\n  • 이미지 생성 및 웹 검색 결과는 콘텐츠 정책에 따라 제한될 수 있습니다.\n\n앱 관리 또는 설치:\nhttps://discord.com/oauth2/authorize?client_id=1460830876345569372"
 }

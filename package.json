@@ -2,7 +2,7 @@
   "name": "@eliware/ask",
   "type": "module",
   "version": "1.1.0",
-  "description": "A modern Discord app built with Node.js, based on the eliware/discord foundation.",
+  "description": "A concise Discord assistant (\"/ask\") for quick answers, web searches, and image generation — supports slash command, mention/DM fallbacks, localization, and usage tracking.",
   "main": "ask.mjs",
   "scripts": {
     "start": "node ask.mjs",
@@ -12,10 +12,19 @@
     "type": "git",
     "url": "git+https://github.com/eliware/ask.git"
   },
-    "keywords": [
-        "ask",
-        "nodejs"
-    ],
+  "keywords": [
+    "discord",
+    "slash-command",
+    "ask",
+    "assistant",
+    "ai",
+    "openai",
+    "image-generation",
+    "web-search",
+    "localization",
+    "rate-limiting",
+    "nodejs"
+  ],
   "author": "Eli Sterling, eliware.org <eli@eliware.org>",
   "license": "MIT",
   "bugs": {
@@ -36,6 +45,8 @@
   "dependencies": {
     "@eliware/common": "^1.1.1",
     "@eliware/discord": "^1.1.1",
+    "@eliware/mysql": "^1.1.1",
+    "@eliware/openai": "^1.1.1",
     "dotenv": "^17.2.3"
   }
 }
