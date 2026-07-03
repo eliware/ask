@@ -9,28 +9,76 @@ function decodeBase64Image(b64) {
   }
 }
 
-function sanitizeForLog(obj, seen = new WeakSet(), depth = 0) {
-  if (depth > 5) return '<<max-depth>>';
+/**
+ * Robust sanitizer for logging arbitrary response objects.
+ * - Truncates long strings
+ * - Redacts likely base64/binary fields
+ * - Limits array lengths and object entry counts
+ * - Handles circular references
+ */
+function sanitizeForLog(obj, seen = new WeakSet(), depth = 0, opts = {}) {
+  const {
+    maxDepth = 5,
+    maxString = 1000,
+    maxArray = 100,
+    maxEntries = 200,
+    redactPatterns = ['b64', 'base64', 'b64_json', 'result', 'image', 'data', 'raw', 'buffer', 'blob']
+  } = opts || {};
+
+  if (depth > maxDepth) return '<<max-depth>>';
   if (obj === null || obj === undefined) return obj;
+
+  // Primitives
   if (typeof obj === 'string') {
-    if (obj.length > 200) return obj.slice(0, 200) + '...[truncated]';
+    // if string appears binary-ish (many non-printable chars) show length only
+    const nonPrintable = obj.replace(/[\x20-\x7E\n\r\t]/g, '').length;
+    if (obj.length > maxString || nonPrintable > Math.min(100, obj.length / 10)) {
+      return `<<string length=${obj.length} truncated, nonprintable=${nonPrintable}>>`;
+    }
     return obj;
   }
   if (typeof obj === 'number' || typeof obj === 'boolean') return obj;
   if (Buffer.isBuffer(obj)) return `[Buffer length=${obj.length}]`;
-  if (Array.isArray(obj)) return obj.map(i => sanitizeForLog(i, seen, depth + 1));
+  if (Array.isArray(obj)) {
+    if (seen.has(obj)) return '<<circular>>';
+    seen.add(obj);
+    const out = [];
+    const limit = Math.min(obj.length, maxArray);
+    for (let i = 0; i < limit; i++) {
+      try {
+        out.push(sanitizeForLog(obj[i], seen, depth + 1, opts));
+      } catch (e) {
+        out.push(`<<error serializing index ${i}: ${String(e)}>>`);
+      }
+    }
+    if (obj.length > maxArray) out.push(`<<${obj.length - maxArray} more items...>>`);
+    return out;
+  }
   if (typeof obj === 'object') {
     if (seen.has(obj)) return '<<circular>>';
     seen.add(obj);
     const out = {};
+    let count = 0;
     for (const [k, v] of Object.entries(obj)) {
-      const keyLower = String(k).toLowerCase();
-      if ((keyLower.includes('b64') || keyLower.includes('base64') || keyLower.includes('result')) && typeof v === 'string' && v.length > 200) {
-        out[k] = `<<${keyLower} truncated, length=${v.length}>>`;
-        continue;
+      if (++count > maxEntries) {
+        out.__more = `<<truncated, more than ${maxEntries} keys>>`;
+        break;
       }
+
+      const keyLower = String(k).toLowerCase();
       try {
-        out[k] = sanitizeForLog(v, seen, depth + 1);
+        // redact likely binary/base64 fields
+        if (typeof v === 'string' && redactPatterns.some(p => keyLower.includes(p))) {
+          out[k] = `<<redacted ${keyLower} length=${v.length}>>`;
+          continue;
+        }
+        // if the value itself is very large string, truncate
+        if (typeof v === 'string' && v.length > maxString) {
+          out[k] = `${v.slice(0, Math.min(200, maxString))}...[truncated length=${v.length}]`;
+          continue;
+        }
+
+        out[k] = sanitizeForLog(v, seen, depth + 1, opts);
       } catch (e) {
         out[k] = `<<error serializing: ${String(e)}>>`;
       }
@@ -205,76 +253,114 @@ export default async function ({ client, log, msg, openai, db }, interaction) {
 
   try {
     const response = await openai.responses.create({
-      model: 'gpt-4.1-mini',
+      model: 'gpt-5.5',
       input,
-      text: { format: { type: 'text' } },
-      reasoning: {},
+      text: {
+        format: {
+           type: 'text'
+        },
+        verbosity: 'low'
+      },
+      reasoning: {
+        effort: 'medium',
+        summary: null
+      },
       tools: [
-        { type: 'web_search', user_location: { type: 'approximate' }, search_context_size: 'low' },
-        { type: 'image_generation', model: 'gpt-image-1', size: 'auto', quality: 'auto', output_format: 'png', background: 'auto', moderation: 'low', partial_images: 0 }
+        {
+          type: 'web_search',
+          user_location: {
+            type: 'approximate'
+          },
+          search_context_size: 'medium'
+        },
+        {
+          type: 'image_generation',
+          model: 'gpt-image-2',
+          size: 'auto',
+          quality: 'auto',
+          output_format: 'png',
+          background: 'auto',
+          moderation: 'low',
+          partial_images: 0
+        }
       ],
-      temperature: 1,
-      max_output_tokens: 2048,
-      top_p: 1,
       store: false,
-      include: ['web_search_call.action.sources']
+      include: [
+        'reasoning.encrypted_content',
+        'web_search_call.action.sources'
+      ]
     });
-
-    // debug log sanitized response
-    try {
-      log.debug('OpenAI response (sanitized)', sanitizeForLog(response));
-    } catch (e) {
-      log.debug('Failed to sanitize response for log', { error: e?.message || e });
-    }
 
     const responseMs = Date.now() - startTs;
 
-    // parse outputs
+    // parse outputs (robust)
     let replyText = '';
     const images = [];
-    const outputs = response?.output || response?.outputs || [];
-    for (const out of outputs) {
+
+    // normalize outputs into an array (supports response.output as object map or array)
+    let outputsArr = [];
+    if (Array.isArray(response?.outputs)) outputsArr = response.outputs;
+    else if (Array.isArray(response?.output)) outputsArr = response.output;
+    else if (response?.outputs && typeof response.outputs === 'object') outputsArr = Object.values(response.outputs);
+    else if (response?.output && typeof response.output === 'object') outputsArr = Object.values(response.output);
+    else outputsArr = [];
+
+    for (const out of outputsArr) {
       try {
-        if (out && out.type === 'image_generation_call' && out.result && typeof out.result === 'string') {
+        // top-level image-generation result (older shape)
+        if (out && (out.type === 'image_generation_call' || (out.id && String(out.id).startsWith('ig_'))) && typeof out.result === 'string') {
           const buf = decodeBase64Image(out.result);
           if (buf) images.push({ buffer: buf, filename: `image_${out.id || Date.now()}.png`, mime: 'image/png', description: out.revised_prompt || null });
           continue;
         }
-      } catch (e) {
-        log.debug('top-level image parse failed', { err: e?.message || e });
-      }
 
-      const contents = out?.content || out?.data || [];
-      for (const c of contents) {
-        const t = c?.type || c?.mime_type || '';
-        if (t === 'output_text' || t === 'text' || t === 'input_text' || t === 'output' || typeof c === 'string') {
-          const text = c?.text ?? c ?? '';
+        // normalize contents: out.content, out.data, or the out itself when string
+        let contents = [];
+        if (Array.isArray(out?.content)) contents = out.content;
+        else if (out?.content && typeof out.content === 'object') contents = Object.values(out.content);
+        else if (typeof out?.content === 'string') contents = [out.content];
+        else if (Array.isArray(out?.data)) contents = out.data;
+        else if (out?.data && typeof out.data === 'object') contents = Object.values(out.data);
+        else if (typeof out === 'string') contents = [out];
+
+        for (const c of contents) {
+          // extract text only if it's a string
+          let text = null;
+          if (typeof c === 'string') text = c;
+          else if (typeof c?.text === 'string') text = c.text;
+          else if (typeof c?.output_text === 'string') text = c.output_text;
+          else if (typeof c?.content === 'string') text = c.content;
+
           if (text) replyText += (replyText ? '\n' : '') + text;
-        }
-        if (t === 'output_image' || t === 'image' || c?.image || c?.b64_json || c?.base64) {
+
+          // image cases: base64 in common keys or image.url
           const b64 = c?.b64_json || c?.base64 || c?.image?.b64 || c?.image?.b64_json || c?.image?.base64;
-          if (b64) {
+          if (typeof b64 === 'string' && b64.length > 0) {
             const buf = decodeBase64Image(b64);
             if (buf) images.push({ buffer: buf, filename: c?.filename || 'image.png', mime: c?.mime || 'image/png', description: c?.description || null });
             continue;
           }
           const url = c?.image?.url || c?.url || c?.src || c?.href;
-          if (url) images.push({ url, filename: c?.filename || 'image.png', description: c?.description || null });
+          if (typeof url === 'string' && url) images.push({ url, filename: c?.filename || 'image.png', description: c?.description || null });
         }
+      } catch (e) {
+        log.debug('output parse item failed', { err: e?.message || e, out: sanitizeForLog(out) });
       }
     }
 
-    if (!replyText && response?.output_text) replyText = response.output_text;
-    if (!replyText && response?.text) replyText = response.text;
-    if (!replyText) replyText = 'Sorry, I could not generate a response.';
+    if (!replyText && typeof response?.output_text === 'string') replyText = response.output_text;
+    if (!replyText && typeof response?.text === 'string') replyText = response.text;
+    if (!replyText) replyText = '';
 
     // persist images
     if (db && usageId && images.length > 0) {
       try {
         for (const img of images) {
           if (img.buffer) {
+            // ensure Buffer type
+            const buf = Buffer.isBuffer(img.buffer) ? img.buffer : Buffer.from(img.buffer || '', 'base64');
             const meta = JSON.stringify({ description: img.description, mime: img.mime });
-            await db.execute('INSERT INTO usage_images (usage_id, filename, mime, data, meta) VALUES (?, ?, ?, ?, ?)', [usageId, img.filename || null, img.mime || null, img.buffer, meta]);
+            await db.execute('INSERT INTO usage_images (usage_id, filename, mime, data, meta) VALUES (?, ?, ?, ?, ?)', [usageId, img.filename || null, img.mime || null, buf, meta]);
           }
         }
       } catch (e) {
@@ -289,7 +375,7 @@ export default async function ({ client, log, msg, openai, db }, interaction) {
         const safetyItems = [];
         if (Array.isArray(response?.safety?.violations)) safetyItems.push(...response.safety.violations.map(String));
         const safetyFromOutputs = [];
-        for (const out of outputs) if (out?.safety_category) safetyFromOutputs.push(out.safety_category);
+        for (const out of outputsArr) if (out?.safety_category) safetyFromOutputs.push(out.safety_category);
         const safetyCombined = [...new Set([...safetyItems, ...safetyFromOutputs])];
 
         const usageObj = response?.usage || {};
@@ -310,14 +396,33 @@ export default async function ({ client, log, msg, openai, db }, interaction) {
         let responseMeta = null;
         try { responseMeta = JSON.stringify(sanitizeForLog(response)); } catch (e) { responseMeta = null; }
 
-        await db.execute(`UPDATE \`usage\` SET response_text = ?, model = ?, model_full = ?, tokens_used = ?, input_tokens = ?, output_tokens = ?, total_tokens = ?, response_ms = ?, completed_at = ?, safety_violations = ?, error_flag = 0, request_id = ?, response_meta = ?, response_status = ?, service_tier = ? WHERE id = ?`, [replyText, modelFull ? modelFull.split('-')[0] : modelFull, modelFull, totalTokens, inputTokens, outputTokens, totalTokens, responseMs, completedAtSql, safetyCombined.join(','), responseId, responseMeta, responseStatus, serviceTier, usageId]);
+        // Log param sizes/types to help diagnose DB binding errors (kept minimal)
+        try {
+          log.debug('update-usage params', {
+            usageId,
+            responseId,
+            modelFull,
+            totalTokens,
+            inputTokens,
+            outputTokens,
+            responseMs,
+            responseMetaLength: responseMeta ? responseMeta.length : 0,
+            replyTextLength: replyText ? replyText.length : 0,
+            imagesCount: images.length
+          });
+        } catch (e) {}
+
+        // Truncate large meta if necessary
+        const safeMeta = responseMeta && responseMeta.length > 200000 ? responseMeta.slice(0, 200000) + '...[truncated]' : responseMeta;
+
+        await db.execute(`UPDATE \`usage\` SET response_text = ?, model = ?, model_full = ?, tokens_used = ?, input_tokens = ?, output_tokens = ?, total_tokens = ?, response_ms = ?, completed_at = ?, safety_violations = ?, error_flag = 0, request_id = ?, response_meta = ?, response_status = ?, service_tier = ? WHERE id = ?`, [replyText, modelFull ? modelFull.split('-')[0] : modelFull, modelFull, totalTokens, inputTokens, outputTokens, totalTokens, responseMs, completedAtSql, safetyCombined.join(','), responseId, safeMeta, responseStatus, serviceTier, usageId]);
       } catch (e) {
         log.error('Failed to update usage record after success', { error: e?.message || e });
       }
     }
 
     // prepare blockquote formatting (unless caller wants to omit it)
-    const addBlockquote = (text) => text.split(/\r?\n/).map(line => (line.trim() === '' ? '> ' : `> ${line}`)).join('\n');
+    const addBlockquote = (text) => String(text ?? '').split(/\r?\n/).map(line => (line.trim() === '' ? '> ' : `> ${line}`)).join('\n');
 
     // function to get a chunking function (try external helper, fallback to defaultSplit)
     const getSplitter = async () => {
@@ -330,10 +435,13 @@ export default async function ({ client, log, msg, openai, db }, interaction) {
 
     const imagesPresent = images.length > 0;
 
+    // If there's no textual reply, we'll only send attachments (avoid sending an empty blockquote like '>')
+    const hasText = replyText && String(replyText).trim().length > 0;
+
     // Build the quoted content (for non-mock interactions). For message-originating mocks (interaction._omitBlockquote)
     // the messageCreate handler will add quoting and do 2000-char chunking, so leave text alone for mocks.
     let quoted = null;
-    if (!interaction || !interaction._omitBlockquote) {
+    if (hasText && (!interaction || !interaction._omitBlockquote)) {
       quoted = addBlockquote(replyText);
     }
 
@@ -347,10 +455,11 @@ export default async function ({ client, log, msg, openai, db }, interaction) {
 
     // If this originated from a message event (mock interaction), rely on that mock to handle chunking and quoting.
     if (interaction && interaction._omitBlockquote) {
-      // send as-is; include files if available
-      const outMsg = { content: replyText };
+      // send as-is; include files if available. If no text, send only files/urls.
+      const outMsg = {};
+      if (hasText) outMsg.content = replyText;
       if (fileAttachments.length > 0) outMsg.files = fileAttachments;
-      if (urlAttachments.length > 0) outMsg.content += '\n\n' + urlAttachments.join('\n');
+      if (urlAttachments.length > 0) outMsg.content = (outMsg.content ? outMsg.content + '\n\n' : '') + urlAttachments.join('\n');
 
       if (deferred) await interaction.editReply(outMsg);
       else await interaction.reply(outMsg);
@@ -360,36 +469,53 @@ export default async function ({ client, log, msg, openai, db }, interaction) {
     // For real interactions, ensure we split at 4000 characters per message and include blockquoting consistently.
     const MAX = 4000;
     const splitter = await getSplitter();
-    const toSendText = quoted ?? replyText;
+
     let chunks = [];
-    try {
-      chunks = splitter(toSendText, MAX);
-    } catch (e) {
-      chunks = defaultSplit(toSendText, MAX);
-    }
-
-    // Attach files/urls only to the first chunk
-    const firstMsg = { content: chunks[0] };
-    if (fileAttachments.length > 0) firstMsg.files = fileAttachments;
-    if (urlAttachments.length > 0) firstMsg.content += '\n\n' + urlAttachments.join('\n');
-
-    // send first chunk
-    if (deferred) {
-      await interaction.editReply(firstMsg);
-    } else {
-      await interaction.reply(firstMsg);
-    }
-
-    // send remaining chunks as follow-ups
-    for (let i = 1; i < chunks.length; i++) {
-      const chunkMsg = { content: chunks[i] };
+    if (hasText) {
+      const toSendText = quoted ?? replyText;
       try {
-        if (typeof interaction.followUp === 'function') await interaction.followUp(chunkMsg);
-        else if (interaction.channel && typeof interaction.channel.send === 'function') await interaction.channel.send(chunkMsg.content);
-        else if (typeof interaction.reply === 'function') await interaction.reply(chunkMsg);
+        chunks = splitter(toSendText, MAX);
       } catch (e) {
-        log.debug('failed to send follow-up chunk', { idx: i, error: e?.message || e });
+        chunks = defaultSplit(toSendText, MAX);
       }
+    } else {
+      // no text -> no chunks
+      chunks = [];
+    }
+
+    // Attach files/urls only to the first chunk (or send them alone if there are no chunks)
+    if (chunks.length > 0) {
+      const firstMsg = { content: chunks[0] };
+      if (fileAttachments.length > 0) firstMsg.files = fileAttachments;
+      if (urlAttachments.length > 0) firstMsg.content += '\n\n' + urlAttachments.join('\n');
+
+      // send first chunk
+      if (deferred) {
+        await interaction.editReply(firstMsg);
+      } else {
+        await interaction.reply(firstMsg);
+      }
+
+      // send remaining chunks as follow-ups
+      for (let i = 1; i < chunks.length; i++) {
+        const chunkMsg = { content: chunks[i] };
+        try {
+          if (typeof interaction.followUp === 'function') await interaction.followUp(chunkMsg);
+          else if (interaction.channel && typeof interaction.channel.send === 'function') await interaction.channel.send(chunkMsg.content);
+          else if (typeof interaction.reply === 'function') await interaction.reply(chunkMsg);
+        } catch (e) {
+          log.debug('failed to send follow-up chunk', { idx: i, error: e?.message || e });
+        }
+      }
+    } else {
+      // No textual chunks: send only attachments (if any) or a minimal message
+      const outMsg = {};
+      if (fileAttachments.length > 0) outMsg.files = fileAttachments;
+      if (urlAttachments.length > 0) outMsg.content = urlAttachments.join('\n');
+      if (!outMsg.files && !outMsg.content) outMsg.content = 'Sorry, I could not generate a response.';
+
+      if (deferred) await interaction.editReply(outMsg);
+      else await interaction.reply(outMsg);
     }
   } catch (err) {
     log.error('ask handler error', { error: err?.message || err, stack: err?.stack });
