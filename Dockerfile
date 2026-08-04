@@ -1,12 +1,7 @@
-FROM ubuntu:latest
-RUN apt-get update && \
-    apt-get install -y curl ca-certificates && \
-    curl -fsSL https://deb.nodesource.com/setup_22.x | bash - && \
-    apt-get install -y nodejs && \
-    apt-get clean && rm -rf /var/lib/apt/lists/*
-WORKDIR /app
-COPY package.json ./
-COPY package-lock.json ./
-RUN npm install || true
-COPY . .
+FROM node:26-bookworm-slim
+WORKDIR /opt/ask
+COPY package*.json ./
+RUN npm ci --omit=dev && npm cache clean --force
+COPY --chown=node:node . .
+USER node
 CMD ["node", "ask.mjs"]

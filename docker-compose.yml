@@ -1,0 +1,6 @@
+services:
+  ask:
+    build: .
+    image: ask:local
+    env_file: .env
+    restart: unless-stopped
