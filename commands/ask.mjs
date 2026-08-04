@@ -253,7 +253,7 @@ export default async function ({ client, log, msg, openai, db }, interaction) {
 
   try {
     const response = await openai.responses.create({
-      model: 'gpt-5.5',
+      model: 'gpt-5.6-luna',
       input,
       text: {
         format: {
