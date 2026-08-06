@@ -1,53 +1,55 @@
 {
-    "name": "@eliware/ask",
-    "type": "module",
-    "version": "1.1.4",
-    "description": "A concise Discord assistant (\"/ask\") for quick answers, web searches, and image generation — supports slash command, mention/DM fallbacks, localization, and usage tracking.",
-    "main": "ask.mjs",
-    "scripts": {
-        "start": "node ask.mjs",
-        "test": "npx --node-options=\"--experimental-vm-modules --no-warnings\" jest --detectOpenHandles --silent"
-    },
-    "repository": {
-        "type": "git",
-        "url": "git+https://github.com/eliware/ask.git"
-    },
-    "keywords": [
-        "discord",
-        "slash-command",
-        "ask",
-        "assistant",
-        "ai",
-        "openai",
-        "image-generation",
-        "web-search",
-        "localization",
-        "rate-limiting",
-        "nodejs"
-    ],
-    "author": "Eli Sterling, eliware.org <eli@eliware.org>",
-    "license": "MIT",
-    "bugs": {
-        "url": "https://github.com/eliware/ask/issues"
-    },
-    "homepage": "https://github.com/eliware/ask#readme",
-    "devDependencies": {
-        "jest": "^30.4.2",
-        "oxlint": "^1.73.0"
-    },
-    "jest": {
-        "testEnvironment": "node",
-        "testMatch": [
-            "**/?(*.)+(spec|test).[jt]s?(x)",
-            "**/?(*.)+(spec|test).mjs",
-            "**/?(*.)+(spec|test).cjs"
-        ]
-    },
-    "dependencies": {
-        "@eliware/common": "^1.1.4",
-        "@eliware/discord": "^1.1.2",
-        "@eliware/mysql": "^1.1.1",
-        "@eliware/openai": "^1.1.2",
-        "dotenv": "^17.4.2"
-    }
+  "name": "@eliware/ask",
+  "type": "module",
+  "version": "1.1.4",
+  "description": "A concise Discord assistant (\"/ask\") for quick answers, web searches, and image generation \u2014 supports slash command, mention/DM fallbacks, localization, and usage tracking.",
+  "main": "ask.mjs",
+  "scripts": {
+    "start": "node ask.mjs",
+    "test": "npx --node-options=\"--experimental-vm-modules --no-warnings\" jest --detectOpenHandles --silent --coverage",
+    "test:gaps": "npm test 2>&1 | grep '|' | grep -vF '|     100 |      100 |     100 |     100 |'",
+    "lint": "npx oxlint ."
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/eliware/ask.git"
+  },
+  "keywords": [
+    "discord",
+    "slash-command",
+    "ask",
+    "assistant",
+    "ai",
+    "openai",
+    "image-generation",
+    "web-search",
+    "localization",
+    "rate-limiting",
+    "nodejs"
+  ],
+  "author": "Eli Sterling, eliware.org <eli@eliware.org>",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/eliware/ask/issues"
+  },
+  "homepage": "https://github.com/eliware/ask#readme",
+  "devDependencies": {
+    "jest": "^30.4.2",
+    "oxlint": "^1.73.0"
+  },
+  "jest": {
+    "testEnvironment": "node",
+    "testMatch": [
+      "**/?(*.)+(spec|test).[jt]s?(x)",
+      "**/?(*.)+(spec|test).mjs",
+      "**/?(*.)+(spec|test).cjs"
+    ]
+  },
+  "dependencies": {
+    "@eliware/common": "^1.1.4",
+    "@eliware/discord": "^1.1.2",
+    "@eliware/mysql": "^1.1.1",
+    "@eliware/openai": "^1.1.2",
+    "dotenv": "^17.4.2"
+  }
 }
