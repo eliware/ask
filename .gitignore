@@ -59,4 +59,4 @@ node_modules/
 *.tar
 
 # Generic cache
-.cache
+.cache.agentx*
