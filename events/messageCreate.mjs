@@ -1,197 +1,30 @@
 import { safeSerialize } from '@eliware/common';
-// events/messageCreate.mjs
+import { createMessageInteraction } from '../src/messageInteraction.mjs';
+
 export default async function ({ client, log, msg, commandHandlers, ...contextData }, message) {
-    log.debug('messageCreate', { id: message.id });
-    // ignore messages from other bots to avoid loops
-    if (message.author?.bot) return;
+  log.debug('messageCreate', { id: message.id });
+  if (message.author?.bot) return;
+  const locale = message.guild?.preferredLocale || 'en-US';
+  const localeMsg = (key, defaultMsg) => msg(locale, key, defaultMsg, log);
+  if (message.content === '!help') { const response = localeMsg('help', 'This is the help text.'); await message.reply(response); log.debug('!help Response', { response }); return; }
 
-    const locale = message.guild?.preferredLocale || 'en-US';
+  const isDirect = !message.guild;
+  const isMentioned = message.mentions?.has?.(client.user) || false;
+  let isReplyToBot = false;
+  try {
+    const referenceId = message.reference?.messageId || message.reference?.message?.id;
+    if (referenceId) { const referencePromise = message.fetchReference ? message.fetchReference() : (message.channel?.messages?.fetch ? message.channel.messages.fetch(referenceId) : null); const reference = await Promise.resolve(referencePromise).catch(() => null); isReplyToBot = reference?.author?.id === client.user?.id; }
+  } catch (error) { log.debug('failed to resolve referenced message', { error: safeSerialize(error) }); }
+  if (!isDirect && !isMentioned && !isReplyToBot) return;
 
-    // Helper to produce localized msg function for handlers
-    const localeMsg = (key, defaultMsg) => msg(locale, key, defaultMsg, log);
-
-    // Simple !help fallback
-    if (message.content === '!help') {
-        const response = localeMsg('help', 'This is the help text.');
-        await message.reply(response);
-        log.debug('!help Response', { response });
-        return;
-    }
-
-    // Determine whether to handle this message as an implicit /ask invocation
-    const isDirect = !message.guild; // DMs have no guild
-    const isMentioned = message.mentions?.has?.(client.user) || false;
-    // Also respond if this message is a reply to a message from the bot
-    let isReplyToBot = false;
-    try {
-        if (message.reference && (message.reference.messageId || message.reference.message?.id)) {
-            // message.fetchReference() will retrieve the referenced message when available
-            const ref = await (message.fetchReference ? message.fetchReference() : (message.channel?.messages?.fetch ? message.channel.messages.fetch(message.reference.messageId || message.reference.message?.id) : null)).catch(() => null);
-            if (ref && ref.author && ref.author.id === client.user?.id) isReplyToBot = true;
-        }
-    } catch (e) {
-        log.debug('failed to resolve referenced message', { error: safeSerialize(e) });
-    }
-    if (!isDirect && !isMentioned && !isReplyToBot) return;
-
-    // Build the text to send to the ask handler: remove the mention if present
-    let text = message.content || '';
-    if (isMentioned) {
-        // strip bot mention tokens like <@id> or <@!id>
-        const mentionRegex = new RegExp(`<@!?\\${client.user.id}>`, 'g');
-        text = text.replace(mentionRegex, '').trim();
-    }
-
-    // If no text remains (e.g., user only mentioned the bot), show a short prompt
-    if (!text) text = 'Hello!';
-
-    // Create a lightweight mock interaction that our command handler understands
-    const interaction = {
-        commandName: 'ask',
-        locale,
-        client,
-        guild: message.guild || undefined,
-        guildId: message.guild?.id || null,
-        channelId: message.channel?.id || null,
-        channel: message.channel,
-        user: message.author,
-        member: message.member || null,
-        data: { options: [{ value: text }] },
-        options: { getString: (_name) => text },
-        deferReply: async () => {
-            // indicate thinking in channel (non-blocking)
-            try {
-                // send an immediate typing indicator if possible
-                await message.channel?.sendTyping?.();
-            } catch { /* ignore */ }
-
-            // If sendTyping is supported, keep resending it every 8 seconds to keep indicator alive
-            try {
-                if (message.channel?.sendTyping && !interaction._typingInterval) {
-                    // setInterval returns a Timer object; store it so we can clear later
-                    interaction._typingInterval = setInterval(() => {
-                        try { message.channel.sendTyping?.(); } catch { /* ignore */ }
-                    }, 8000);
-                }
-            } catch { /* ignore */ }
-            return;
-        },
-        reply: async (resp) => {
-            try {
-                // stop any typing interval when we are about to reply
-                try { if (interaction._typingInterval) { clearInterval(interaction._typingInterval); interaction._typingInterval = null; } } catch {}
-
-                const content = resp?.content ?? resp;
-                const files = resp?.files ?? null;
-                // if ephemeral flag present, DM the author when possible
-                const flags = resp?.flags ?? 0;
-
-                // prepare text
-                let textOut = typeof content === 'string' ? content : JSON.stringify(content);
-                // add per-line blockquote formatting so message-originated replies match /ask behavior
-                const addBlockquote = (t) => t.split(/\r?\n/).map(line => (line.trim() === '' ? '> ' : `> ${line}`)).join('\n');
-                textOut = addBlockquote(textOut);
-
-                // split into 2000-char chunks (Discord message limit for normal messages)
-                const MAX = 2000;
-                let splitFn = null;
-                try { const mod = await import('@eliware/discord').catch(() => null); if (mod && typeof mod.splitMsg === 'function') splitFn = (t, m) => mod.splitMsg(t, m); } catch {}
-                if (!splitFn) splitFn = (t, m) => { const out=[]; for (let i=0;i<t.length;i+=m) out.push(t.slice(i,i+m)); return out; };
-                const chunks = splitFn(textOut, MAX);
-
-                if (flags & (1 << 6)) {
-                    // ephemeral -> DM the author
-                    try {
-                        if (files && files.length) {
-                            // send first chunk with files, remaining as separate messages
-                            await message.author.send({ content: chunks[0], files });
-                            for (let i = 1; i < chunks.length; i++) await message.author.send(chunks[i]);
-                            return;
-                        }
-                        for (const c of chunks) await message.author.send(c);
-                        return;
-                    } catch { /* fallback below */ }
-                }
-
-                // Not ephemeral: reply in-channel. Attach files only to first chunk if present.
-                if (files && files.length) {
-                    await message.reply({ content: chunks[0], files });
-                } else {
-                    await message.reply(chunks[0]);
-                }
-                for (let i = 1; i < chunks.length; i++) await message.reply(chunks[i]);
-                return;
-            } catch (e) {
-                log.error('mock interaction.reply failed', { error: safeSerialize(e) });
-            }
-        },
-        editReply: async (resp) => {
-            try {
-                // stop any typing interval when editing/replying
-                try { if (interaction._typingInterval) { clearInterval(interaction._typingInterval); interaction._typingInterval = null; } } catch {}
-
-                let content = resp?.content ?? resp;
-                const files = resp?.files ?? null;
-                // editReply not available on Message; send a follow-up instead
-                if (files && files.length) return await message.reply({ content: typeof content === 'string' ? content : JSON.stringify(content), files });
-                if (typeof content !== 'string') content = JSON.stringify(content, null, 2);
-
-                // add per-line blockquote formatting
-                const addBlockquote = (t) => t.split(/\r?\n/).map(line => (line.trim() === '' ? '> ' : `> ${line}`)).join('\n');
-                content = addBlockquote(content);
-
-                const MAX = 2000;
-                let splitMsgFn = null;
-                try { splitMsgFn = (await import('@eliware/discord')).splitMsg; } catch { /* fallback below */ }
-                if (typeof splitMsgFn !== 'function') {
-                    // fallback simple chunking
-                    const chunks = [];
-                    for (let i = 0; i < content.length; i += MAX) chunks.push(content.slice(i, i + MAX));
-                    for (const c of chunks) await message.reply(c);
-                    return;
-                }
-                const chunks = splitMsgFn(content, MAX);
-                for (const c of chunks) await message.reply(c);
-                return;
-            } catch (e) {
-                log.error('mock interaction.editReply failed', { error: safeSerialize(e) });
-            }
-        },
-    };
-    // mark that this mock interaction originates from a message event so the handler
-    // can avoid double-quoting when replying in-channel
-    interaction._omitBlockquote = true;
-
-    // Call the ask command handler if available. If the framework didn't provide commandHandlers
-    // (some event contexts may not include them), dynamically import the command module as a fallback.
-    try {
-        let handler = commandHandlers?.ask;
-        if (!handler) {
-            try {
-                // dynamic import relative to events directory
-                const mod = await import('../commands/ask.mjs');
-                handler = mod?.default || null;
-            } catch (err) {
-                log.debug('failed to dynamically import ask command', { error: safeSerialize(err) });
-            }
-        }
-
-        if (handler) {
-            try {
-                await handler({ client, log, msg: localeMsg, ...contextData }, interaction);
-            } finally {
-                // ensure we clear any typing interval left behind if the handler didn't already clear it
-                try { if (interaction._typingInterval) { clearInterval(interaction._typingInterval); interaction._typingInterval = null; } } catch {}
-            }
-        } else {
-            // fallback: reply with short help (ephemeral)
-            // clear any typing interval before sending fallback
-            try { if (interaction._typingInterval) { clearInterval(interaction._typingInterval); interaction._typingInterval = null; } } catch {}
-            await interaction.reply({ content: localeMsg('help', 'Try /ask <anything>.'), flags: 1 << 6 });
-        }
-    } catch (e) {
-        log.error('messageCreate handler invocation failed', { error: safeSerialize(e), stack: e?.stack });
-        // make sure typing is cleared on error
-        try { if (interaction._typingInterval) { clearInterval(interaction._typingInterval); interaction._typingInterval = null; } } catch {}
-    }
+  const mentionPattern = new RegExp(`<@!?\\${client.user.id}>`, 'g');
+  const text = (message.content || '').replace(isMentioned ? mentionPattern : /$^/, '').trim() || 'Hello!';
+  const interaction = createMessageInteraction({ client, message, locale, text, log });
+  try {
+    let handler = commandHandlers?.ask;
+    if (!handler) handler = (await import('../commands/ask.mjs')).default;
+    if (handler) await handler({ client, log, msg: localeMsg, ...contextData }, interaction);
+    else await interaction.reply({ content: localeMsg('help', 'Try /ask <anything>.'), flags: 1 << 6 });
+  } catch (error) { log.error('messageCreate handler invocation failed', { error: safeSerialize(error), stack: error?.stack }); }
+  finally { interaction.stopTyping(); }
 }
