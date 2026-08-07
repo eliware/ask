@@ -52,8 +52,8 @@ describe('Command definitions (.json) are valid and follow Discord command schem
         }
       });
       if (parsed.options) {
-        for (const [i, opt] of parsed.options.entries()) {
-          test(`${file} option[${i}] has valid name and localizations`, () => {
+        for (const [_i, opt] of parsed.options.entries()) {
+          test(`${file} option[${_i}] has valid name and localizations`, () => {
             expect(opt.name_localizations).toBeDefined();
             expect(opt.description_localizations).toBeDefined();
             expect(chatInputRegex.test(opt.name)).toBe(true);
@@ -90,7 +90,7 @@ describe('Command definitions (.json) are valid and follow Discord command schem
           expect(parsed.name_localizations[key].length).toBeLessThanOrEqual(32);
         }
         if (parsed.options) {
-          for (const [i, opt] of parsed.options.entries()) {
+          for (const [_i, opt] of parsed.options.entries()) {
             expect(typeof opt.name).toBe('string');
             expect(opt.name.length).toBeGreaterThanOrEqual(1);
             expect(opt.name.length).toBeLessThanOrEqual(32);

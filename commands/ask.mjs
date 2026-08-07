@@ -1,98 +1,9 @@
+import { safeSerialize } from '@eliware/common';
+import sanitizeForLog from '../src/sanitizeForLog.mjs';
+import { parseResponse } from '../src/responseParsing.mjs';
+import { addBlockquote, defaultSplit, safetyMessage } from '../src/formatResponse.mjs';
+
 // commands/ask.mjs
-import fs from 'fs';
-
-function decodeBase64Image(b64) {
-  try {
-    return Buffer.from(b64, 'base64');
-  } catch (e) {
-    return null;
-  }
-}
-
-/**
- * Robust sanitizer for logging arbitrary response objects.
- * - Truncates long strings
- * - Redacts likely base64/binary fields
- * - Limits array lengths and object entry counts
- * - Handles circular references
- */
-function sanitizeForLog(obj, seen = new WeakSet(), depth = 0, opts = {}) {
-  const {
-    maxDepth = 5,
-    maxString = 1000,
-    maxArray = 100,
-    maxEntries = 200,
-    redactPatterns = ['b64', 'base64', 'b64_json', 'result', 'image', 'data', 'raw', 'buffer', 'blob']
-  } = opts || {};
-
-  if (depth > maxDepth) return '<<max-depth>>';
-  if (obj === null || obj === undefined) return obj;
-
-  // Primitives
-  if (typeof obj === 'string') {
-    // if string appears binary-ish (many non-printable chars) show length only
-    const nonPrintable = obj.replace(/[\x20-\x7E\n\r\t]/g, '').length;
-    if (obj.length > maxString || nonPrintable > Math.min(100, obj.length / 10)) {
-      return `<<string length=${obj.length} truncated, nonprintable=${nonPrintable}>>`;
-    }
-    return obj;
-  }
-  if (typeof obj === 'number' || typeof obj === 'boolean') return obj;
-  if (Buffer.isBuffer(obj)) return `[Buffer length=${obj.length}]`;
-  if (Array.isArray(obj)) {
-    if (seen.has(obj)) return '<<circular>>';
-    seen.add(obj);
-    const out = [];
-    const limit = Math.min(obj.length, maxArray);
-    for (let i = 0; i < limit; i++) {
-      try {
-        out.push(sanitizeForLog(obj[i], seen, depth + 1, opts));
-      } catch (e) {
-        out.push(`<<error serializing index ${i}: ${String(e)}>>`);
-      }
-    }
-    if (obj.length > maxArray) out.push(`<<${obj.length - maxArray} more items...>>`);
-    return out;
-  }
-  if (typeof obj === 'object') {
-    if (seen.has(obj)) return '<<circular>>';
-    seen.add(obj);
-    const out = {};
-    let count = 0;
-    for (const [k, v] of Object.entries(obj)) {
-      if (++count > maxEntries) {
-        out.__more = `<<truncated, more than ${maxEntries} keys>>`;
-        break;
-      }
-
-      const keyLower = String(k).toLowerCase();
-      try {
-        // redact likely binary/base64 fields
-        if (typeof v === 'string' && redactPatterns.some(p => keyLower.includes(p))) {
-          out[k] = `<<redacted ${keyLower} length=${v.length}>>`;
-          continue;
-        }
-        // if the value itself is very large string, truncate
-        if (typeof v === 'string' && v.length > maxString) {
-          out[k] = `${v.slice(0, Math.min(200, maxString))}...[truncated length=${v.length}]`;
-          continue;
-        }
-
-        out[k] = sanitizeForLog(v, seen, depth + 1, opts);
-      } catch (e) {
-        out[k] = `<<error serializing: ${String(e)}>>`;
-      }
-    }
-    return out;
-  }
-  return String(obj);
-}
-
-function defaultSplit(text, max) {
-  const out = [];
-  for (let i = 0; i < text.length; i += max) out.push(text.slice(i, i + max));
-  return out;
-}
 
 export default async function ({ client, log, msg, openai, db }, interaction) {
   log.debug('ask Request', { interaction });
@@ -123,7 +34,7 @@ export default async function ({ client, log, msg, openai, db }, interaction) {
           if (!guildName && ch.guild) guildName = ch.guild.name || null;
         }
       } catch (e) {
-        log.debug('failed to fetch channel', { channelId, error: e?.message || e });
+        log.debug('failed to fetch channel', { channelId, error: safeSerialize(e) });
       }
     }
     if (!guildName && client && guildId) {
@@ -131,11 +42,11 @@ export default async function ({ client, log, msg, openai, db }, interaction) {
         const g = await client.guilds.fetch(guildId).catch(() => null);
         if (g) guildName = g.name || null;
       } catch (e) {
-        log.debug('failed to fetch guild', { guildId, error: e?.message || e });
+        log.debug('failed to fetch guild', { guildId, error: safeSerialize(e) });
       }
     }
   } catch (e) {
-    log.debug('enriching names failed', { error: e?.message || e });
+    log.debug('enriching names failed', { error: safeSerialize(e) });
   }
 
   // Rate limits
@@ -179,7 +90,7 @@ export default async function ({ client, log, msg, openai, db }, interaction) {
       }
     }
   } catch (e) {
-    log.error('Failed to check rate limits', { error: e?.message || e });
+    log.error('Failed to check rate limits', { error: safeSerialize(e) });
   }
 
   // Insert pre-call usage record
@@ -193,7 +104,7 @@ export default async function ({ client, log, msg, openai, db }, interaction) {
       log.debug('Inserted usage pre-record', { usageId, channelName, guildName });
     }
   } catch (e) {
-    log.error('Failed to insert pre-call usage record', { error: e?.message || e });
+    log.error('Failed to insert pre-call usage record', { error: safeSerialize(e) });
   }
 
   // Defer reply
@@ -202,7 +113,7 @@ export default async function ({ client, log, msg, openai, db }, interaction) {
     await interaction.deferReply();
     deferred = true;
   } catch (e) {
-    log.debug('deferReply failed', { error: e?.message || e });
+    log.debug('deferReply failed', { error: safeSerialize(e) });
   }
 
   // System prompt
@@ -237,13 +148,13 @@ export default async function ({ client, log, msg, openai, db }, interaction) {
           // Determine role: messages from the bot are assistant, others are user
           const role = (m.author && client && m.author.id === client.user?.id) ? 'assistant' : 'user';
           input.push({ role, content: [{ type: role === 'assistant' ? 'output_text' : 'input_text', text }] });
-        } catch (e) {
+        } catch {
           // ignore individual message parse errors
         }
       }
     }
   } catch (e) {
-    log.debug('Failed to fetch/attach channel history', { error: e?.message || e });
+    log.debug('Failed to fetch/attach channel history', { error: safeSerialize(e) });
   }
 
   // finally add the user's current prompt as the last message
@@ -293,64 +204,9 @@ export default async function ({ client, log, msg, openai, db }, interaction) {
 
     const responseMs = Date.now() - startTs;
 
-    // parse outputs (robust)
-    let replyText = '';
-    const images = [];
-
-    // normalize outputs into an array (supports response.output as object map or array)
-    let outputsArr = [];
-    if (Array.isArray(response?.outputs)) outputsArr = response.outputs;
-    else if (Array.isArray(response?.output)) outputsArr = response.output;
-    else if (response?.outputs && typeof response.outputs === 'object') outputsArr = Object.values(response.outputs);
-    else if (response?.output && typeof response.output === 'object') outputsArr = Object.values(response.output);
-    else outputsArr = [];
-
-    for (const out of outputsArr) {
-      try {
-        // top-level image-generation result (older shape)
-        if (out && (out.type === 'image_generation_call' || (out.id && String(out.id).startsWith('ig_'))) && typeof out.result === 'string') {
-          const buf = decodeBase64Image(out.result);
-          if (buf) images.push({ buffer: buf, filename: `image_${out.id || Date.now()}.png`, mime: 'image/png', description: out.revised_prompt || null });
-          continue;
-        }
-
-        // normalize contents: out.content, out.data, or the out itself when string
-        let contents = [];
-        if (Array.isArray(out?.content)) contents = out.content;
-        else if (out?.content && typeof out.content === 'object') contents = Object.values(out.content);
-        else if (typeof out?.content === 'string') contents = [out.content];
-        else if (Array.isArray(out?.data)) contents = out.data;
-        else if (out?.data && typeof out.data === 'object') contents = Object.values(out.data);
-        else if (typeof out === 'string') contents = [out];
-
-        for (const c of contents) {
-          // extract text only if it's a string
-          let text = null;
-          if (typeof c === 'string') text = c;
-          else if (typeof c?.text === 'string') text = c.text;
-          else if (typeof c?.output_text === 'string') text = c.output_text;
-          else if (typeof c?.content === 'string') text = c.content;
-
-          if (text) replyText += (replyText ? '\n' : '') + text;
-
-          // image cases: base64 in common keys or image.url
-          const b64 = c?.b64_json || c?.base64 || c?.image?.b64 || c?.image?.b64_json || c?.image?.base64;
-          if (typeof b64 === 'string' && b64.length > 0) {
-            const buf = decodeBase64Image(b64);
-            if (buf) images.push({ buffer: buf, filename: c?.filename || 'image.png', mime: c?.mime || 'image/png', description: c?.description || null });
-            continue;
-          }
-          const url = c?.image?.url || c?.url || c?.src || c?.href;
-          if (typeof url === 'string' && url) images.push({ url, filename: c?.filename || 'image.png', description: c?.description || null });
-        }
-      } catch (e) {
-        log.debug('output parse item failed', { err: e?.message || e, out: sanitizeForLog(out) });
-      }
-    }
-
-    if (!replyText && typeof response?.output_text === 'string') replyText = response.output_text;
-    if (!replyText && typeof response?.text === 'string') replyText = response.text;
-    if (!replyText) replyText = '';
+    // Parse response into text and attachments.
+    const { replyText: parsedReplyText, images } = parseResponse(response);
+    replyText = parsedReplyText;
 
     // persist images
     if (db && usageId && images.length > 0) {
@@ -364,7 +220,7 @@ export default async function ({ client, log, msg, openai, db }, interaction) {
           }
         }
       } catch (e) {
-        log.error('Failed to write images to usage_images', { error: e?.message || e });
+        log.error('Failed to write images to usage_images', { error: safeSerialize(e) });
       }
     }
 
@@ -394,7 +250,7 @@ export default async function ({ client, log, msg, openai, db }, interaction) {
         }
 
         let responseMeta = null;
-        try { responseMeta = JSON.stringify(sanitizeForLog(response)); } catch (e) { responseMeta = null; }
+        try { responseMeta = JSON.stringify(sanitizeForLog(response)); } catch { responseMeta = null; }
 
         // Log param sizes/types to help diagnose DB binding errors (kept minimal)
         try {
@@ -410,30 +266,25 @@ export default async function ({ client, log, msg, openai, db }, interaction) {
             replyTextLength: replyText ? replyText.length : 0,
             imagesCount: images.length
           });
-        } catch (e) {}
+        } catch {}
 
         // Truncate large meta if necessary
         const safeMeta = responseMeta && responseMeta.length > 200000 ? responseMeta.slice(0, 200000) + '...[truncated]' : responseMeta;
 
         await db.execute(`UPDATE \`usage\` SET response_text = ?, model = ?, model_full = ?, tokens_used = ?, input_tokens = ?, output_tokens = ?, total_tokens = ?, response_ms = ?, completed_at = ?, safety_violations = ?, error_flag = 0, request_id = ?, response_meta = ?, response_status = ?, service_tier = ? WHERE id = ?`, [replyText, modelFull ? modelFull.split('-')[0] : modelFull, modelFull, totalTokens, inputTokens, outputTokens, totalTokens, responseMs, completedAtSql, safetyCombined.join(','), responseId, safeMeta, responseStatus, serviceTier, usageId]);
       } catch (e) {
-        log.error('Failed to update usage record after success', { error: e?.message || e });
+        log.error('Failed to update usage record after success', { error: safeSerialize(e) });
       }
     }
 
-    // prepare blockquote formatting (unless caller wants to omit it)
-    const addBlockquote = (text) => String(text ?? '').split(/\r?\n/).map(line => (line.trim() === '' ? '> ' : `> ${line}`)).join('\n');
-
-    // function to get a chunking function (try external helper, fallback to defaultSplit)
+    // Format and deliver the response.
     const getSplitter = async () => {
       try {
         const mod = await import('@eliware/discord').catch(() => null);
-        if (mod && typeof mod.splitMsg === 'function') return (t, m) => mod.splitMsg(t, m);
-      } catch (e) {}
+        if (mod && typeof mod.splitMsg === 'function') return (text, max) => mod.splitMsg(text, max);
+      } catch {}
       return defaultSplit;
     };
-
-    const imagesPresent = images.length > 0;
 
     // If there's no textual reply, we'll only send attachments (avoid sending an empty blockquote like '>')
     const hasText = replyText && String(replyText).trim().length > 0;
@@ -475,7 +326,7 @@ export default async function ({ client, log, msg, openai, db }, interaction) {
       const toSendText = quoted ?? replyText;
       try {
         chunks = splitter(toSendText, MAX);
-      } catch (e) {
+      } catch {
         chunks = defaultSplit(toSendText, MAX);
       }
     } else {
@@ -503,8 +354,8 @@ export default async function ({ client, log, msg, openai, db }, interaction) {
           if (typeof interaction.followUp === 'function') await interaction.followUp(chunkMsg);
           else if (interaction.channel && typeof interaction.channel.send === 'function') await interaction.channel.send(chunkMsg.content);
           else if (typeof interaction.reply === 'function') await interaction.reply(chunkMsg);
-        } catch (e) {
-          log.debug('failed to send follow-up chunk', { idx: i, error: e?.message || e });
+        } catch {
+          log.debug('failed to send follow-up chunk', { idx: i, error: safeSerialize(e) });
         }
       }
     } else {
@@ -518,7 +369,7 @@ export default async function ({ client, log, msg, openai, db }, interaction) {
       else await interaction.reply(outMsg);
     }
   } catch (err) {
-    log.error('ask handler error', { error: err?.message || err, stack: err?.stack });
+    log.error('ask handler error', { error: safeSerialize(err), stack: err?.stack });
 
     // extract safety
     let violations = [];
@@ -529,9 +380,9 @@ export default async function ({ client, log, msg, openai, db }, interaction) {
         const safetyMatch = m.match(/safety_violations=\[([^\]]+)\]/i);
         if (safetyMatch && safetyMatch[1]) violations = safetyMatch[1].split(',').map(s => s.trim()).filter(Boolean);
       }
-    } catch (e) {}
+    } catch {}
 
-    const userMessage = violations.length > 0 ? `I can't assist with that request because it appears to violate content policy (${violations.join(', ')}). Please try a different request or rephrase.` : `I can't assist with that request because it appears to violate content policy. Please try a different request or rephrase.`;
+    const userMessage = safetyMessage(violations);
     const quotedError = (interaction && interaction._omitBlockquote)
       ? userMessage
       : userMessage.split(/\r?\n/).map(line => (line.trim() === '' ? '> ' : `> ${line}`)).join('\n');
@@ -541,7 +392,7 @@ export default async function ({ client, log, msg, openai, db }, interaction) {
         const errMeta = JSON.stringify(sanitizeForLog(err));
         await db.execute('UPDATE `usage` SET response_text = ?, safety_violations = ?, error_flag = 1, response_meta = ? WHERE id = ?', [userMessage, violations.join(','), errMeta, usageId]);
       } catch (e) {
-        log.error('Failed to update usage record after error', { error: e?.message || e });
+        log.error('Failed to update usage record after error', { error: safeSerialize(e) });
       }
     }
 
@@ -549,7 +400,7 @@ export default async function ({ client, log, msg, openai, db }, interaction) {
       if (deferred) await interaction.editReply({ content: quotedError, flags: 1 << 6 });
       else await interaction.reply({ content: quotedError, flags: 1 << 6 });
     } catch (e) {
-      log.error('failed to send error response', { error: e?.message || e });
+      log.error('failed to send error response', { error: safeSerialize(e) });
     }
   }
 }

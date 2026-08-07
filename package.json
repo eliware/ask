@@ -8,7 +8,8 @@
     "start": "node ask.mjs",
     "test": "npx --node-options=\"--experimental-vm-modules --no-warnings\" jest --detectOpenHandles --silent --coverage",
     "test:gaps": "npm test 2>&1 | grep '|' | grep -vF '|     100 |      100 |     100 |     100 |'",
-    "lint": "npx oxlint ."
+    "lint": "npx oxlint .",
+    "pack": "npm pack --dry-run"
   },
   "repository": {
     "type": "git",
@@ -46,10 +47,10 @@
     ]
   },
   "dependencies": {
-    "@eliware/common": "^1.1.4",
-    "@eliware/discord": "^1.1.2",
-    "@eliware/mysql": "^1.1.1",
-    "@eliware/openai": "^1.1.2",
+    "@eliware/common": "^1.1.7",
+    "@eliware/discord": "^1.1.4",
+    "@eliware/mysql": "^1.1.4",
+    "@eliware/openai": "^1.1.11",
     "dotenv": "^17.4.2"
   }
 }

@@ -1,3 +1,4 @@
+import { safeSerialize } from '@eliware/common';
 // events/messageCreate.mjs
 export default async function ({ client, log, msg, commandHandlers, ...contextData }, message) {
     log.debug('messageCreate', { id: message.id });
@@ -29,7 +30,7 @@ export default async function ({ client, log, msg, commandHandlers, ...contextDa
             if (ref && ref.author && ref.author.id === client.user?.id) isReplyToBot = true;
         }
     } catch (e) {
-        log.debug('failed to resolve referenced message', { error: e?.message || e });
+        log.debug('failed to resolve referenced message', { error: safeSerialize(e) });
     }
     if (!isDirect && !isMentioned && !isReplyToBot) return;
 
@@ -56,29 +57,29 @@ export default async function ({ client, log, msg, commandHandlers, ...contextDa
         user: message.author,
         member: message.member || null,
         data: { options: [{ value: text }] },
-        options: { getString: (name) => text },
+        options: { getString: (_name) => text },
         deferReply: async () => {
             // indicate thinking in channel (non-blocking)
             try {
                 // send an immediate typing indicator if possible
                 await message.channel?.sendTyping?.();
-            } catch (e) { /* ignore */ }
+            } catch { /* ignore */ }
 
             // If sendTyping is supported, keep resending it every 8 seconds to keep indicator alive
             try {
                 if (message.channel?.sendTyping && !interaction._typingInterval) {
                     // setInterval returns a Timer object; store it so we can clear later
                     interaction._typingInterval = setInterval(() => {
-                        try { message.channel.sendTyping?.(); } catch (_) { /* ignore */ }
+                        try { message.channel.sendTyping?.(); } catch { /* ignore */ }
                     }, 8000);
                 }
-            } catch (e) { /* ignore */ }
+            } catch { /* ignore */ }
             return;
         },
         reply: async (resp) => {
             try {
                 // stop any typing interval when we are about to reply
-                try { if (interaction._typingInterval) { clearInterval(interaction._typingInterval); interaction._typingInterval = null; } } catch (_) {}
+                try { if (interaction._typingInterval) { clearInterval(interaction._typingInterval); interaction._typingInterval = null; } } catch {}
 
                 const content = resp?.content ?? resp;
                 const files = resp?.files ?? null;
@@ -94,7 +95,7 @@ export default async function ({ client, log, msg, commandHandlers, ...contextDa
                 // split into 2000-char chunks (Discord message limit for normal messages)
                 const MAX = 2000;
                 let splitFn = null;
-                try { const mod = await import('@eliware/discord').catch(() => null); if (mod && typeof mod.splitMsg === 'function') splitFn = (t, m) => mod.splitMsg(t, m); } catch (e) {}
+                try { const mod = await import('@eliware/discord').catch(() => null); if (mod && typeof mod.splitMsg === 'function') splitFn = (t, m) => mod.splitMsg(t, m); } catch {}
                 if (!splitFn) splitFn = (t, m) => { const out=[]; for (let i=0;i<t.length;i+=m) out.push(t.slice(i,i+m)); return out; };
                 const chunks = splitFn(textOut, MAX);
 
@@ -109,7 +110,7 @@ export default async function ({ client, log, msg, commandHandlers, ...contextDa
                         }
                         for (const c of chunks) await message.author.send(c);
                         return;
-                    } catch (_) { /* fallback below */ }
+                    } catch { /* fallback below */ }
                 }
 
                 // Not ephemeral: reply in-channel. Attach files only to first chunk if present.
@@ -121,13 +122,13 @@ export default async function ({ client, log, msg, commandHandlers, ...contextDa
                 for (let i = 1; i < chunks.length; i++) await message.reply(chunks[i]);
                 return;
             } catch (e) {
-                log.error('mock interaction.reply failed', { error: e?.message || e });
+                log.error('mock interaction.reply failed', { error: safeSerialize(e) });
             }
         },
         editReply: async (resp) => {
             try {
                 // stop any typing interval when editing/replying
-                try { if (interaction._typingInterval) { clearInterval(interaction._typingInterval); interaction._typingInterval = null; } } catch (_) {}
+                try { if (interaction._typingInterval) { clearInterval(interaction._typingInterval); interaction._typingInterval = null; } } catch {}
 
                 let content = resp?.content ?? resp;
                 const files = resp?.files ?? null;
@@ -141,7 +142,7 @@ export default async function ({ client, log, msg, commandHandlers, ...contextDa
 
                 const MAX = 2000;
                 let splitMsgFn = null;
-                try { splitMsgFn = (await import('@eliware/discord')).splitMsg; } catch (err) { /* fallback below */ }
+                try { splitMsgFn = (await import('@eliware/discord')).splitMsg; } catch { /* fallback below */ }
                 if (typeof splitMsgFn !== 'function') {
                     // fallback simple chunking
                     const chunks = [];
@@ -153,7 +154,7 @@ export default async function ({ client, log, msg, commandHandlers, ...contextDa
                 for (const c of chunks) await message.reply(c);
                 return;
             } catch (e) {
-                log.error('mock interaction.editReply failed', { error: e?.message || e });
+                log.error('mock interaction.editReply failed', { error: safeSerialize(e) });
             }
         },
     };
@@ -171,7 +172,7 @@ export default async function ({ client, log, msg, commandHandlers, ...contextDa
                 const mod = await import('../commands/ask.mjs');
                 handler = mod?.default || null;
             } catch (err) {
-                log.debug('failed to dynamically import ask command', { error: err?.message || err });
+                log.debug('failed to dynamically import ask command', { error: safeSerialize(err) });
             }
         }
 
@@ -180,17 +181,17 @@ export default async function ({ client, log, msg, commandHandlers, ...contextDa
                 await handler({ client, log, msg: localeMsg, ...contextData }, interaction);
             } finally {
                 // ensure we clear any typing interval left behind if the handler didn't already clear it
-                try { if (interaction._typingInterval) { clearInterval(interaction._typingInterval); interaction._typingInterval = null; } } catch (_) {}
+                try { if (interaction._typingInterval) { clearInterval(interaction._typingInterval); interaction._typingInterval = null; } } catch {}
             }
         } else {
             // fallback: reply with short help (ephemeral)
             // clear any typing interval before sending fallback
-            try { if (interaction._typingInterval) { clearInterval(interaction._typingInterval); interaction._typingInterval = null; } } catch (_) {}
+            try { if (interaction._typingInterval) { clearInterval(interaction._typingInterval); interaction._typingInterval = null; } } catch {}
             await interaction.reply({ content: localeMsg('help', 'Try /ask <anything>.'), flags: 1 << 6 });
         }
     } catch (e) {
-        log.error('messageCreate handler invocation failed', { error: e?.message || e, stack: e?.stack });
+        log.error('messageCreate handler invocation failed', { error: safeSerialize(e), stack: e?.stack });
         // make sure typing is cleared on error
-        try { if (interaction._typingInterval) { clearInterval(interaction._typingInterval); interaction._typingInterval = null; } } catch (_) {}
+        try { if (interaction._typingInterval) { clearInterval(interaction._typingInterval); interaction._typingInterval = null; } } catch {}
     }
 }

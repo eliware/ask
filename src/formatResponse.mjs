@@ -1,0 +1,3 @@
+export function addBlockquote(text) { return String(text ?? '').split(/\r?\n/).map(line => line.trim() === '' ? '> ' : `> ${line}`).join('\n'); }
+export function defaultSplit(text, max) { const out = []; for (let i = 0; i < text.length; i += max) out.push(text.slice(i, i + max)); return out; }
+export function safetyMessage(violations = []) { return violations.length ? `I can't assist with that request because it appears to violate content policy (${violations.join(', ')}). Please try a different request or rephrase.` : `I can't assist with that request because it appears to violate content policy. Please try a different request or rephrase.`; }
