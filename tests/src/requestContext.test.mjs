@@ -1,0 +1,2 @@
+import { getRequestContext } from '../../src/requestContext.mjs';
+test('builds request context', async () => { const context = await getRequestContext({ client: null, interaction: { locale: 'en-US', options: { getString: () => 'hi' }, user: { id: 'u' }, channel: { id: 'c' }, guild: { id: 'g' } }, log: { debug() {} } }); expect(context).toMatchObject({ query: 'hi', userId: 'u', channelId: 'c', guildId: 'g' }); });
