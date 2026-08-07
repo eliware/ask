@@ -60,3 +60,14 @@ test('logs reply and edit failures', async () => {
   await interaction.editReply('bad');
   expect(logger.error).toHaveBeenCalledTimes(2);
 });
+
+test('falls back to default splitting when discord splitter is unavailable', async () => {
+  jest.resetModules();
+  jest.unstable_mockModule('@eliware/discord', () => ({}));
+  const { createMessageInteraction: createFallbackInteraction } = await import('../../src/messageInteraction.mjs');
+  const replies = [];
+  const message = { author: {}, reply: async value => replies.push(value) };
+  const interaction = createFallbackInteraction({ client: {}, message, locale: 'en', text: 'x', log: log() });
+  await interaction.editReply('y'.repeat(2100));
+  expect(replies).toHaveLength(2);
+});
