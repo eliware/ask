@@ -85,3 +85,27 @@ test('continues when client or channel fetch rejects', async () => {
   });
   expect(input).toHaveLength(2);
 });
+
+test('handles fetch results without iterable history and missing channel API', async () => {
+  const noHistory = await buildConversationInput({
+    interaction: { channel: { messages: { fetch: jest.fn(async () => ({})) } } },
+    query: 'q', locale: 'en', log,
+  });
+  expect(noHistory).toHaveLength(2);
+
+  const noChannelApi = await buildConversationInput({
+    interaction: {}, client: { channels: {} }, channelId: 'channel', query: 'q2', locale: 'en', log,
+  });
+  expect(noChannelApi).toHaveLength(2);
+});
+
+test('falls back when interaction fetch returns null and client channel has no fetcher', async () => {
+  const channelFetch = jest.fn(async () => ({}));
+  const input = await buildConversationInput({
+    interaction: { channel: { messages: { fetch: jest.fn(async () => null) } } },
+    client: { channels: { fetch: jest.fn(async () => ({ messages: { fetch: channelFetch } })) } },
+    channelId: 'channel', query: 'q', locale: 'en', log,
+  });
+  expect(channelFetch).toHaveBeenCalledWith({ limit: 100 });
+  expect(input).toHaveLength(2);
+});
