@@ -75,3 +75,21 @@ test('saveError skips, persists, and logs failures', async () => {
   await saveError({ execute: jest.fn().mockRejectedValue(new Error('err')) }, 4, 'bad', [], {}, log);
   expect(log.error).toHaveBeenCalledWith('Failed to update usage record after error', { error: 'err' });
 });
+
+test('saveImages logs non-Error failures as strings', async () => {
+  const log = logger();
+  await saveImages({ execute: jest.fn().mockRejectedValue(null) }, 1, [{ buffer: Buffer.from('x') }], log);
+  expect(log.error).toHaveBeenCalledWith('Failed to write images to usage_images', { error: 'null' });
+});
+
+test('saveSuccess logs non-Error failures as strings', async () => {
+  const log = logger();
+  await saveSuccess({ execute: jest.fn().mockRejectedValue(null) }, 1, {}, 'x', 1, [], log);
+  expect(log.error).toHaveBeenCalledWith('Failed to update usage record after success', { error: 'null' });
+});
+
+test('saveError logs non-Error failures as strings', async () => {
+  const log = logger();
+  await saveError({ execute: jest.fn().mockRejectedValue(null) }, 1, 'x', [], {}, log);
+  expect(log.error).toHaveBeenCalledWith('Failed to update usage record after error', { error: 'null' });
+});

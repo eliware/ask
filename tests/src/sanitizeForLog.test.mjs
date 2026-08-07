@@ -37,3 +37,15 @@ test('handles redaction evaluation errors', () => {
   expect(sanitizeForLog(value, new WeakSet(), 0, opts).secret).toMatch(/error serializing/);
 });
 test('accepts null options', () => { expect(sanitizeForLog('ok', new WeakSet(), 0, null)).toBe('ok'); });
+
+test('handles array item serialization errors', () => {
+  const value = [];
+  Object.defineProperty(value, 0, { enumerable: true, get: () => { throw new Error('index'); } });
+  value.length = 1;
+  expect(sanitizeForLog(value)[0]).toMatch(/error serializing index 0/);
+});
+
+test('handles object entry enumeration errors', () => {
+  const value = new Proxy({}, { ownKeys: () => { throw new Error('keys'); } });
+  expect(sanitizeForLog(value)).toMatch(/error serializing/);
+});

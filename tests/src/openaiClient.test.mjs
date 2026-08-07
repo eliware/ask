@@ -21,3 +21,14 @@ test('supports missing logger methods', async () => {
 test('supports omitted logger on failure', async () => {
   await expect(initializeOpenAI({ factory: async () => { throw 'broken'; } })).rejects.toBe('broken');
 });
+
+test('uses default options and factory', async () => {
+  const previousKey = process.env.OPENAI_API_KEY;
+  process.env.OPENAI_API_KEY = 'test-key';
+  try {
+    await expect(initializeOpenAI()).resolves.toHaveProperty('responses');
+  } finally {
+    if (previousKey === undefined) delete process.env.OPENAI_API_KEY;
+    else process.env.OPENAI_API_KEY = previousKey;
+  }
+});
