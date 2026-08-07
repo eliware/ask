@@ -22,7 +22,9 @@ export default function sanitizeForLog(obj, seen = new WeakSet(), depth = 0, opt
   if (typeof obj === 'object') {
     if (seen.has(obj)) return '<<circular>>'; seen.add(obj);
     const out = {}; let count = 0;
-    for (const [key, value] of Object.entries(obj)) {
+    let entries;
+    try { entries = Object.entries(obj); } catch (err) { return `<<error serializing: ${String(err)}>>`; }
+    for (const [key, value] of entries) {
       if (++count > maxEntries) { out.__more = `<<truncated, more than ${maxEntries} keys>>`; break; }
       try {
         const lower = String(key).toLowerCase();
