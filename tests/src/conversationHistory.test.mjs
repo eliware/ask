@@ -109,3 +109,20 @@ test('falls back when interaction fetch returns null and client channel has no f
   expect(channelFetch).toHaveBeenCalledWith({ limit: 100 });
   expect(input).toHaveLength(2);
 });
+
+test('handles rejected client channel history fetch', async () => {
+  const input = await buildConversationInput({
+    interaction: { channel: { messages: {} } },
+    client: {
+      channels: {
+        fetch: jest.fn(async () => ({
+          messages: { fetch: jest.fn(async () => { throw new Error('history unavailable'); }) },
+        })),
+      },
+    },
+    channelId: 'channel', query: 'q', locale: 'en', log,
+  });
+
+  expect(input).toHaveLength(2);
+  expect(log.debug).not.toHaveBeenCalled();
+});

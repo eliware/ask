@@ -14,3 +14,10 @@ test('sanitizes initialization errors before logging', async () => {
   await expect(initializeOpenAI({ log, factory: async () => { throw error; } })).rejects.toBe(error);
   expect(log.error).toHaveBeenCalledWith('Failed to initialize OpenAI client', { error: expect.anything() });
 });
+test('supports missing logger methods', async () => {
+  const client = await initializeOpenAI({ log: {}, factory: async () => ({ ok: true }) });
+  expect(client).toEqual({ ok: true });
+});
+test('supports omitted logger on failure', async () => {
+  await expect(initializeOpenAI({ factory: async () => { throw 'broken'; } })).rejects.toBe('broken');
+});
