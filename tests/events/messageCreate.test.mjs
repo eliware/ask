@@ -92,4 +92,26 @@ describe('messageCreate', () => {
     await run(makeMessage({ guild: undefined }), { log, commandHandlers: { ask: jest.fn(async () => { throw error; }) } });
     expect(log.error).toHaveBeenCalledWith('messageCreate handler invocation failed', expect.objectContaining({ stack: error.stack }));
   });
+
+  test('ignores unrelated guild messages', async () => {
+    const message = makeMessage({ guild: { preferredLocale: 'en-US' } });
+    await run(message, { commandHandlers: { ask: jest.fn() } });
+    expect(message.reply).not.toHaveBeenCalled();
+  });
+
+  test('handles referenced message when no fetch method exists', async () => {
+    const message = makeMessage({ reference: { messageId: 'ref-id' }, channel: {} });
+    await run(message, { commandHandlers: { ask: jest.fn() } });
+    expect(message.reply).not.toHaveBeenCalled();
+  });
+
+  test('logs unexpected reference resolution errors', async () => {
+    const log = makeLog();
+    const message = makeMessage({ guild: { preferredLocale: 'en-US' } });
+    Object.defineProperty(message, 'reference', { get: () => { throw new Error('bad reference'); } });
+    await run(message, { log, commandHandlers: { ask: jest.fn() } });
+    expect(log.debug).toHaveBeenCalledWith('failed to resolve referenced message', expect.objectContaining({ error: expect.anything() }));
+    expect(message.reply).not.toHaveBeenCalled();
+  });
+
 });
