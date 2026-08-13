@@ -13,7 +13,6 @@ Ask is a Discord bot with a primary `/ask` command plus mention/reply/DM fallbac
 - `events/` — Discord event handlers
 - `locales/` — localized command/help strings
 - `tests/` — Jest tests
-- `schema.sql` — MySQL/MariaDB schema for `usage` and `usage_images`
 - `ask.service` — systemd unit
 - `Dockerfile` — container build
 - `.env.example` — runtime config template
@@ -29,10 +28,9 @@ Ask is a Discord bot with a primary `/ask` command plus mention/reply/DM fallbac
 
 ## Runtime notes
 
-- Entry startup order: OpenAI client, DB pool, Discord client.
+- Entry startup order: OpenAI client, Discord client.
 - Presence format: `ask v<version>`.
 - Bot intents include `Guilds`, `GuildMessages`, `MessageContent`, and `DirectMessages`.
-- DB is optional, but disabling it reduces tracking, rate limiting, and image persistence.
 
 ## Discord notes
 
@@ -41,11 +39,6 @@ Ask is a Discord bot with a primary `/ask` command plus mention/reply/DM fallbac
 - Keep Discord message length and attachment limits in mind.
 - Localization is required for command names, descriptions, and option metadata.
 
-## Database notes
-
-- `schema.sql` defines `usage` and `usage_images`.
-- `usage_images.usage_id` references `usage.id` with cascade delete.
-- Schema is MySQL/MariaDB with `utf8mb4`.
 - Be careful: schema changes affect rate limiting, auditing, and image storage.
 
 ## Testing
