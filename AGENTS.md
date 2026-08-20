@@ -52,3 +52,7 @@ Ask is a Discord bot with a primary `/ask` command plus mention/reply/DM fallbac
 - Do not run deployment, sync, tagging, or cluster-wide maintenance commands unless explicitly requested.
 - Avoid changing `ask.service` or `Dockerfile` unless the task is deployment-related.
 - Keep documentation changes single-purpose.
+- Do not over-engineer simple tasks.
+- Do not guess when confused.
+- Do not make random, pointless changes.
+- Check your own work before saying you're done.
