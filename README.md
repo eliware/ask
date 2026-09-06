@@ -2,6 +2,8 @@
 
 ## @eliware/ask [![npm version](https://img.shields.io/npm/v/@eliware/ask.svg)](https://www.npmjs.com/package/@eliware/ask)[![license](https://img.shields.io/github/license/eliware/ask.svg)](LICENSE)[![build status](https://github.com/eliware/ask/actions/workflows/nodejs.yml/badge.svg)](https://github.com/eliware/ask/actions)
 
+Documentation: [docs](docs/README.md) · [specifications](specs/README.md) · [examples](examples/README.md)
+
 Ask — a focused Discord application that provides quick answers, web searches, and image generation via a single /ask command or by mentioning the bot in chat. This repository contains the bot implementation, localization files, and deployment helpers (systemd / Docker). The project is based on the @eliware/discord foundations and is ready to adapt to your server.
 
 ---
