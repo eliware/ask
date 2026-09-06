@@ -1,5 +1,7 @@
 # Examples
 
+- [Basic example](basic.mjs)
+
 This directory is reserved for runnable Ask examples.
 
 ## Contents
