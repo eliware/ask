@@ -1,4 +1,1 @@
-// events/invalidated.mjs
-export default async function ({ log }) {
-    log.debug('invalidated');
-}
+export { default } from "../src/events/invalidated.mjs";

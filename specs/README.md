@@ -1,8 +1,9 @@
 # Specifications
 
-This directory contains developer-facing requirements for `@eliware/ask`.
+This directory contains repository-specific requirements for `@eliware/ask`.
 
 ## Contents
 
-- [Requirements](requirements.md)
-- [Out of scope](out-of-scope.md)
+- [Directives](directives.json)
+
+The shared application and Discord requirements are defined by the applied Eliware convention profiles.

@@ -1,55 +1,86 @@
 {
-    "name": "@eliware/ask",
-    "type": "module",
-    "version": "1.1.6",
-    "description": "A concise Discord assistant (\"/ask\") for quick answers, web searches, and image generation — supports slash command, mention/DM fallbacks, localization, and usage tracking.",
-    "main": "ask.mjs",
-    "scripts": {
-        "start": "node ask.mjs",
-        "test": "npx --node-options=\"--experimental-vm-modules --no-warnings\" jest --detectOpenHandles --silent --coverage",
-        "test:gaps": "npm test 2>&1 | grep '|' | grep -vF '|     100 |      100 |     100 |     100 |'",
-        "lint": "npx oxlint .",
-        "pack": "npm pack --dry-run"
-    },
-    "repository": {
-        "type": "git",
-        "url": "git+https://github.com/eliware/ask.git"
-    },
-    "keywords": [
-        "discord",
-        "slash-command",
-        "ask",
-        "assistant",
-        "ai",
-        "openai",
-        "image-generation",
-        "web-search",
-        "localization",
-        "rate-limiting",
-        "nodejs"
+  "name": "@eliware/ask",
+  "type": "module",
+  "version": "9.0.0",
+  "description": "A concise Discord assistant (\"/ask\") for quick answers, web searches, and image generation — supports slash command, mention/DM fallbacks, localization, and usage tracking.",
+  "main": "ask.mjs",
+  "scripts": {
+    "test": "eliware-test",
+    "lint": "eliware-test --lint",
+    "audit": "eliware-test --audit",
+    "format": "eliware-test --format",
+    "format:check": "eliware-test --format-check"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/eliware/ask"
+  },
+  "keywords": [
+    "discord",
+    "slash-command",
+    "ask",
+    "assistant",
+    "ai",
+    "openai",
+    "image-generation",
+    "web-search",
+    "localization",
+    "rate-limiting",
+    "nodejs"
+  ],
+  "author": "Eli Sterling, eliware.org <eli@eliware.org>",
+  "license": "MIT",
+  "private": true,
+  "engines": {
+    "node": "26"
+  },
+  "bugs": {
+    "url": "https://github.com/eliware/ask/issues"
+  },
+  "homepage": "https://github.com/eliware/ask#readme",
+  "devDependencies": {
+    "@eliware/test": "^8.0.0"
+  },
+  "jest": {
+    "testEnvironment": "node",
+    "testMatch": [
+      "**/tests/**/*.test.mjs"
     ],
-    "author": "Eli Sterling, eliware.org <eli@eliware.org>",
-    "license": "MIT",
-    "bugs": {
-        "url": "https://github.com/eliware/ask/issues"
-    },
-    "homepage": "https://github.com/eliware/ask#readme",
-    "devDependencies": {
-        "jest": "^30.4.2",
-        "oxlint": "^1.78.0"
-    },
-    "jest": {
-        "testEnvironment": "node",
-        "testMatch": [
-            "**/?(*.)+(spec|test).[jt]s?(x)",
-            "**/?(*.)+(spec|test).mjs",
-            "**/?(*.)+(spec|test).cjs"
-        ]
-    },
-    "dependencies": {
-        "@eliware/common": "^1.1.8",
-        "@eliware/discord": "^1.1.4",
-        "@eliware/openai": "^1.1.11",
-        "dotenv": "^17.4.2"
-    }
+    "collectCoverageFrom": [
+      "src/**/*.mjs"
+    ],
+    "coverageReporters": [
+      "text",
+      "json-summary"
+    ]
+  },
+  "dependencies": {
+    "@eliware/common": "^2.0.0",
+    "@eliware/discord": "^2.0.0",
+    "@eliware/openai": "^1.1.11",
+    "dotenv": "^18.0.5"
+  },
+  "eliware": {
+    "apply": [
+      "general",
+      "application",
+      "discord",
+      "ghcr-published"
+    ]
+  },
+  "prettier": {
+    "printWidth": 100,
+    "tabWidth": 2,
+    "useTabs": false,
+    "semi": true,
+    "singleQuote": false,
+    "quoteProps": "as-needed",
+    "jsxSingleQuote": false,
+    "trailingComma": "all",
+    "bracketSpacing": true,
+    "bracketSameLine": false,
+    "arrowParens": "always",
+    "proseWrap": "preserve",
+    "endOfLine": "lf"
+  }
 }

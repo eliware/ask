@@ -1,0 +1,18 @@
+{
+  "version": "9.0",
+  "description": "Repository-specific requirements for the Ask Discord assistant.",
+  "directives": [
+    {
+      "id": "E-3000",
+      "dos": [
+        "Ask provides answers, web searches, and image generation through the /ask command, and supports message mentions, replies, direct messages, localized help, and available recent channel context.",
+        "Ask requires DISCORD_CLIENT_ID, DISCORD_TOKEN, and OPENAI_API_KEY before it can connect to Discord or answer requests.",
+        "Keep command definitions, handlers, event behavior, supported intents, and required permissions aligned with the root README and the Discord application implementation."
+      ],
+      "donts": [
+        "Do not document or request Discord intents or permissions that the application does not use.",
+        "Do not commit runtime credentials or deploy the bot as part of validation."
+      ]
+    }
+  ]
+}

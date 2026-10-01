@@ -1,175 +1,82 @@
 # [![eliware.org](https://eliware.org/logos/brand.png)](https://discord.gg/M6aTR9eTwN)
 
-## @eliware/ask [![npm version](https://img.shields.io/npm/v/@eliware/ask.svg)](https://www.npmjs.com/package/@eliware/ask)[![license](https://img.shields.io/github/license/eliware/ask.svg)](LICENSE)[![build status](https://github.com/eliware/ask/actions/workflows/nodejs.yml/badge.svg)](https://github.com/eliware/ask/actions)
-
-Documentation: [docs](docs/README.md) · [specifications](specs/README.md) · [examples](examples/README.md)
-
-Ask — a focused Discord application that provides quick answers, web searches, and image generation via a single /ask command or by mentioning the bot in chat. This repository contains the bot implementation, localization files, and deployment helpers (systemd / Docker). The project is based on the @eliware/discord foundations and is ready to adapt to your server.
-
----
+## @eliware/ask [![license](https://img.shields.io/github/license/eliware/ask.svg)](LICENSE) [![CI](https://github.com/eliware/ask/actions/workflows/ci.yml/badge.svg)](https://github.com/eliware/ask/actions/workflows/ci.yml)
 
 ## Table of Contents
 
-- [Overview](#overview)  
-- [Features](#features)  
-- [Quick Start](#quick-start)  
-- [Usage](#usage)  
-  - [/ask command](#ask-command)  
-  - [Message-based usage (mention/reply/DM)](#message-based-usage-mentionreplydm)  
-- [Configuration](#configuration)  
-- [Deployment](#deployment)  
-  - [Run locally](#run-locally)  
-  - [systemd service](#systemd-service)  
-  - [Docker](#docker)  
-- [Localization](#localization)  
-- [Development & Testing](#development--testing)  
-- [Support](#support)  
-- [License](#license)  
+- [Features](#features)
+- [Requirements](#requirements)
+- [Setup](#setup)
+- [Usage](#usage)
+- [Development](#development)
+- [Testing](#testing)
+- [Troubleshooting](#troubleshooting)
+- [Security](#security)
+- [Configuration](#configuration)
+- [Operations](#operations)
+- [Commands](#commands)
+- [Events](#events)
+- [Intents and permissions](#intents-and-permissions)
+- [Support](#support)
+- [License](#license)
 - [Links](#links)
-
-## Overview
-
-Ask is a concise assistant for Discord that supports:
-- Short answers, summaries, and rewrites
-- Quick web searches to surface sources
-- Simple image generation (via the bot's image tool)
-- Context-aware replies by including recent channel messages
-- Images are returned to Discord without database persistence
-
-The bot is intentionally concise: the system prompt instructs responses to be succinct and to not identify as "ChatGPT" or "OpenAI".
 
 ## Features
 
-- Single `/ask` command with natural language input
-- Message fallback: mention the bot, DM it, or reply to a bot message to invoke /ask
-- Automatic inclusion of recent message history (up to 100 messages) for context
-- Image generation support (returns images as attachments or URLs)
-- Locales support for multi-language replies (see locales/)
-- Ready-to-run with systemd or Docker
-- Testable with Jest
+Documentation: [docs](docs/README.md) · [specifications](specs/README.md) · [release notes](RELEASE_NOTES.md)
 
-## Quick Start
+Purpose:
+Ask provides quick answers, web searches, and image generation through a Discord slash command or chat mention. It also supports replies to the bot, direct messages, localized responses, and recent channel context.
 
-1. Clone the repo and install dependencies:
+Description: A concise Discord assistant ("/ask") for quick answers, web searches, and image generation — supports slash command, mention/DM fallbacks, localization, and usage tracking. Author: Eli Sterling, eliware.org <eli@eliware.org>. License: MIT.
 
-   ```bash
-   git clone https://github.com/eliware/ask.git
-   cd ask
-   npm install
-   ```
+## Requirements
 
-2. Copy and edit environment variables:
+Use Node.js 26 and npm. Running the bot requires a Discord application with a bot token and application ID, the Message Content privileged intent enabled in the Discord Developer Portal, and an OpenAI API key.
 
-   ```bash
-   cp .env.example .env
-   # edit .env and add your Discord token, OpenAI/API keys, etc.
-   ```
+## Setup
 
-3. Start locally:
-
-   ```bash
-   npm start
-   # or
-   node ask.mjs
-   ```
+Run `npm ci`, copy `.env.example` to an untracked `.env`, and set `DISCORD_CLIENT_ID`, `DISCORD_TOKEN`, and `OPENAI_API_KEY`. Keep the `.env` file private. The [documentation index](docs/README.md) links user guidance; [specs/README.md](specs/README.md) indexes repository requirements.
 
 ## Usage
 
-### /ask command
+Run `node ask.mjs` to launch the bot locally. In Discord, use `/ask <question>` or mention the bot with a prompt. You can also reply to one of its messages or send it a direct message. Use `!help` for localized help.
 
-Use the slash command for structured usage:
+## Development
 
-- Examples:
-  - /ask explain recursion in simple terms
-  - /ask summarize the last 3 messages
-  - /ask draft a 3-item meeting agenda about onboarding
-  - /ask generate a simple red circle on a white background --image
+Read [AGENTS.md](AGENTS.md), this README, and the [specification index](specs/README.md) before changing files. `commands/` contains command definitions and handlers, `events/` contains Discord event handlers, `locales/` contains translations, and `src/` contains focused application modules. Keep `tests/` mirrored to `src/`.
 
-The handler will:
-- Defer the reply (typing indicator) while contacting the backend
-- Include recent channel history when available
-- Return text and attach generated images (files or URLs)
-- Split long replies into multiple messages when needed
+## Testing
 
-### Message-based usage (mention/reply/DM)
+Run `npm test` for Jest, 100% statement, branch, function, and line coverage of `src/`, lint, format-check, audit, and applicable convention checks through `eliware-test`. Run `npm run format:check` for read-only formatting validation. CI runs `npm ci` followed by `npm test`.
 
-The bot also listens for messages and will create a lightweight mock interaction when:
-- The bot is mentioned in a server message
-- The message is a reply to a message previously sent by the bot
-- The bot receives a DM
+## Troubleshooting
 
-Behavior:
-- Strips the mention and uses the remaining text as the prompt (falls back to "Hello!" if empty)
-- Replies in-channel (or DMs user if response is ephemeral)
-- Uses blockquote formatting per-line for message-originated replies
-- Respects Discord message length limits (chunks to 2000 characters)
-
-## Configuration
-
-All runtime configuration is via `.env`. Copy `.env.example` to `.env` and provide required values:
-
-- DISCORD_TOKEN / DISCORD_CLIENT_ID / DISCORD_PUBLIC_KEY (Discord app credentials)
-- OPENAI_API_KEY (OpenAI API credential)
-- LOG_LEVEL, NODE_ENV, and other standard variables
-
-See `.env.example` for the complete list.
-
-## Deployment
-
-### Run locally
-
-Start with `npm start` or `node ask.mjs`. Ensure your `.env` is populated.
-
-### systemd service
-
-A sample `ask.service` (included) facilitates running the app as a systemd service:
-
-1. Copy `ask.service` to `/usr/lib/systemd/system/ask.service` and adjust paths/user.
-2. Reload and start:
-
-   ```bash
-   sudo systemctl daemon-reload
-   sudo systemctl enable ask
-   sudo systemctl start ask
-   sudo systemctl status ask
-   ```
-
-### Docker
-
-Build and run:
-
-```bash
-docker build -t ask .
-docker run --env-file .env ask
-```
+If the bot does not connect, check that the Discord application ID and bot token are valid and that the configured intents are enabled. If requests fail, check the OpenAI API key and the provider response. Run `npm test` to validate the local checkout.
 
 ## Security
 
-- Never commit `.env`, API keys, Discord tokens, or other credentials.
-- Keep `.env` user-owned and protected; use `.env.example` only as a placeholder template.
-- Rotate credentials immediately if they are exposed.
+Keep Discord and OpenAI credentials in an untracked `.env` file or an authorized deployment secret store. Do not commit credentials, log tokens or private message contents, or grant Discord permissions beyond those listed below.
 
-## Localization
+## Configuration
 
-Responses and help text are localized via JSON files under `locales/`. The default English help (locales/en-US.json) contains the bot's quick-help text and install link.
+The application reads `DISCORD_CLIENT_ID`, `DISCORD_TOKEN`, and `OPENAI_API_KEY` from the environment; all are required and have no defaults. `.env.example` lists these supported variables. There are no optional environment variables currently supported. `package.json` and `.knit/deploy.yaml` contain package and deployment metadata, not runtime configuration.
 
-Add or edit locale files to localize command names, descriptions, and bot responses.
+## Operations
 
-## Development & Testing
+Run `node ask.mjs` to start the bot locally; its shutdown handler closes the Discord client when the process receives a termination signal. For a local container, use `docker build -t ask .` and `docker run --env-file .env ask`. The root [Dockerfile](Dockerfile) runs `ask.mjs` as the unprivileged `node` user. Versioned releases use exact `vMAJOR.MINOR.PATCH` tags; the publish workflow builds the corresponding image tag after validation, then verifies its digest and signed attestation. Pull an authorized release with `docker pull ghcr.io/eliware/ask:<release-tag>`. The GHCR image is public. The bot exposes `/ask`, message mentions, replies, and direct messages; these are its externally observable workflows. Operational boundaries: validation does not publish or deploy; publication and deployment require separate authorized handoffs, and this repository does not deploy an image automatically.
 
-- Tests are run with Jest:
+## Commands
 
-  ```bash
-  npm test
-  ```
+Purpose: Ask provides a single `/ask` command that accepts one required `query` string. It can answer questions, summarize or rewrite text, search the web, and generate images. `!help` sends localized usage guidance. The command definition and localized strings are in `commands/ask.json`; the handler is in `commands/ask.mjs`.
 
-- Command handlers live in `commands/` (e.g., `commands/ask.mjs`).
-- Event handlers live in `events/` (e.g., `events/messageCreate.mjs`).
-- The ask handler expects an interaction-like object and supports both real interactions and the lightweight mock created by the messageCreate handler.
+## Events
 
-Tips:
-- The code attempts to import `@eliware/discord` split helpers when available for message chunking; this is optional.
-- Typing indicator is kept alive with an interval while processing message-originated requests — ensure that any custom handlers clear this interval on completion to avoid stray timers.
+The bot handles Discord interactions, messages, client readiness, warnings, errors, debug events, and invalidation. Message handling responds to direct messages, mentions, and replies to the bot. It ignores messages from bots and unrelated server messages. Responses include recent channel messages when Discord provides them.
+
+## Intents and permissions
+
+The bot requests the `Guilds`, `GuildMessages`, `MessageContent`, and `DirectMessages` gateway intents. Enable the privileged Message Content intent in the Discord Developer Portal. The bot needs View Channels, Send Messages, and Read Message History in channels where it reads context and replies. Slash-command use also requires the command to be registered and available to the user. The command does not request administrator permissions.
 
 ## Support
 
@@ -183,10 +90,15 @@ For help or discussion, join the community:
 
 [MIT © 2025 Eli Sterling, eliware.org](LICENSE)
 
+See [LICENSE](LICENSE).
+
 ## Links
 
-- [Home Page](https://eliware.org)  
-- [GitHub Repo](https://github.com/eliware/ask)  
-- [GitHub Org](https://github.com/eliware)  
-- [GitHub Personal](https://github.com/eli-sterling)  
+- [Home Page](https://eliware.org)
+- [GitHub repository](https://github.com/eliware/ask)
+- [GitHub organization](https://github.com/eliware)
+- [GitHub profile](https://github.com/eli-sterling)
 - [Discord](https://discord.gg/M6aTR9eTwN)
+- [Documentation](docs/README.md)
+- [Specifications](specs/README.md)
+- [Release notes](RELEASE_NOTES.md)
