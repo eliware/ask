@@ -23,12 +23,10 @@
 
 ## Features
 
-Documentation: [docs](docs/README.md) · [specifications](specs/README.md) · [release notes](RELEASE_NOTES.md)
-
 Purpose:
 Ask provides quick answers, web searches, and image generation through a Discord slash command or chat mention. It also supports replies to the bot, direct messages, localized responses, and recent channel context.
 
-Description: A concise Discord assistant ("/ask") for quick answers, web searches, and image generation — supports slash command, mention/DM fallbacks, localization, and usage tracking. Author: Eli Sterling, eliware.org <eli@eliware.org>. License: MIT.
+Package description: A concise Discord assistant ("/ask") for quick answers, web searches, and image generation — supports slash command, mention/DM fallbacks, localization, and usage tracking. Author: Eli Sterling, eliware.org <eli@eliware.org>. License: MIT.
 
 ## Requirements
 
@@ -82,23 +80,21 @@ The bot requests the `Guilds`, `GuildMessages`, `MessageContent`, and `DirectMes
 
 For help or discussion, join the community:
 
-[![Discord](https://eliware.org/logos/discord_96.png)](https://discord.gg/M6aTR9eTwN)[![eliware.org](https://eliware.org/logos/eliware_96.png)](https://discord.gg/M6aTR9eTwN)
+[![Discord](https://eliware.org/logos/discord_96.png)](https://discord.gg/M6aTR9eTwN)
 
 **[eliware.org on Discord](https://discord.gg/M6aTR9eTwN)**
 
 ## License
 
-[MIT © 2025 Eli Sterling, eliware.org](LICENSE)
-
-See [LICENSE](LICENSE).
+[license](LICENSE)
 
 ## Links
 
+- Documentation: [docs](docs/README.md) · [specifications](specs/README.md)
+- [Release Notes](RELEASE_NOTES.md)
+- [Canonical repository profile specifications](https://github.com/eliware/test/blob/main/specs/conventions/README.md)
 - [Home Page](https://eliware.org)
-- [GitHub repository](https://github.com/eliware/ask)
-- [GitHub organization](https://github.com/eliware)
+- [GitHub Repo](https://github.com/eliware/ask) (`git+https://github.com/eliware/ask.git`)
+- [GitHub Org](https://github.com/eliware)
 - [GitHub profile](https://github.com/eli-sterling)
 - [Discord](https://discord.gg/M6aTR9eTwN)
-- [Documentation](docs/README.md)
-- [Specifications](specs/README.md)
-- [Release notes](RELEASE_NOTES.md)
