@@ -1,6 +1,6 @@
 # [![eliware.org](https://eliware.org/logos/brand.png)](https://discord.gg/M6aTR9eTwN)
 
-## @eliware/ask [![license](https://img.shields.io/github/license/eliware/ask.svg)](LICENSE) [![CI](https://github.com/eliware/ask/actions/workflows/ci.yml/badge.svg)](https://github.com/eliware/ask/actions/workflows/ci.yml)
+@eliware/ask [![License](https://img.shields.io/github/license/eliware/ask)](https://github.com/eliware/ask/blob/main/LICENSE) [![CI](https://github.com/eliware/ask/actions/workflows/ci.yaml/badge.svg)](https://github.com/eliware/ask/actions/workflows/ci.yaml)
 
 ## Table of Contents
 
@@ -26,7 +26,9 @@
 Purpose:
 Ask provides quick answers, web searches, and image generation through a Discord slash command or chat mention. It also supports replies to the bot, direct messages, localized responses, and recent channel context.
 
-Package description: A concise Discord assistant ("/ask") for quick answers, web searches, and image generation — supports slash command, mention/DM fallbacks, localization, and usage tracking. Author: Eli Sterling, eliware.org <eli@eliware.org>. License: MIT.
+Ownership boundary: this repository owns the Ask Discord application and its container definition; shared package behavior, release procedures, production credentials, and deployment execution belong to their owners.
+
+Package description: A concise Discord assistant ("/ask") for quick answers, web searches, and image generation — supports slash command, mention/DM fallbacks, localization, and usage tracking. Author: Eliware <eliware@eliware.org>. License: MIT.
 
 ## Requirements
 
@@ -38,7 +40,12 @@ Run `npm ci`, copy `.env.example` to an untracked `.env`, and set `DISCORD_CLIEN
 
 ## Usage
 
-Run `node ask.mjs` to launch the bot locally. In Discord, use `/ask <question>` or mention the bot with a prompt. You can also reply to one of its messages or send it a direct message. Use `!help` for localized help.
+Run `node ask.mjs` to launch the bot locally. In Discord, use `/ask <question>` or mention the bot with a prompt. You can also reply to one of its messages or send it a direct message. Use `!help` for localized help. Image generation is available through `/ask` when requested.
+
+Image: ghcr.io/eliware/ask
+Pull command: docker pull ghcr.io/eliware/ask:v11.0.0
+Supported tags: vMAJOR.MINOR.PATCH
+Deployment boundary: publication does not deploy; deploy by immutable version tag and recorded sha256 digest.
 
 ## Development
 
@@ -93,8 +100,9 @@ For help or discussion, join the community:
 - Documentation: [docs](docs/README.md) · [specifications](specs/README.md)
 - [Release Notes](RELEASE_NOTES.md)
 - [Canonical repository profile specifications](https://github.com/eliware/test/blob/main/specs/conventions/README.md)
-- [Home Page](https://eliware.org)
-- [GitHub Repo](https://github.com/eliware/ask) (`git+https://github.com/eliware/ask.git`)
-- [GitHub Org](https://github.com/eliware)
+- [Home Page](https://github.com/eliware/ask#readme)
+- [GitHub repository](https://github.com/eliware/ask.git)
+- [Eliware](https://eliware.org)
+- [GitHub organization](https://github.com/eliware)
 - [GitHub profile](https://github.com/eli-sterling)
 - [Discord](https://discord.gg/M6aTR9eTwN)

@@ -1,5 +1,11 @@
 # Release Notes
 
+## 11.0.0 — 2026-10-03
+
+### Changed
+
+- Aligned repository metadata, structured specifications, and validation with Eliware Test v11 conventions.
+
 ## 9.0.0 — 2026-09-30
 
 ### Changed

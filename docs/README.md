@@ -18,5 +18,5 @@ Use the community support link in the root README.
 
 ## Contents
 
-- [Usage](docs/usage.md)
-- [Troubleshooting](docs/troubleshooting.md)
+- [Usage (docs/usage.md)](usage.md)
+- [Troubleshooting (docs/troubleshooting.md)](troubleshooting.md)

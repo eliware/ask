@@ -1,9 +1,9 @@
 {
   "name": "@eliware/ask",
   "type": "module",
-  "version": "9.0.0",
+  "version": "11.0.0",
   "description": "A concise Discord assistant (\"/ask\") for quick answers, web searches, and image generation — supports slash command, mention/DM fallbacks, localization, and usage tracking.",
-  "main": "ask.mjs",
+  "main": "bin/ask.mjs",
   "scripts": {
     "test": "eliware-test",
     "lint": "eliware-test --lint",
@@ -13,7 +13,7 @@
   },
   "repository": {
     "type": "git",
-    "url": "https://github.com/eliware/ask"
+    "url": "git+https://github.com/eliware/ask.git"
   },
   "keywords": [
     "discord",
@@ -28,7 +28,7 @@
     "rate-limiting",
     "nodejs"
   ],
-  "author": "Eli Sterling, eliware.org <eli@eliware.org>",
+  "author": "Eliware <eliware@eliware.org>",
   "license": "MIT",
   "private": true,
   "engines": {
@@ -39,7 +39,7 @@
   },
   "homepage": "https://github.com/eliware/ask#readme",
   "devDependencies": {
-    "@eliware/test": "^8.0.0"
+    "@eliware/test": "^10.0.0"
   },
   "jest": {
     "testEnvironment": "node",
@@ -52,7 +52,15 @@
     "coverageReporters": [
       "text",
       "json-summary"
-    ]
+    ],
+    "coverageThreshold": {
+      "global": {
+        "branches": 100,
+        "functions": 100,
+        "lines": 100,
+        "statements": 100
+      }
+    }
   },
   "dependencies": {
     "@eliware/common": "^2.0.0",
@@ -83,5 +91,8 @@
     "arrowParens": "always",
     "proseWrap": "preserve",
     "endOfLine": "lf"
+  },
+  "overrides": {
+    "pretty-format": "30.5.0"
   }
 }
