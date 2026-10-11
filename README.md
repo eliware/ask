@@ -1,6 +1,8 @@
 # [![eliware.org](https://eliware.org/logos/brand.png)](https://discord.gg/M6aTR9eTwN)
 
-@eliware/ask [![License](https://img.shields.io/github/license/eliware/ask)](https://github.com/eliware/ask/blob/main/LICENSE) [![CI](https://github.com/eliware/ask/actions/workflows/ci.yaml/badge.svg)](https://github.com/eliware/ask/actions/workflows/ci.yaml)
+## @eliware/ask [![License](https://img.shields.io/github/license/eliware/ask)](https://github.com/eliware/ask/blob/main/LICENSE) [![CI](https://github.com/eliware/ask/actions/workflows/ci.yaml/badge.svg)](https://github.com/eliware/ask/actions/workflows/ci.yaml)
+
+A concise Discord assistant ("/ask") for quick answers, web searches, and image generation — supports slash command, mention/DM fallbacks, localization, and usage tracking.
 
 ## Table of Contents
 
@@ -18,91 +20,82 @@
 - [Events](#events)
 - [Intents and permissions](#intents-and-permissions)
 - [Support](#support)
-- [License](#license)
 - [Links](#links)
+- [License](#license)
 
 ## Features
 
-Purpose:
-Ask provides quick answers, web searches, and image generation through a Discord slash command or chat mention. It also supports replies to the bot, direct messages, localized responses, and recent channel context.
-
-Ownership boundary: this repository owns the Ask Discord application and its container definition; shared package behavior, release procedures, production credentials, and deployment execution belong to their owners.
-
-Package description: A concise Discord assistant ("/ask") for quick answers, web searches, and image generation — supports slash command, mention/DM fallbacks, localization, and usage tracking. Author: Eliware <eliware@eliware.org>. License: MIT.
+Ask answers questions, searches the web, and generates images through Discord. It supports mentions, replies, direct messages, localized help, and recent channel context.
 
 ## Requirements
 
-Use Node.js 26 and npm. Running the bot requires a Discord application with a bot token and application ID, the Message Content privileged intent enabled in the Discord Developer Portal, and an OpenAI API key.
+Use Node.js 26 or later and npm. Bot startup needs a Discord application and an OpenAI API key.
 
 ## Setup
 
-Run `npm ci`, copy `.env.example` to an untracked `.env`, and set `DISCORD_CLIENT_ID`, `DISCORD_TOKEN`, and `OPENAI_API_KEY`. Keep the `.env` file private. The [documentation index](docs/README.md) links user guidance; [specs/README.md](specs/README.md) indexes repository requirements.
+Run `npm ci`. Copy `.env.example` to an untracked `.env`. Set `DISCORD_CLIENT_ID`, `DISCORD_TOKEN`, and `OPENAI_API_KEY` in `.env`.
 
 ## Usage
 
-Run `node ask.mjs` to launch the bot locally. In Discord, use `/ask <question>` or mention the bot with a prompt. You can also reply to one of its messages or send it a direct message. Use `!help` for localized help. Image generation is available through `/ask` when requested.
+Run `node bin/ask.mjs` to start the bot. Use `/ask <question>`, mention the bot, reply to its message, or send it a direct message. Use `!help` for localized help. Read the [release notes](RELEASE_NOTES.md) for version changes.
 
 Image: ghcr.io/eliware/ask
-Pull command: docker pull ghcr.io/eliware/ask:v11.0.0
+Pull command: docker pull ghcr.io/eliware/ask:v12.0.0
 Supported tags: vMAJOR.MINOR.PATCH
 Deployment boundary: publication does not deploy; deploy by immutable version tag and recorded sha256 digest.
 
 ## Development
 
-Read [AGENTS.md](AGENTS.md), this README, and the [specification index](specs/README.md) before changing files. `commands/` contains command definitions and handlers, `events/` contains Discord event handlers, `locales/` contains translations, and `src/` contains focused application modules. Keep `tests/` mirrored to `src/`.
+Read [AGENTS.md](AGENTS.md), [docs/README.md](docs/README.md), and [specs/README.md](specs/README.md) before changes. Command adapters live in `commands/`. Event adapters live in `events/`. Handlers live in `src/commands/` and `src/events/`. Locale files live in `locales/`.
 
 ## Testing
 
-Run `npm test` for Jest, 100% statement, branch, function, and line coverage of `src/`, lint, format-check, audit, and applicable convention checks through `eliware-test`. Run `npm run format:check` for read-only formatting validation. CI runs `npm ci` followed by `npm test`.
+Run `npm test` for Jest coverage and Eliware validation. Run `npm run format:check` for read-only format validation. CI runs `npm ci` and `npm test`.
 
 ## Troubleshooting
 
-If the bot does not connect, check that the Discord application ID and bot token are valid and that the configured intents are enabled. If requests fail, check the OpenAI API key and the provider response. Run `npm test` to validate the local checkout.
+If the bot cannot connect, check the Discord application ID, token, and enabled intents. If OpenAI requests fail, check the API key and provider status.
 
 ## Security
 
-Keep Discord and OpenAI credentials in an untracked `.env` file or an authorized deployment secret store. Do not commit credentials, log tokens or private message contents, or grant Discord permissions beyond those listed below.
+Keep Discord and OpenAI credentials in an untracked `.env` file or an authorized secret store. Do not commit credentials or log tokens or private message content.
 
 ## Configuration
 
-The application reads `DISCORD_CLIENT_ID`, `DISCORD_TOKEN`, and `OPENAI_API_KEY` from the environment; all are required and have no defaults. `.env.example` lists these supported variables. There are no optional environment variables currently supported. `package.json` and `.knit/deploy.yaml` contain package and deployment metadata, not runtime configuration.
+The application requires `DISCORD_CLIENT_ID`, `DISCORD_TOKEN`, and `OPENAI_API_KEY`. The `.env.example` file lists these variables. The application has no optional environment variables.
 
 ## Operations
 
-Run `node ask.mjs` to start the bot locally; its shutdown handler closes the Discord client when the process receives a termination signal. For a local container, use `docker build -t ask .` and `docker run --env-file .env ask`. The root [Dockerfile](Dockerfile) runs `ask.mjs` as the unprivileged `node` user. Versioned releases use exact `vMAJOR.MINOR.PATCH` tags; the publish workflow builds the corresponding image tag after validation, then verifies its digest and signed attestation. Pull an authorized release with `docker pull ghcr.io/eliware/ask:<release-tag>`. The GHCR image is public. The bot exposes `/ask`, message mentions, replies, and direct messages; these are its externally observable workflows. Operational boundaries: validation does not publish or deploy; publication and deployment require separate authorized handoffs, and this repository does not deploy an image automatically.
+Run `node bin/ask.mjs` to start the bot. The shutdown handler closes the Discord client after a termination signal. Build a local image with `docker build -t ask .`. Run it with `docker run --env-file .env ask`. The root [Dockerfile](Dockerfile) starts the bot as the unprivileged `node` user. Image publication does not deploy the bot. Deployment needs a separate GitOps handoff.
 
 ## Commands
 
-Purpose: Ask provides a single `/ask` command that accepts one required `query` string. It can answer questions, summarize or rewrite text, search the web, and generate images. `!help` sends localized usage guidance. The command definition and localized strings are in `commands/ask.json`; the handler is in `commands/ask.mjs`.
+The bot provides the `/ask` command with one required `query` string. It can answer, summarize, rewrite, search the web, and generate images. The `!help` command provides localized usage details. Command definitions and adapters are in `commands/`. Handlers are in `src/commands/`.
 
 ## Events
 
-The bot handles Discord interactions, messages, client readiness, warnings, errors, debug events, and invalidation. Message handling responds to direct messages, mentions, and replies to the bot. It ignores messages from bots and unrelated server messages. Responses include recent channel messages when Discord provides them.
+The bot handles interactions, messages, readiness, warnings, errors, debug events, and invalidation. It ignores messages from bots and unrelated server messages. It uses recent channel messages when Discord provides them.
 
 ## Intents and permissions
 
-The bot requests the `Guilds`, `GuildMessages`, `MessageContent`, and `DirectMessages` gateway intents. Enable the privileged Message Content intent in the Discord Developer Portal. The bot needs View Channels, Send Messages, and Read Message History in channels where it reads context and replies. Slash-command use also requires the command to be registered and available to the user. The command does not request administrator permissions.
+The bot requests the `Guilds`, `GuildMessages`, `MessageContent`, and `DirectMessages` intents. Enable the privileged Message Content intent in the Discord Developer Portal. The bot needs View Channels, Send Messages, and Read Message History. It does not need administrator permissions.
 
 ## Support
 
-For help or discussion, join the community:
+For help, questions, or to chat with the author and community, visit:
 
-[![Discord](https://eliware.org/logos/discord_96.png)](https://discord.gg/M6aTR9eTwN)
+[![Discord](https://eliware.org/logos/discord_96.png)](https://discord.gg/M6aTR9eTwN)[![eliware.org](https://eliware.org/logos/eliware_96.png)](https://discord.gg/M6aTR9eTwN)
 
 **[eliware.org on Discord](https://discord.gg/M6aTR9eTwN)**
 
-## License
-
-[license](LICENSE)
-
 ## Links
 
-- Documentation: [docs](docs/README.md) · [specifications](specs/README.md)
-- [Release Notes](RELEASE_NOTES.md)
-- [Canonical repository profile specifications](https://github.com/eliware/test/blob/main/specs/conventions/README.md)
-- [Home Page](https://github.com/eliware/ask#readme)
-- [GitHub repository](https://github.com/eliware/ask.git)
-- [Eliware](https://eliware.org)
-- [GitHub organization](https://github.com/eliware)
-- [GitHub profile](https://github.com/eli-sterling)
+- [Home Page](https://eliware.org)
+- [GitHub Org](https://github.com/eliware)
+- [GitHub Repo](https://github.com/eliware/ask)
+- [Bug Reports](https://github.com/eliware/ask/issues)
 - [Discord](https://discord.gg/M6aTR9eTwN)
+
+## License
+
+[MIT © Eliware](LICENSE)

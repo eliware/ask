@@ -1,2 +1,15 @@
 #!/usr/bin/env node
-import "../ask.mjs";
+import { join } from "node:path";
+import { createDiscord } from "@eliware/discord";
+import { log, registerHandlers, registerSignals } from "@eliware/common";
+import { initializeOpenAI } from "../src/openaiClient.mjs";
+import { startApplication } from "../src/main.mjs";
+
+await startApplication({
+  createDiscord,
+  initializeOpenAI,
+  log,
+  registerHandlers,
+  registerSignals,
+  rootDir: join(import.meta.dirname, ".."),
+});

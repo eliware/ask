@@ -46,8 +46,8 @@ jobs:
           password: ${{ secrets.GITHUB_TOKEN }}
       - name: Verify release tag matches package version
         id: version
-        shell: bash
-        run: '[[ "${GITHUB_REF_NAME}" =~ ^v(0|[1-9][0-9]*)\.(0|[1-9][0-9]*)\.(0|[1-9][0-9]*)$ ]] && test "$(node -p "require(process.argv[1]).version" ./package.json)" = "${GITHUB_REF_NAME#v}"'
+        run: >-
+          node -e "const version=require('./package.json').version;if(!/^(0|[1-9][0-9]*)[.](0|[1-9][0-9]*)[.](0|[1-9][0-9]*)$/.test(version)||process.env.GITHUB_REF_NAME!=='v'+version)process.exit(1)"
       - name: Build and publish image
         id: image
         uses: docker/build-push-action@v6
@@ -56,7 +56,7 @@ jobs:
           file: ./Dockerfile
           platforms: linux/amd64
           push: true
-          tags: ghcr.io/eliware/ask:v11.0.0
+          tags: ghcr.io/eliware/ask:v12.0.0
       - name: Attest published image
         uses: actions/attest@v4
         with:
@@ -64,10 +64,10 @@ jobs:
           subject-digest: ${{ steps.image.outputs.digest }}
           push-to-registry: true
       - name: Verify version tag resolves to the pushed digest
-        run: test "$(docker buildx imagetools inspect ghcr.io/eliware/ask:v11.0.0 --format '{{.Manifest.Digest}}')" = "${{ steps.image.outputs.digest }}"
+        run: test "$(docker buildx imagetools inspect ghcr.io/eliware/ask:v12.0.0 --format '{{.Manifest.Digest}}')" = "${{ steps.image.outputs.digest }}"
       - name: Inspect image by digest
         run: docker buildx imagetools inspect ghcr.io/eliware/ask@${{ steps.image.outputs.digest }}
       - name: Verify signed image attestation
         run: gh attestation verify oci://ghcr.io/eliware/ask@${{ steps.image.outputs.digest }} --repo ${{ github.repository }}
       - name: Record release handoff evidence
-        run: 'echo "Image digest: ghcr.io/eliware/ask@${{ steps.image.outputs.digest }}" >> "$GITHUB_STEP_SUMMARY"'
+        run: 'echo "${{ steps.image.outputs.digest }}" >> "$GITHUB_STEP_SUMMARY"'

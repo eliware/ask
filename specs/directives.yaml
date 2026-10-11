@@ -1,7 +1,7 @@
-version: "11.0"
+version: "12.0"
 description: "Repository-specific requirements for the Ask Discord assistant."
 directives:
-  - id: E-3000
+  - id: E-3000.0
     dos:
       - "Ask provides answers, web searches, and image generation through the /ask command, and supports message mentions, replies, direct messages, localized help, and available recent channel context."
       - "Ask requires DISCORD_CLIENT_ID, DISCORD_TOKEN, and OPENAI_API_KEY before it can connect to Discord or answer requests."

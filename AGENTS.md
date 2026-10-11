@@ -10,7 +10,7 @@ Scope: this repository owns the Ask Discord application, its command and event h
 
 ## Layout
 
-The required application structure includes `src/` and its mirrored `tests/`, root `README.md`, `AGENTS.md`, `specs/README.md`, and `docs/README.md`. `ask.mjs` starts the bot. `commands/`, `events/`, and `locales/` contain Discord integration code and data. `docs/` contains user documentation, `specs/` indexes structured repository requirements, and `.knit/deploy.yaml` defines deployment commands.
+The required application structure includes `src/` and its mirrored `tests/`, root `README.md`, `AGENTS.md`, `specs/README.md`, and `docs/README.md`. `bin/ask.mjs` starts the bot. `commands/` and `events/` contain Discord adapters. `src/` contains handlers. `locales/` contains translations. `docs/` contains user documentation, `specs/` indexes requirements, and `.knit/deploy.yaml` defines deployment commands.
 
 ## Development
 
@@ -32,12 +32,17 @@ Keep changes actionable, current, and concise. Preserve documented behavior and 
 
 ## Application
 
-The executable entrypoint is `ask.mjs`; it starts the Discord client and registered handlers. Runtime configuration is loaded from `.env` and the environment; `DISCORD_CLIENT_ID`, `DISCORD_TOKEN`, and `OPENAI_API_KEY` are all required and have no defaults. The process lifecycle registers signal handlers that close the Discord client safely and idempotently. Validation is read-only and does not modify external state. Package metadata and `.knit/deploy.yaml` are not runtime configuration. Operational boundaries are documented in the README.
+The executable entrypoint is `bin/ask.mjs`; it starts the Discord client and registered handlers. Runtime configuration is loaded from `.env` and the environment; `DISCORD_CLIENT_ID`, `DISCORD_TOKEN`, and `OPENAI_API_KEY` are all required and have no defaults. The process lifecycle registers signal handlers that close the Discord client safely and idempotently. Validation is read-only and does not modify external state. Package metadata and `.knit/deploy.yaml` are not runtime configuration. Operational boundaries are documented in the README.
 
 ## Discord
 
-`commands/` contains command definitions and handlers, `events/` contains gateway event handlers, and `locales/` contains translations. The bot uses Guilds, GuildMessages, MessageContent, and DirectMessages intents. The Message Content privileged intent must be enabled in the Discord Developer Portal. Required channel permissions are View Channels, Send Messages, and Read Message History. Keep bot credentials private and review intent and permission changes against README.md.
+`commands/` contains command definitions and adapters. `events/` contains event adapters. Handlers live in `src/commands/` and `src/events/`. `locales/` contains translations. The bot uses Guilds, GuildMessages, MessageContent, and DirectMessages intents. Enable the Message Content privileged intent in the Discord Developer Portal. Required channel permissions are View Channels, Send Messages, and Read Message History. Keep bot credentials private and review intent and permission changes against README.md.
 
 ## GHCR publication
 
-The image name is `ghcr.io/eliware/ask`; it is built from the repository-root Dockerfile and context for `linux/amd64`. Image visibility is public. `.github/workflows/publish.yml` validates exact package-version tags, publishes the image, creates a signed GitHub artifact provenance attestation, and verifies the tag and digest. GitHub must protect the `ghcr-publish` environment with Eli as a required reviewer. Publication requires the Operations release handoff. Any rollout requires a separate GitOps deployment handoff; publication alone does not deploy. The workflow uses its scoped `GITHUB_TOKEN` for registry credentials.
+The image name is `ghcr.io/eliware/ask`; it is built from the repository-root Dockerfile and context for `linux/amd64`. Image visibility is public. `.github/workflows/publish.yaml` validates exact package-version tags, publishes the image, creates a signed GitHub artifact provenance attestation, and verifies the tag and digest. GitHub must protect the `ghcr-publish` environment with Eli as a required reviewer. Publication requires the Operations release handoff. Any rollout requires a separate GitOps deployment handoff; publication alone does not deploy. The workflow uses its scoped `GITHUB_TOKEN` for registry credentials.
+
+Image: ghcr.io/eliware/ask
+Pull command: docker pull ghcr.io/eliware/ask:v12.0.0
+Supported tags: vMAJOR.MINOR.PATCH
+Deployment boundary: publication does not deploy; deploy by immutable version tag and recorded sha256 digest.

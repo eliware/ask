@@ -11,7 +11,7 @@ Group=root
 RestartSec=5
 Restart=on-failure
 WorkingDirectory=/opt/ask
-ExecStart=/opt/ask/ask.mjs
+ExecStart=/usr/bin/node /opt/ask/bin/ask.mjs
 EnvironmentFile=/opt/ask/.env
 
 [Install]

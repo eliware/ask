@@ -12,6 +12,10 @@ coverage/
 build/
 dist/
 
+# Ignore generated output
+generated/
+test-results/
+
 # Ignore generated artifacts and caches
 artifacts/
 .cache/
@@ -23,9 +27,8 @@ logs/
 *.seed
 
 # Ignore environment secrets
-.env
-.env.*
-!.env.example
+.env*
+!.env*.example
 
 # Ignore machine-specific files
 .vscode/

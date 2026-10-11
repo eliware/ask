@@ -1,6 +1,7 @@
 import { jest, expect, test, describe } from "@jest/globals";
 import { validateLocaleCatalog } from "../../test-fixtures/discord-contracts.mjs";
 jest.unstable_mockModule("../../src/commands/ask.mjs", () => ({ default: undefined }));
+jest.unstable_mockModule("@eliware/discord", () => ({ splitMsg: jest.fn((text) => [text]) }));
 const { default: handler } = await import("../../src/events/messageCreate.mjs");
 
 const makeLog = () => ({ debug: jest.fn(), info: jest.fn(), error: jest.fn(), warn: jest.fn() });

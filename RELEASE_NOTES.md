@@ -1,5 +1,13 @@
 # Release Notes
 
+## 12.0.0 — 2026-10-11
+
+### Changed
+
+- Aligned package metadata, specifications, documentation, launch commands, and GHCR workflow with Eliware Test v12.
+- Updated the launcher path to `bin/ask.mjs`.
+- Updated dependencies and lockfile metadata for v12 validation.
+
 ## 11.0.0 — 2026-10-03
 
 ### Changed
