@@ -1,8 +1,8 @@
 # Ask documentation
 
-Purpose: explain how to configure, use, and troubleshoot the Ask Discord application.
+Purpose: Tell readers how to configure, use, and troubleshoot the Ask Discord application.
 
-Scope: this directory contains end-user documentation for `@eliware/ask`; it does not define deployment ownership, release approval, or production procedures.
+Scope: This directory contains end-user documentation for `@eliware/ask`. It does not define deployment ownership, release approval, or production procedures.
 
 ## Setup
 

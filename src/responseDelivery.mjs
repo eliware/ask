@@ -34,7 +34,6 @@ export async function deliverResponse(interaction, replyText, images, deferred, 
   const message = {};
   if (files.length) message.files = files;
   if (urls.length) message.content = urls.join("\n");
-  if (!message.files && !message.content)
-    message.content = "Sorry, I could not generate a response.";
+  if (!message.files && !message.content) message.content = "Sorry, I could not create a reply.";
   return deferred ? interaction.editReply(message) : interaction.reply(message);
 }

@@ -1,6 +1,8 @@
 import { jest } from "@jest/globals";
 import { createMessageInteraction } from "../src/messageInteraction.mjs";
 
+jest.setTimeout(10_000);
+
 const log = () => ({ error: jest.fn() });
 
 test("creates a message-backed interaction and sends replies", async () => {

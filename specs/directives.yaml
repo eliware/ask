@@ -1,11 +1,16 @@
-version: "12.0"
+version: "13.0"
 description: "Repository-specific requirements for the Ask Discord assistant."
 directives:
   - id: E-3000.0
     dos:
-      - "Ask provides answers, web searches, and image generation through the /ask command, and supports message mentions, replies, direct messages, localized help, and available recent channel context."
-      - "Ask requires DISCORD_CLIENT_ID, DISCORD_TOKEN, and OPENAI_API_KEY before it can connect to Discord or answer requests."
-      - "Keep command definitions, handlers, event behavior, supported intents, and required permissions aligned with the root README and the Discord application implementation."
+      - "Provide answers, web lookup, and image creation through the /ask command."
+      - "Support address mentions, replies, direct messages, localized help, and channel context."
+      - "Require DISCORD_CLIENT_ID, DISCORD_TOKEN, and OPENAI_API_KEY at startup."
+      - "Keep command definitions and handlers aligned with README.md and the application."
+      - "Keep event behavior aligned with README.md and the application."
+      - >-
+        Keep supported intents and required permissions aligned with README.md
+        and the application.
     donts:
-      - "Do not document or request Discord intents or permissions that the application does not use."
+      - "Do not request intents or permissions that the application does not use."
       - "Do not commit runtime credentials or deploy the bot as part of validation."

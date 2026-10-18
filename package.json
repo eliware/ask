@@ -1,8 +1,8 @@
 {
   "name": "@eliware/ask",
-  "version": "12.0.0",
+  "version": "13.0.0",
   "type": "module",
-  "description": "A concise Discord assistant (\"/ask\") for quick answers, web searches, and image generation — supports slash command, mention/DM fallbacks, localization, and usage tracking.",
+  "description": "A Discord assistant for short answers, web lookup, and image generation. Supports slash commands, direct-message triggers, localization, and usage tracking.",
   "keywords": [
     "discord",
     "slash-command",
@@ -29,10 +29,10 @@
     "node": ">=26"
   },
   "dependencies": {
-    "@eliware/common": "^2.0.0",
-    "@eliware/discord": "^2.0.0",
-    "@eliware/openai": "^1.1.11",
-    "dotenv": "^18.0.7"
+    "@eliware/common": "^12.0.1",
+    "@eliware/discord": "^12.0.0",
+    "@eliware/openai": "^12.0.0",
+    "dotenv": "^18.0.8"
   },
   "devDependencies": {
     "@eliware/test": "^12.0.0"

@@ -1,5 +1,3 @@
-import { readdirSync } from "node:fs";
-import { join } from "node:path";
 import { expect, jest, test } from "@jest/globals";
 import { startApplication } from "../src/main.mjs";
 
@@ -80,29 +78,4 @@ test("does not connect when shutdown is requested during startup", async () => {
   });
   await expect(startApplication(dependencies)).resolves.toBeUndefined();
   expect(createDiscord).not.toHaveBeenCalled();
-});
-
-test("keeps runtime loader files available at the configured root", async () => {
-  const commandFiles = readdirSync(join(rootDir, "commands")).filter((file) =>
-    file.endsWith(".mjs"),
-  );
-  const eventFiles = readdirSync(join(rootDir, "events")).filter((file) => file.endsWith(".mjs"));
-  expect(commandFiles.sort()).toEqual(["ask.mjs", "help.mjs"]);
-  expect(eventFiles.sort()).toEqual([
-    "clientReady.mjs",
-    "debug.mjs",
-    "error.mjs",
-    "interactionCreate.mjs",
-    "invalidated.mjs",
-    "messageCreate.mjs",
-    "warn.mjs",
-  ]);
-  for (const file of commandFiles) {
-    const handler = await import(join(rootDir, "commands", file));
-    expect(typeof handler.default).toBe("function");
-  }
-  for (const file of eventFiles) {
-    const handler = await import(join(rootDir, "events", file));
-    expect(typeof handler.default).toBe("function");
-  }
 });

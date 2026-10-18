@@ -86,7 +86,7 @@ test("delivers attachment-only and deferred empty responses", async () => {
     true,
     log,
   );
-  expect(edited.content).toMatch(/could not generate/);
+  expect(edited.content).toMatch(/could not create/);
 });
 test("covers deferred real delivery and URL-only output", async () => {
   let edited;
