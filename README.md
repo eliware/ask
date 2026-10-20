@@ -39,7 +39,7 @@ Copy `.env.example` to an untracked `.env` file. Set `DISCORD_CLIENT_ID`, `DISCO
 
 Run `node bin/ask.mjs` to start the bot. Use `/ask <question>`, address the bot, reply to its message, or send a direct message. Use `!help` for localized help. Read the [release notes](RELEASE_NOTES.md) for release history.
 
-The GHCR image packages this Discord assistant. The image builds for `linux/amd64` and uses the public `ghcr.io/eliware/ask` package. Pull a version with `docker pull ghcr.io/eliware/ask:v13.0.0`. Image publication does not deploy the bot. Deploy with an immutable version tag and record its SHA-256 digest.
+The GHCR image packages this Discord assistant. The image builds for `linux/amd64` and uses the public `ghcr.io/eliware/ask` package. Pull version 14.0.0 with `docker pull ghcr.io/eliware/ask:v14.0.0`. Image publication does not deploy the bot. Deploy with an immutable version tag and record its SHA-256 digest.
 
 ## Development
 

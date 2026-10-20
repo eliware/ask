@@ -1,4 +1,4 @@
-version: "13.0"
+version: "14.0"
 description: "Repository-specific requirements for the Ask Discord assistant."
 directives:
   - id: E-3000.0

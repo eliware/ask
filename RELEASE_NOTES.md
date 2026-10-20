@@ -1,8 +1,11 @@
 # Release Notes
 
-## 13.0.0 — 2026-10-18
+## 14.0.0 — 2026-10-20
 
 ### Changed
 
-- Aligned package metadata, workflows, specifications, and documentation with Eliware Test v13.
-- Replaced the GHCR publisher with the canonical workflow.
+- Added localized Discord help and support for slash commands, direct messages, address mentions, and replies.
+- Added short answers, web lookup, image generation, and recent channel context.
+- Updated the Discord and common libraries to version 13 and aligned repository metadata and specifications with Eliware Test 14.
+- Standardized container publication with the canonical GHCR workflow, image attestations, and digest verification.
+- Expanded end-user setup, usage, configuration, operations, and troubleshooting documentation.
