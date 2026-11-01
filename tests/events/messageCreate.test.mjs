@@ -28,6 +28,15 @@ describe("messageCreate", () => {
     expect(log.debug).toHaveBeenCalledWith("messageCreate", { id: "message-id" });
   });
 
+  test("routes help messages before invoking the ask handler", async () => {
+    const message = makeMessage({ content: "!help", guild: { preferredLocale: "fr" } });
+    const ask = jest.fn();
+    await run(message, { commandHandlers: { ask } });
+
+    expect(message.reply).toHaveBeenCalledWith("fr:help:This is the help text.");
+    expect(ask).not.toHaveBeenCalled();
+  });
+
   test("handles DM with supplied ask handler", async () => {
     const message = makeMessage({ guild: undefined, content: "" });
     const handlerMock = jest.fn(async (_ctx, interaction) => {

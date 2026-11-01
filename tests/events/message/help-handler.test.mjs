@@ -1,5 +1,4 @@
 import { expect, jest, test } from "@jest/globals";
-import messageCreate from "../../../src/events/messageCreate.mjs";
 import { handleMessageHelp } from "../../../src/events/message/help-handler.mjs";
 
 test("replies with localized help and handles the command", async () => {
@@ -23,21 +22,4 @@ test("leaves other messages for trigger routing", async () => {
     handleMessageHelp({ log: { debug: jest.fn() }, msg: jest.fn() }, message, "en"),
   ).resolves.toBe(false);
   expect(message.reply).not.toHaveBeenCalled();
-});
-
-test("routes help messages before invoking the ask handler", async () => {
-  const log = { debug: jest.fn(), error: jest.fn() };
-  const msg = jest.fn(() => "localized help");
-  const ask = jest.fn();
-  const message = {
-    id: "help-message",
-    content: "!help",
-    guild: { preferredLocale: "fr" },
-    reply: jest.fn(),
-  };
-
-  await messageCreate({ client: {}, log, msg, commandHandlers: { ask } }, message);
-
-  expect(message.reply).toHaveBeenCalledWith("localized help");
-  expect(ask).not.toHaveBeenCalled();
 });

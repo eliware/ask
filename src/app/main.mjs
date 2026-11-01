@@ -1,7 +1,7 @@
 import { readFileSync } from "node:fs";
 import { join } from "node:path";
-import { config } from "dotenv";
 import { validateConfiguration } from "../configuration/validate.mjs";
+import { loadEnvironment } from "../configuration/environment.mjs";
 
 export async function startApplication({
   createDiscord,
@@ -11,10 +11,9 @@ export async function startApplication({
   registerSignals,
   rootDir,
   createHealthServer,
-  configureEnvironment = config,
   environment = process.env,
 }) {
-  configureEnvironment({ path: join(rootDir, ".env"), quiet: true });
+  loadEnvironment(rootDir);
   validateConfiguration(environment);
   const healthServer = createHealthServer?.({
     host: environment.HEALTH_HOST || "127.0.0.1",
