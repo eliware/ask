@@ -1,4 +1,4 @@
-import { addBlockquote, defaultSplit } from "./formatting.mjs";
+import { defaultSplit, splitBlockquoted } from "./formatting.mjs";
 export async function deliverResponse(interaction, replyText, images, deferred, log) {
   const text = typeof replyText === "string" ? replyText.trim() : "";
   const files = images
@@ -14,7 +14,7 @@ export async function deliverResponse(interaction, replyText, images, deferred, 
     return deferred ? interaction.editReply(message) : interaction.reply(message);
   }
   const chunks = [
-    ...(text ? defaultSplit(addBlockquote(text), 2000) : []),
+    ...(text ? splitBlockquoted(text, 2000) : []),
     ...urls.flatMap((url) => defaultSplit(url, 2000)),
   ];
   if (chunks.length) {
