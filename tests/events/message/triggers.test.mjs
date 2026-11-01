@@ -1,16 +1,5 @@
 import { expect, test } from "@jest/globals";
-import { isAddressedByName, isMessageTriggered } from "../../../src/events/message/triggers.mjs";
-
-test.each([
-  ["Ask what is here?", true],
-  ["  ask, what is here?", true],
-  ["ASK!", true],
-  ["asking about this", false],
-  ["hello", false],
-  ["", false],
-])("detects the Ask name prefix in %p", (content, expected) => {
-  expect(isAddressedByName(content)).toBe(expected);
-});
+import { isMessageTriggered } from "../../../src/events/message/triggers.mjs";
 
 test.each([
   [{ isDirect: true }, true],

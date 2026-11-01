@@ -1,4 +1,5 @@
-import { extractContentImage, extractGeneratedImage } from "./images.mjs";
+import { extractContentImage } from "./images/content.mjs";
+import { extractGeneratedImage } from "./images/generated.mjs";
 import { getFallbackText, normalizeOutputs } from "./outputs.mjs";
 import { extractContentText, getContentItems } from "./content.mjs";
 

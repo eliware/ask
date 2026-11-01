@@ -1,6 +1,7 @@
 import { safeSerialize } from "@eliware/common";
 import { createMessageInteraction } from "../interaction/message.mjs";
-import { isAddressedByName, isMessageTriggered } from "./message/triggers.mjs";
+import { isAddressedByName } from "./message/addressing.mjs";
+import { isMessageTriggered } from "./message/triggers.mjs";
 import { extractMessagePrompt } from "./message/prompt.mjs";
 import { replyWithLocalizedHelp } from "./message/help.mjs";
 
