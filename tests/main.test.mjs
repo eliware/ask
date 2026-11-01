@@ -106,12 +106,34 @@ test.each([
 });
 
 test("does not connect when shutdown is requested during startup", async () => {
-  const { dependencies, createDiscord, getSignalHandlers } = makeDependencies({
+  const { dependencies, getSignalHandlers } = makeDependencies({
     initializeOpenAI: jest.fn(async () => {
       await getSignalHandlers().shutdownHook();
       return { responses: {} };
     }),
   });
+  const createDiscord = dependencies.createDiscord;
   await expect(startApplication(dependencies)).resolves.toBeUndefined();
   expect(createDiscord).not.toHaveBeenCalled();
+});
+
+test("shuts down a Discord client created after a stop signal", async () => {
+  let resolveClient;
+  const client = { shutdown: jest.fn() };
+  const { dependencies, getSignalHandlers } = makeDependencies({
+    createDiscord: jest.fn(
+      () =>
+        new Promise((resolve) => {
+          resolveClient = resolve;
+        }),
+    ),
+  });
+  const createDiscord = dependencies.createDiscord;
+  const startup = startApplication(dependencies);
+  await Promise.resolve();
+  expect(createDiscord).toHaveBeenCalled();
+  await getSignalHandlers().shutdownHook();
+  resolveClient(client);
+  await expect(startup).resolves.toBeUndefined();
+  expect(client.shutdown).toHaveBeenCalledTimes(1);
 });

@@ -1,5 +1,6 @@
 import { jest } from "@jest/globals";
 import { createMessageInteraction } from "../src/messageInteraction.mjs";
+import { deliverResponse } from "../src/responseDelivery.mjs";
 
 jest.setTimeout(10_000);
 
@@ -57,6 +58,30 @@ test("exposes message metadata and handles objects, files, and ephemeral replies
   expect(interaction.guildId).toBe("g");
   expect(interaction.user).toBe(message.author);
   expect(interaction.member).toBe(message.member);
+});
+
+test("splits message text before adding an image URL to the next chunk", async () => {
+  const replies = [];
+  const url = "https://example.test/image.png";
+  const message = {
+    id: "source-message",
+    author: { id: "user" },
+    channel: { id: "channel" },
+    reply: async (value) => replies.push(value),
+  };
+  const interaction = createMessageInteraction({
+    client: {},
+    message,
+    locale: "en-US",
+    text: "question",
+    log: log(),
+  });
+
+  await deliverResponse(interaction, "x".repeat(2000), [{ url }], false, log());
+
+  expect(replies).toHaveLength(2);
+  expect(replies[0]).toHaveLength(2000);
+  expect(replies[1].trim()).toBe(url);
 });
 
 test("deferReply starts and refreshes typing, including failures", async () => {

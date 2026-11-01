@@ -19,16 +19,19 @@ export async function startApplication({
 
   let client;
   let shuttingDown = false;
+  const shutdownClient = async (target) => {
+    try {
+      if (target) await target.shutdown();
+    } catch (error) {
+      log.warn("Discord shutdown failed", { error: error?.message || String(error) });
+    }
+  };
   registerSignals({
     log,
     shutdownHook: async () => {
       if (shuttingDown) return;
       shuttingDown = true;
-      try {
-        if (client) await client.shutdown();
-      } catch (error) {
-        log.warn("Discord shutdown failed", { error: error?.message || String(error) });
-      }
+      await shutdownClient(client);
     },
   });
 
@@ -40,7 +43,7 @@ export async function startApplication({
   const openai = await initializeOpenAI({ log });
   if (shuttingDown) return undefined;
 
-  client = await createDiscord({
+  const createdClient = await createDiscord({
     log,
     rootDir,
     context: {
@@ -72,5 +75,10 @@ export async function startApplication({
       DirectMessagePolls: false,
     },
   });
+  if (shuttingDown) {
+    await shutdownClient(createdClient);
+    return undefined;
+  }
+  client = createdClient;
   return client;
 }
