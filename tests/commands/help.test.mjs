@@ -1,5 +1,5 @@
 import help from "../../src/commands/help.mjs";
-import { validateDiscordCommand } from "../../test-fixtures/discord-contracts.mjs";
+import { validateDiscordCommand } from "../../test-fixtures/discord-command-contract.mjs";
 
 test("help command definition matches the supported Discord schema", () => {
   expect(validateDiscordCommand("help")).toEqual([]);

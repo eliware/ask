@@ -1,29 +1,17 @@
+import { defaultRedactPatterns, redactStringField } from "./redaction.mjs";
+import { sanitizeLogString, truncateLogField } from "./strings.mjs";
+
 export default function sanitizeForLog(obj, seen = new WeakSet(), depth = 0, opts = {}) {
   const {
     maxDepth = 5,
     maxString = 1000,
     maxArray = 100,
     maxEntries = 200,
-    redactPatterns = [
-      "b64",
-      "base64",
-      "b64_json",
-      "result",
-      "image",
-      "data",
-      "raw",
-      "buffer",
-      "blob",
-    ],
+    redactPatterns = defaultRedactPatterns,
   } = opts || {};
   if (depth > maxDepth) return "<<max-depth>>";
   if (obj === null || obj === undefined) return obj;
-  if (typeof obj === "string") {
-    const nonPrintable = obj.replace(/[\x20-\x7E\n\r\t]/g, "").length;
-    return obj.length > maxString || nonPrintable > Math.min(100, obj.length / 10)
-      ? `<<string length=${obj.length} truncated, nonprintable=${nonPrintable}>>`
-      : obj;
-  }
+  if (typeof obj === "string") return sanitizeLogString(obj, maxString);
   if (typeof obj === "number" || typeof obj === "boolean") return obj;
   if (Buffer.isBuffer(obj)) return `[Buffer length=${obj.length}]`;
   if (Array.isArray(obj)) {
@@ -57,12 +45,10 @@ export default function sanitizeForLog(obj, seen = new WeakSet(), depth = 0, opt
         break;
       }
       try {
-        const lower = String(key).toLowerCase();
-        if (typeof value === "string" && redactPatterns.some((pattern) => lower.includes(pattern)))
-          out[key] = `<<redacted ${lower} length=${value.length}>>`;
+        const redacted = redactStringField(key, value, redactPatterns);
+        if (redacted !== undefined) out[key] = redacted;
         else if (typeof value === "string" && value.length > maxString)
-          out[key] =
-            `${value.slice(0, Math.min(200, maxString))}...[truncated length=${value.length}]`;
+          out[key] = truncateLogField(value, maxString);
         else out[key] = sanitizeForLog(value, seen, depth + 1, opts);
       } catch (err) {
         out[key] = `<<error serializing: ${String(err)}>>`;

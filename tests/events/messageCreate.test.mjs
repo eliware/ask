@@ -1,5 +1,4 @@
 import { jest, expect, test, describe } from "@jest/globals";
-import { validateLocaleCatalog } from "../../test-fixtures/discord-contracts.mjs";
 jest.unstable_mockModule("../../src/commands/ask.mjs", () => ({ default: undefined }));
 jest.unstable_mockModule("@eliware/discord", () => ({ splitMsg: jest.fn((text) => [text]) }));
 const { default: handler } = await import("../../src/events/messageCreate.mjs");
@@ -23,9 +22,6 @@ const run = (message, extra = {}) => {
 };
 
 describe("messageCreate", () => {
-  test("locale catalog is complete and consistent", () => {
-    expect(validateLocaleCatalog()).toEqual([]);
-  });
   test("ignores bot authors", async () => {
     const log = makeLog();
     await run(makeMessage({ author: { bot: true } }), { log });

@@ -1,5 +1,5 @@
 import ask from "../../src/commands/ask.mjs";
-import { validateDiscordCommand } from "../../test-fixtures/discord-contracts.mjs";
+import { validateDiscordCommand } from "../../test-fixtures/discord-command-contract.mjs";
 
 test("Ask command definition matches the supported Discord schema", () => {
   expect(validateDiscordCommand("ask")).toEqual([]);
