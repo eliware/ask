@@ -1,4 +1,5 @@
 import { deliverResponse } from "../../src/response/delivery.mjs";
+import { createMessageSender } from "../../src/interaction/sender.mjs";
 
 const log = { debug() {} };
 
@@ -18,6 +19,31 @@ test("delivers message-backed responses with files and URLs", async () => {
   );
 
   expect(sent).toMatchObject({ content: "ok\n\nhttps://x.test/a", files: [{ name: "x.png" }] });
+});
+
+test("splits combined maximum-length text and image URLs into valid messages", async () => {
+  const replies = [];
+  const channelMessages = [];
+  const sender = createMessageSender({
+    reply: async (message) => replies.push(message),
+    channel: { send: async (message) => channelMessages.push(message) },
+  });
+
+  await deliverResponse(
+    { _omitBlockquote: true, reply: sender },
+    "a".repeat(2000),
+    [{ url: "https://images.example.test/image.png" }],
+    false,
+    log,
+  );
+
+  const messages = [...replies, ...channelMessages];
+  const contents = messages.map((message) =>
+    typeof message === "string" ? message : message.content,
+  );
+  expect(messages.length).toBeGreaterThan(1);
+  expect(contents.every((content) => content.length <= 2000)).toBe(true);
+  expect(contents.join("\n")).toContain("https://images.example.test/image.png");
 });
 
 test("edits deferred message-backed responses", async () => {
