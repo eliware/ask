@@ -18,4 +18,12 @@ describe("clientReady", () => {
     await handler({ log, presence }, client);
     expect(client.user.setPresence).toHaveBeenCalledWith(presence);
   });
+
+  test("marks the health endpoint ready after Discord is ready", async () => {
+    const healthServer = { setReady: jest.fn() };
+    const log = { debug: jest.fn(), info: jest.fn() };
+    const client = { user: { tag: "test#0001", setPresence: jest.fn() } };
+    await handler({ log, healthServer }, client);
+    expect(healthServer.setReady).toHaveBeenCalledWith(true);
+  });
 });

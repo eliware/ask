@@ -6,6 +6,11 @@ const logger = { warn: jest.fn() };
 
 function makeDependencies(overrides = {}) {
   const client = { shutdown: jest.fn() };
+  const healthServer = {
+    start: jest.fn(),
+    close: jest.fn(),
+    setReady: jest.fn(),
+  };
   let signalHandlers;
   const createDiscord = jest.fn(async () => client);
   const dependencies = {
@@ -16,6 +21,7 @@ function makeDependencies(overrides = {}) {
     registerSignals: jest.fn((handlers) => {
       signalHandlers = handlers;
     }),
+    createHealthServer: jest.fn(() => healthServer),
     configureEnvironment: jest.fn(),
     environment: {
       DISCORD_CLIENT_ID: "test-client-id",
@@ -25,7 +31,13 @@ function makeDependencies(overrides = {}) {
     rootDir,
     ...overrides,
   };
-  return { dependencies, client, createDiscord, getSignalHandlers: () => signalHandlers };
+  return {
+    dependencies,
+    client,
+    createDiscord,
+    healthServer,
+    getSignalHandlers: () => signalHandlers,
+  };
 }
 
 test("rejects missing configuration before registering or initializing services", async () => {
@@ -117,6 +129,34 @@ test("does not connect when shutdown is requested during startup", async () => {
   expect(createDiscord).not.toHaveBeenCalled();
 });
 
+test("stops the health server when Discord startup fails", async () => {
+  const { dependencies, healthServer } = makeDependencies({
+    createDiscord: jest.fn(async () => {
+      throw new Error("Discord startup failed");
+    }),
+  });
+  await expect(startApplication(dependencies)).rejects.toThrow("Discord startup failed");
+  expect(healthServer.setReady).toHaveBeenCalledWith(false);
+  expect(healthServer.close).toHaveBeenCalledTimes(1);
+});
+
+test("logs health server shutdown failures", async () => {
+  const { dependencies, healthServer, getSignalHandlers } = makeDependencies();
+  healthServer.close.mockRejectedValue({});
+  await startApplication(dependencies);
+  await getSignalHandlers().shutdownHook();
+  expect(logger.warn).toHaveBeenCalledWith("Health server shutdown failed", {
+    error: "[object Object]",
+  });
+});
+
+test("supports startup without a health server", async () => {
+  const { dependencies, getSignalHandlers } = makeDependencies();
+  delete dependencies.createHealthServer;
+  await startApplication(dependencies);
+  await getSignalHandlers().shutdownHook();
+});
+
 test("shuts down a Discord client created after a stop signal", async () => {
   let resolveClient;
   const client = { shutdown: jest.fn() };
@@ -130,7 +170,15 @@ test("shuts down a Discord client created after a stop signal", async () => {
   });
   const createDiscord = dependencies.createDiscord;
   const startup = startApplication(dependencies);
-  await Promise.resolve();
+  const clientCreation = new Promise((resolve) =>
+    createDiscord.mockImplementationOnce(() => {
+      resolve();
+      return new Promise((done) => {
+        resolveClient = done;
+      });
+    }),
+  );
+  await clientCreation;
   expect(createDiscord).toHaveBeenCalled();
   await getSignalHandlers().shutdownHook();
   resolveClient(client);

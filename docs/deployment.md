@@ -9,7 +9,9 @@ The GHCR image runs the Ask Discord assistant as the unprivileged `node` user. T
 3. Run `docker compose logs -f ask` to view container logs.
 4. Run `docker compose down` to stop and remove the container.
 
-The Compose entry builds the local Dockerfile and starts again unless stopped. The bot does not expose a network port.
+The Compose entry builds the local Dockerfile and starts again unless stopped. It exposes the health endpoints on `127.0.0.1:3000`.
+
+Use `GET /health` to check that the process responds. Use `GET /ready` to check the Discord client status. The endpoint returns `503` until the client emits `clientReady`, then returns `200`. Both endpoints listen on port `3000` inside the container.
 
 ## Run a published image
 
