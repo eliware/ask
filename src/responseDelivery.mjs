@@ -1,20 +1,20 @@
 import { addBlockquote, defaultSplit } from "./formatResponse.mjs";
 export async function deliverResponse(interaction, replyText, images, deferred, log) {
-  const text = String(replyText || "").trim();
+  const text = typeof replyText === "string" ? replyText.trim() : "";
   const files = images
     .filter((image) => image.buffer)
     .map((image) => ({ attachment: image.buffer, name: image.filename }));
   const urls = images.filter((image) => image.url).map((image) => image.url);
   if (interaction._omitBlockquote) {
     const message = {};
-    if (text) message.content = replyText;
+    if (text) message.content = text;
     if (files.length) message.files = files;
     if (urls.length)
       message.content = `${message.content ? `${message.content}\n\n` : ""}${urls.join("\n")}`;
     return deferred ? interaction.editReply(message) : interaction.reply(message);
   }
   const splitter = defaultSplit;
-  const chunks = text ? splitter(addBlockquote(replyText), 4000) : [];
+  const chunks = text ? splitter(addBlockquote(text), 4000) : [];
   if (chunks.length) {
     const first = { content: chunks[0] };
     if (files.length) first.files = files;

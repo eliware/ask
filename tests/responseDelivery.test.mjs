@@ -29,6 +29,21 @@ test("edits deferred mock response", async () => {
   await deliverResponse(interaction, "", [], true, log);
   expect(edited).toEqual({});
 });
+test("does not stringify object text beside a slash-command image", async () => {
+  let sent;
+  await deliverResponse(
+    {
+      reply: async (value) => {
+        sent = value;
+      },
+    },
+    { image: "generated" },
+    [{ buffer: Buffer.from("image"), filename: "image.png" }],
+    false,
+    log,
+  );
+  expect(sent).toEqual({ files: [{ attachment: Buffer.from("image"), name: "image.png" }] });
+});
 test("delivers real response, attachments, URLs, and followups", async () => {
   const calls = [];
   const interaction = {

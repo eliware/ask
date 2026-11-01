@@ -84,3 +84,36 @@ test("parseResponse uses fallback text", () => {
   });
   expect(parseResponse({})).toEqual({ replyText: "", images: [] });
 });
+
+test("ignores nontext fallback objects on an image response", () => {
+  expect(
+    parseResponse({
+      output_text: { image: "generated" },
+      text: { image: "generated" },
+      output: [{ type: "image_generation_call", id: "ig_image", result: "aGVsbG8=" }],
+    }),
+  ).toEqual({
+    replyText: "",
+    images: [
+      expect.objectContaining({
+        buffer: Buffer.from("hello"),
+        filename: "image_ig_image.png",
+      }),
+    ],
+  });
+});
+
+test("extracts text fields from fallback objects", () => {
+  expect(parseResponse({ output_text: { text: "caption" } })).toEqual({
+    replyText: "caption",
+    images: [],
+  });
+  expect(parseResponse({ output_text: { output_text: "output caption" } })).toEqual({
+    replyText: "output caption",
+    images: [],
+  });
+  expect(parseResponse({ text: { content: "content caption" } })).toEqual({
+    replyText: "content caption",
+    images: [],
+  });
+});
