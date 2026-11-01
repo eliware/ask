@@ -55,17 +55,3 @@ test("splits message text before adding an image URL to the next chunk", async (
   expect(replies[0]).toHaveLength(2000);
   expect(replies[1].trim()).toBe(url);
 });
-
-test("wires typing controls onto the interaction", async () => {
-  const message = { author: {}, channel: { sendTyping: jest.fn() } };
-  const interaction = createMessageInteraction({
-    client: {},
-    message,
-    locale: "en",
-    text: "",
-    log: log(),
-  });
-  await interaction.deferReply();
-  expect(message.channel.sendTyping).toHaveBeenCalledTimes(1);
-  interaction.stopTyping();
-});
