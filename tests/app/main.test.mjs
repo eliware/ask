@@ -198,6 +198,19 @@ test("closes the health server when listening fails", async () => {
   expect(healthServer.close).toHaveBeenCalledTimes(1);
 });
 
+test("handles health server construction failures through startup cleanup", async () => {
+  const { dependencies } = makeDependencies({
+    createHealthServer: jest.fn(() => {
+      throw new Error("health construction failed");
+    }),
+  });
+
+  await expect(startApplication(dependencies)).rejects.toThrow("health construction failed");
+  expect(dependencies.registerSignals).not.toHaveBeenCalled();
+  expect(dependencies.registerHandlers).not.toHaveBeenCalled();
+  expect(dependencies.initializeOpenAI).not.toHaveBeenCalled();
+});
+
 test("closes the health server when handler registration fails", async () => {
   const { dependencies, healthServer } = makeDependencies({
     registerHandlers: jest.fn(() => {

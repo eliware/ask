@@ -75,7 +75,7 @@
   "dm_permission": true,
 
   "permissions": {
-    "user_permissions": ["VIEW_CHANNEL", "SEND_MESSAGES"]
+    "user_permissions": ["VIEW_CHANNEL", "SEND_MESSAGES", "READ_MESSAGE_HISTORY"]
   },
 
   "integration_types": [0, 1],

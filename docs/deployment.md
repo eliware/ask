@@ -20,8 +20,8 @@ Use `GET /health` to check that the process responds. Use `GET /ready` to check 
 The image is published to `ghcr.io/eliware/ask`. Package settings determine who can pull it. Use a version tag for an approved release, or use the immutable digest recorded by the publish workflow.
 
 1. Set the required values in an untracked `.env` file or deployment secret store.
-2. Pull the selected version with `docker pull ghcr.io/eliware/ask:v15.1.0`.
-3. Run the selected image with `docker run --env-file .env ghcr.io/eliware/ask:v15.1.0`.
+2. Pull the selected version with `docker pull ghcr.io/eliware/ask:v15.1.1`.
+3. Run the selected image with `docker run --env-file .env ghcr.io/eliware/ask:v15.1.1`.
 
 For a deployment, replace the example version with an approved release tag. Record the SHA-256 digest and deploy by digest when the platform supports it. Publication does not grant deployment approval.
 

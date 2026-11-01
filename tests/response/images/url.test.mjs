@@ -14,3 +14,10 @@ test("extracts image URLs from supported fields", () => {
   expect(extractImageUrl(null)).toEqual({ handled: false, image: null });
   expect(extractImageUrl({ image: { url: "" } })).toEqual({ handled: false, image: null });
 });
+
+test.each(["javascript:alert(1)", "file:///etc/passwd", "not a URL"])(
+  "rejects unsupported image URL %s",
+  (url) => {
+    expect(extractImageUrl({ url })).toEqual({ handled: false, image: null });
+  },
+);

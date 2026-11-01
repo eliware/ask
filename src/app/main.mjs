@@ -17,12 +17,14 @@ export async function startApplication({
 }) {
   loadEnvironment(rootDir);
   validateConfiguration(environment);
-  const healthServer = createHealthServer?.({
-    host: environment.HEALTH_HOST || "127.0.0.1",
-  });
-  const shutdown = createShutdownManager({ log, healthServer });
+  let healthServer;
+  const shutdown = createShutdownManager({ log });
 
   try {
+    healthServer = createHealthServer?.({
+      host: environment.HEALTH_HOST || "127.0.0.1",
+    });
+    shutdown.setHealthServer(healthServer);
     registerSignals({ log, shutdownHook: shutdown.shutdownHook });
     if (shutdown.isShuttingDown()) return undefined;
     await healthServer?.start();
