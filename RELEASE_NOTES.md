@@ -2,9 +2,24 @@
 
 ## 15.1.1 — 2026-11-01
 
+### Added
+
+- Added `HEALTH_HOST` to configure the address used by `/health` and `/ready`.
+- Added Read Message History to the permissions declared for `/ask` and `/help`.
+
 ### Changed
 
-- Added optional `HEALTH_HOST` configuration for health server binding. The default remains `127.0.0.1`.
+- Reorganized application modules and tests into focused directories by responsibility.
+- Updated setup, usage, configuration, and deployment guidance for the current application behavior.
+- Updated the package version and lockfile to 15.1.1.
+
+### Fixed
+
+- Fixed health server cleanup when startup fails or shutdown arrives during startup.
+- Fixed stale readiness after health server listener errors and Discord session invalidation.
+- Fixed message responses that combine maximum-length text with image URLs.
+- Rejected malformed base64 image data and image URLs that do not use HTTP or HTTPS.
+- Rejected empty locale catalog values during validation.
 
 ## 15.1.0 — 2026-11-01
 
