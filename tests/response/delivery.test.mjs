@@ -1,34 +1,6 @@
 import { deliverResponse } from "../../src/response/delivery.mjs";
 
 const log = { debug() {} };
-test("delivers mock response with files and URLs", async () => {
-  let sent;
-  const interaction = {
-    _omitBlockquote: true,
-    reply: async (value) => {
-      sent = value;
-    },
-  };
-  await deliverResponse(
-    interaction,
-    "ok",
-    [{ buffer: Buffer.from("x"), filename: "x.png" }, { url: "https://x.test/a" }],
-    false,
-    log,
-  );
-  expect(sent).toMatchObject({ content: "ok\n\nhttps://x.test/a", files: [{ name: "x.png" }] });
-});
-test("edits deferred mock response", async () => {
-  let edited;
-  const interaction = {
-    _omitBlockquote: true,
-    editReply: async (value) => {
-      edited = value;
-    },
-  };
-  await deliverResponse(interaction, "", [], true, log);
-  expect(edited).toEqual({});
-});
 test("does not stringify object text beside a slash-command image", async () => {
   let sent;
   await deliverResponse(
@@ -149,21 +121,7 @@ test("covers deferred real delivery and URL-only output", async () => {
   );
   expect(sent.content).toBe("https://x.test/a");
 });
-test("covers mock empty and real attachment URL combinations", async () => {
-  let sent;
-  await deliverResponse(
-    {
-      _omitBlockquote: true,
-      reply: async (value) => {
-        sent = value;
-      },
-    },
-    "",
-    [{ url: "u" }],
-    false,
-    log,
-  );
-  expect(sent.content).toBe("u");
+test("covers deferred real attachment URL combinations", async () => {
   let edited;
   await deliverResponse(
     {

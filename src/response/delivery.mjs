@@ -1,18 +1,13 @@
 import { defaultSplit, splitBlockquoted } from "./formatting.mjs";
+import { deliverMessageResponse } from "./message-delivery.mjs";
 export async function deliverResponse(interaction, replyText, images, deferred, log) {
   const text = typeof replyText === "string" ? replyText.trim() : "";
   const files = images
     .filter((image) => image.buffer)
     .map((image) => ({ attachment: image.buffer, name: image.filename }));
   const urls = images.filter((image) => image.url).map((image) => image.url);
-  if (interaction._omitBlockquote) {
-    const message = {};
-    if (text) message.content = text;
-    if (files.length) message.files = files;
-    if (urls.length)
-      message.content = `${message.content ? `${message.content}\n\n` : ""}${urls.join("\n")}`;
-    return deferred ? interaction.editReply(message) : interaction.reply(message);
-  }
+  if (interaction._omitBlockquote)
+    return deliverMessageResponse(interaction, text, files, urls, deferred);
   const chunks = [
     ...(text ? splitBlockquoted(text, 2000) : []),
     ...urls.flatMap((url) => defaultSplit(url, 2000)),
