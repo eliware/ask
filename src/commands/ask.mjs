@@ -5,18 +5,7 @@ import { requestAnswer } from "../openai/request.mjs";
 import { parseResponse } from "../response/parsing.mjs";
 import { deliverResponse } from "../response/delivery.mjs";
 import { safetyMessage } from "../response/safety-message.mjs";
-
-function extractViolations(error) {
-  if (Array.isArray(error?.error?.safety_violations))
-    return error.error.safety_violations.map(String);
-  const match = String(error?.message || error || "").match(/safety_violations=\[([^\]]+)\]/i);
-  return match
-    ? match[1]
-        .split(",")
-        .map((value) => value.trim())
-        .filter(Boolean)
-    : [];
-}
+import { extractViolations } from "../response/violations.mjs";
 
 export default async function ({ client, log, msg, openai }, interaction) {
   log.debug("ask Request");

@@ -52,48 +52,43 @@ test("rejects missing configuration before registering or initializing services"
   expect(createDiscord).not.toHaveBeenCalled();
 });
 
-test("uses default dotenv configuration and process environment", async () => {
-  const names = ["DISCORD_CLIENT_ID", "DISCORD_TOKEN", "OPENAI_API_KEY"];
+test("starts the bot with dotenv configuration, version, intents, and runtime root", async () => {
+  const names = ["DISCORD_CLIENT_ID", "DISCORD_TOKEN", "OPENAI_API_KEY", "HEALTH_HOST"];
   const values = ["test-client-id", "test-discord-token", "test-openai-key"];
   const originalValues = Object.fromEntries(names.map((name) => [name, process.env[name]]));
-  const { dependencies, client, getSignalHandlers } = makeDependencies();
+  const { dependencies, client, createDiscord, getSignalHandlers } = makeDependencies();
   delete dependencies.configureEnvironment;
   delete dependencies.environment;
   Object.assign(process.env, Object.fromEntries(names.map((name, index) => [name, values[index]])));
+  delete process.env.HEALTH_HOST;
   try {
     await expect(startApplication(dependencies)).resolves.toBe(client);
+
+    expect(dependencies.registerHandlers).toHaveBeenCalledWith({ log: logger });
+    expect(dependencies.createHealthServer).toHaveBeenCalledWith({ host: "127.0.0.1" });
+    expect(dependencies.initializeOpenAI).toHaveBeenCalledWith({ log: logger });
+    expect(createDiscord).toHaveBeenCalledWith(
+      expect.objectContaining({
+        log: logger,
+        rootDir,
+        context: expect.objectContaining({ openai: { responses: {} } }),
+        intents: expect.objectContaining({
+          Guilds: true,
+          GuildMessages: true,
+          MessageContent: true,
+          DirectMessages: true,
+        }),
+      }),
+    );
     await getSignalHandlers().shutdownHook();
+    await getSignalHandlers().shutdownHook();
+    expect(client.shutdown).toHaveBeenCalledTimes(1);
   } finally {
     for (const name of names) {
       if (originalValues[name] === undefined) delete process.env[name];
       else process.env[name] = originalValues[name];
     }
   }
-});
-
-test("starts the bot with its package version, intents, and runtime root", async () => {
-  const { dependencies, client, createDiscord, getSignalHandlers } = makeDependencies();
-  await expect(startApplication(dependencies)).resolves.toBe(client);
-
-  expect(dependencies.registerHandlers).toHaveBeenCalledWith({ log: logger });
-  expect(dependencies.createHealthServer).toHaveBeenCalledWith({ host: "127.0.0.1" });
-  expect(dependencies.initializeOpenAI).toHaveBeenCalledWith({ log: logger });
-  expect(createDiscord).toHaveBeenCalledWith(
-    expect.objectContaining({
-      log: logger,
-      rootDir,
-      context: expect.objectContaining({ openai: { responses: {} } }),
-      intents: expect.objectContaining({
-        Guilds: true,
-        GuildMessages: true,
-        MessageContent: true,
-        DirectMessages: true,
-      }),
-    }),
-  );
-  await getSignalHandlers().shutdownHook();
-  await getSignalHandlers().shutdownHook();
-  expect(client.shutdown).toHaveBeenCalledTimes(1);
 });
 
 test("uses the configured health server host", async () => {
