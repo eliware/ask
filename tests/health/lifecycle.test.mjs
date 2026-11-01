@@ -53,6 +53,15 @@ test("rejects start and close failures", async () => {
   startServer.listen.mockImplementation(() => startServer.fail(new Error("listen failed")));
   const startLifecycle = createHealthServerLifecycle(startServer);
   await expect(startLifecycle.start()).rejects.toThrow("listen failed");
+  expect(startServer.off).toHaveBeenCalledWith("error", expect.any(Function));
+
+  const throwingServer = makeServer();
+  throwingServer.listen.mockImplementation(() => {
+    throw new Error("listen threw");
+  });
+  const throwingLifecycle = createHealthServerLifecycle(throwingServer);
+  await expect(throwingLifecycle.start()).rejects.toThrow("listen threw");
+  expect(throwingServer.off).toHaveBeenCalledWith("error", expect.any(Function));
 
   const closeServer = makeServer();
   closeServer.listening = true;

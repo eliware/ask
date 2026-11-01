@@ -20,18 +20,21 @@ export async function startApplication({
   const healthServer = createHealthServer?.({
     host: environment.HEALTH_HOST || "127.0.0.1",
   });
-  await healthServer?.start();
-  registerHandlers({ log });
-
   const shutdown = createShutdownManager({ log, healthServer });
-  registerSignals({
-    log,
-    shutdownHook: shutdown.shutdownHook,
-  });
 
-  const packageJson = JSON.parse(readFileSync(join(rootDir, "package.json"), "utf8"));
-  const presence = createPresence(packageJson.version);
   try {
+    registerSignals({ log, shutdownHook: shutdown.shutdownHook });
+    if (shutdown.isShuttingDown()) return undefined;
+    await healthServer?.start();
+    if (shutdown.isShuttingDown()) {
+      await shutdown.shutdownHealthServer();
+      return undefined;
+    }
+    registerHandlers({ log });
+    if (shutdown.isShuttingDown()) return undefined;
+
+    const packageJson = JSON.parse(readFileSync(join(rootDir, "package.json"), "utf8"));
+    const presence = createPresence(packageJson.version);
     const openai = await initializeOpenAI({ log });
     if (shutdown.isShuttingDown()) return undefined;
 

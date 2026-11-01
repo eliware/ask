@@ -123,6 +123,59 @@ test("does not connect when shutdown is requested during startup", async () => {
   expect(createDiscord).not.toHaveBeenCalled();
 });
 
+test("stops before starting health services when shutdown is already requested", async () => {
+  let shutdownPromise;
+  const { dependencies, healthServer } = makeDependencies({
+    registerSignals: jest.fn(({ shutdownHook }) => {
+      shutdownPromise = shutdownHook();
+    }),
+  });
+
+  await expect(startApplication(dependencies)).resolves.toBeUndefined();
+  await shutdownPromise;
+
+  expect(healthServer.start).not.toHaveBeenCalled();
+  expect(dependencies.registerHandlers).not.toHaveBeenCalled();
+});
+
+test("closes health server when shutdown arrives during its startup", async () => {
+  let shutdownHook;
+  let shutdownPromise;
+  const { dependencies, healthServer } = makeDependencies({
+    registerSignals: jest.fn((handlers) => {
+      shutdownHook = handlers.shutdownHook;
+    }),
+  });
+  healthServer.start.mockImplementation(async () => {
+    shutdownPromise = shutdownHook();
+  });
+
+  await expect(startApplication(dependencies)).resolves.toBeUndefined();
+  await shutdownPromise;
+
+  expect(healthServer.close).toHaveBeenCalledTimes(2);
+  expect(dependencies.registerHandlers).not.toHaveBeenCalled();
+});
+
+test("stops startup when shutdown arrives during handler registration", async () => {
+  let shutdownHook;
+  let shutdownPromise;
+  const { dependencies } = makeDependencies({
+    registerSignals: jest.fn((handlers) => {
+      shutdownHook = handlers.shutdownHook;
+    }),
+    registerHandlers: jest.fn(() => {
+      shutdownPromise = shutdownHook();
+    }),
+  });
+
+  await expect(startApplication(dependencies)).resolves.toBeUndefined();
+  await shutdownPromise;
+
+  expect(dependencies.initializeOpenAI).not.toHaveBeenCalled();
+  expect(dependencies.createDiscord).not.toHaveBeenCalled();
+});
+
 test("stops the health server when Discord startup fails", async () => {
   const { dependencies, healthServer } = makeDependencies({
     createDiscord: jest.fn(async () => {
@@ -130,6 +183,32 @@ test("stops the health server when Discord startup fails", async () => {
     }),
   });
   await expect(startApplication(dependencies)).rejects.toThrow("Discord startup failed");
+  expect(healthServer.close).toHaveBeenCalledTimes(1);
+});
+
+test("closes the health server when listening fails", async () => {
+  const { dependencies, healthServer } = makeDependencies();
+  healthServer.start.mockRejectedValue(new Error("listen failed"));
+
+  await expect(startApplication(dependencies)).rejects.toThrow("listen failed");
+
+  expect(dependencies.registerSignals).toHaveBeenCalled();
+  expect(dependencies.registerHandlers).not.toHaveBeenCalled();
+  expect(healthServer.setReady).toHaveBeenCalledWith(false);
+  expect(healthServer.close).toHaveBeenCalledTimes(1);
+});
+
+test("closes the health server when handler registration fails", async () => {
+  const { dependencies, healthServer } = makeDependencies({
+    registerHandlers: jest.fn(() => {
+      throw new Error("handler registration failed");
+    }),
+  });
+
+  await expect(startApplication(dependencies)).rejects.toThrow("handler registration failed");
+
+  expect(healthServer.start).toHaveBeenCalledTimes(1);
+  expect(healthServer.setReady).toHaveBeenCalledWith(false);
   expect(healthServer.close).toHaveBeenCalledTimes(1);
 });
 

@@ -2,11 +2,20 @@ export function createHealthServerLifecycle(server, { host = "127.0.0.1", port =
   return {
     start: () =>
       new Promise((resolve, reject) => {
-        server.once("error", reject);
-        server.listen(port, host, () => {
-          server.off("error", reject);
-          resolve();
-        });
+        const onError = (error) => {
+          server.off("error", onError);
+          reject(error);
+        };
+        server.once("error", onError);
+        try {
+          server.listen(port, host, () => {
+            server.off("error", onError);
+            resolve();
+          });
+        } catch (error) {
+          server.off("error", onError);
+          reject(error);
+        }
       }),
     close: () =>
       new Promise((resolve, reject) => {
