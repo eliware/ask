@@ -2,6 +2,7 @@ import { safeSerialize } from "@eliware/common";
 import { createMessageInteraction } from "../interaction/message.mjs";
 import { isAddressedByName, isMessageTriggered } from "./message/triggers.mjs";
 import { extractMessagePrompt } from "./message/prompt.mjs";
+import { replyWithLocalizedHelp } from "./message/help.mjs";
 
 export default async function ({ client, log, msg, commandHandlers, ...contextData }, message) {
   log.debug("messageCreate", { id: message.id });
@@ -9,9 +10,7 @@ export default async function ({ client, log, msg, commandHandlers, ...contextDa
   const locale = message.guild?.preferredLocale || "en-US";
   const localeMsg = (key, defaultMsg) => msg(locale, key, defaultMsg, log);
   if (message.content === "!help") {
-    const response = localeMsg("help", "This is the help text.");
-    await message.reply(response);
-    log.debug("!help Response", { response });
+    await replyWithLocalizedHelp({ log, msg }, message, locale);
     return;
   }
 
