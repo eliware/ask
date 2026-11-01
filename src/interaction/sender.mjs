@@ -1,18 +1,10 @@
-import { defaultSplit } from "../response/formatting.mjs";
-
-async function splitText(text, max) {
-  try {
-    const mod = await import("@eliware/discord");
-    if (typeof mod.splitMsg === "function") return mod.splitMsg(text, max);
-  } catch {}
-  return defaultSplit(text, max);
-}
+import { splitMessage } from "./splitting.mjs";
 
 export function createMessageSender(message) {
   return async function send(response, ephemeral = false) {
     const content = response?.content ?? response;
     const files = response?.files || null;
-    const chunks = await splitText(
+    const chunks = await splitMessage(
       typeof content === "string" ? content : JSON.stringify(content),
       2000,
     );

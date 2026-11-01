@@ -1,6 +1,6 @@
 import { join } from "node:path";
-import { loadLocaleCatalogFiles } from "./catalog-files.mjs";
-import { supportedLocales } from "./supported.mjs";
+import { loadLocaleCatalogFiles } from "./files.mjs";
+import { supportedLocales } from "../supported.mjs";
 
 export function validateLocaleCatalog(directory = join(process.cwd(), "locales"), fileSystem) {
   const { files, names, values, reference } = loadLocaleCatalogFiles(directory, fileSystem);

@@ -1,5 +1,5 @@
 import { expect, test } from "@jest/globals";
-import { validateLocaleCatalog } from "../../src/locales/catalog.mjs";
+import { validateLocaleCatalog } from "../../../src/locales/catalog/validation.mjs";
 
 test("locale catalog is complete and consistent", () => {
   expect(validateLocaleCatalog()).toEqual([]);

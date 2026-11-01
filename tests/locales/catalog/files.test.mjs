@@ -1,5 +1,5 @@
 import { expect, jest, test } from "@jest/globals";
-import { loadLocaleCatalogFiles } from "../../src/locales/catalog-files.mjs";
+import { loadLocaleCatalogFiles } from "../../../src/locales/catalog/files.mjs";
 
 test("loads only JSON locale files and reads their catalogs", () => {
   const localeData = { "en-US.json": { expected: "value" }, "fr.json": { expected: "value" } };
