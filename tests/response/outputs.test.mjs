@@ -1,4 +1,8 @@
-import { getFallbackText, normalizeOutputs } from "../../src/response/outputs.mjs";
+import {
+  getFallbackText,
+  normalizeOutputs,
+  selectFallbackText,
+} from "../../src/response/outputs.mjs";
 
 test("normalizeOutputs handles arrays, objects, and missing values", () => {
   const array = [{ content: "a" }];
@@ -18,4 +22,11 @@ test("gets text from supported fallback values", () => {
   expect(getFallbackText({ image: "not text" })).toBe("");
   expect(getFallbackText(null)).toBe("");
   expect(getFallbackText(3)).toBe("");
+});
+
+test("selects reply text before fallback fields", () => {
+  expect(selectFallbackText("reply", { output_text: "output", text: "text" })).toBe("reply");
+  expect(selectFallbackText("", { output_text: "output", text: "text" })).toBe("output");
+  expect(selectFallbackText("", { output_text: {}, text: { content: "caption" } })).toBe("caption");
+  expect(selectFallbackText("", {})).toBe("");
 });

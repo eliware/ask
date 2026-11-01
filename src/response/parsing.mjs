@@ -1,6 +1,6 @@
 import { extractContentImage } from "./images/content.mjs";
 import { extractGeneratedImage } from "./images/generated.mjs";
-import { getFallbackText, normalizeOutputs } from "./outputs.mjs";
+import { normalizeOutputs, selectFallbackText } from "./outputs.mjs";
 import { extractContentText, getContentItems } from "./content.mjs";
 
 export function parseResponse(response) {
@@ -21,8 +21,7 @@ export function parseResponse(response) {
     }
   }
   return {
-    replyText:
-      replyText || getFallbackText(response?.output_text) || getFallbackText(response?.text),
+    replyText: selectFallbackText(replyText, response),
     images,
   };
 }

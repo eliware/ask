@@ -16,3 +16,7 @@ export function getFallbackText(value) {
   if (typeof value.content === "string") return value.content;
   return "";
 }
+
+export function selectFallbackText(replyText, response) {
+  return replyText || getFallbackText(response?.output_text) || getFallbackText(response?.text);
+}

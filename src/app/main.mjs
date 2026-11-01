@@ -2,6 +2,8 @@ import { readFileSync } from "node:fs";
 import { join } from "node:path";
 import { validateConfiguration } from "../configuration/validate.mjs";
 import { loadEnvironment } from "../configuration/environment.mjs";
+import { createPresence } from "./presence.mjs";
+import { createShutdownManager } from "./shutdown.mjs";
 
 export async function startApplication({
   createDiscord,
@@ -21,41 +23,17 @@ export async function startApplication({
   await healthServer?.start();
   registerHandlers({ log });
 
-  let client;
-  let shuttingDown = false;
-  const shutdownClient = async (target) => {
-    try {
-      if (target) await target.shutdown();
-    } catch (error) {
-      log.warn("Discord shutdown failed", { error: error?.message || String(error) });
-    }
-  };
-  const shutdownHealthServer = async () => {
-    try {
-      healthServer?.setReady(false);
-      await healthServer?.close();
-    } catch (error) {
-      log.warn("Health server shutdown failed", { error: error?.message || String(error) });
-    }
-  };
+  const shutdown = createShutdownManager({ log, healthServer });
   registerSignals({
     log,
-    shutdownHook: async () => {
-      if (shuttingDown) return;
-      shuttingDown = true;
-      await shutdownClient(client);
-      await shutdownHealthServer();
-    },
+    shutdownHook: shutdown.shutdownHook,
   });
 
   const packageJson = JSON.parse(readFileSync(join(rootDir, "package.json"), "utf8"));
-  const presence = {
-    activities: [{ name: `ask v${packageJson.version}`, type: 4 }],
-    status: "online",
-  };
+  const presence = createPresence(packageJson.version);
   try {
     const openai = await initializeOpenAI({ log });
-    if (shuttingDown) return undefined;
+    if (shutdown.isShuttingDown()) return undefined;
 
     const createdClient = await createDiscord({
       log,
@@ -90,16 +68,16 @@ export async function startApplication({
         DirectMessagePolls: false,
       },
     });
-    if (shuttingDown) {
-      await shutdownClient(createdClient);
-      await shutdownHealthServer();
+    if (shutdown.isShuttingDown()) {
+      await shutdown.shutdownClient(createdClient);
+      await shutdown.shutdownHealthServer();
       return undefined;
     }
-    client = createdClient;
-    return client;
+    shutdown.setClient(createdClient);
+    return createdClient;
   } catch (error) {
-    await shutdownClient(client);
-    await shutdownHealthServer();
+    await shutdown.shutdownClient();
+    await shutdown.shutdownHealthServer();
     throw error;
   }
 }
