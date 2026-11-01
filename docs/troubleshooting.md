@@ -4,6 +4,10 @@
 
 Check that `DISCORD_CLIENT_ID`, `DISCORD_TOKEN`, and `OPENAI_API_KEY` have values. Confirm that the application ID and bot token belong to the same Discord application. Keep the values private when you inspect logs.
 
+## Discord connection status
+
+The `/ready` endpoint returns `503` until Discord emits the `clientReady` event. Check `docker compose logs -f ask` for startup errors. Confirm that the bot token is valid and Discord responds.
+
 ## A command does not appear
 
 Confirm that you invited Ask with the `applications.commands` scope. Start Ask again after changing command definitions. Discord may require time to refresh command data.

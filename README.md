@@ -25,15 +25,15 @@ A Discord assistant for short answers, web lookup, and image generation. Support
 
 ## Features
 
-Ask answers questions, looks up web results, and creates images through Discord. It supports localized commands, direct messages, address mentions, replies, and channel context.
+Ask provides answers, web lookup, and image generation through Discord. See the [user guides](docs/README.md) for setup and request details.
 
 ## Requirements
 
-Use Node.js 26 or later and npm 12 or later. Bot startup requires a Discord application and an OpenAI API key.
+Use Node.js 26 or later and npm 12 or later. Provide a Discord application and an OpenAI API key.
 
 ## Setup
 
-Follow the [setup guide](docs/README.md) to configure Discord, set environment values, and start the bot.
+Follow the [setup guide](docs/usage.md) to configure Discord, set environment values, and start Ask.
 
 ## Usage
 
@@ -61,7 +61,9 @@ Set `DISCORD_CLIENT_ID`, `DISCORD_TOKEN`, and `OPENAI_API_KEY`. See the [configu
 
 ## Operations
 
-Run `node bin/ask.mjs` for a local start. The public GHCR image packages Ask for container use. Pull it with a version tag or deploy by its recorded SHA-256 digest. Publication does not deploy the bot. See the [deployment guide](docs/deployment.md) for container commands and shutdown behavior.
+Run `node bin/ask.mjs` to start Ask locally. The GHCR image packages Ask for container use. The repository workflow builds on `ubuntu-latest` and leaves the build platform unset, so Docker uses the runner default.
+
+Package settings control image access. Pull an approved version or deploy by its recorded SHA-256 digest. Publication does not deploy the bot. See the [deployment guide](docs/deployment.md) for container commands and shutdown behavior.
 
 ## Commands
 

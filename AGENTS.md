@@ -6,15 +6,15 @@ This repository is `eliware/ask`. It provides a Discord assistant for short answ
 
 ## Scope and boundaries
 
-Use README.md for repository purpose, scope, and ownership. Keep requirements in their authoritative specifications.
+Use README.md for repository purpose and ownership. Keep canonical requirements in their specifications.
 
 ## Layout
 
-Use README.md and specs/README.md to find repository files.
+Use README.md and specs/README.md to navigate the repository.
 
 ## Development
 
-Keep each source and test module focused on one responsibility.
+Keep each source module and test module focused on one responsibility.
 
 ## Validation
 
@@ -29,11 +29,11 @@ Run `npm run format:check` to check formatting.
 
 ## Security
 
-Keep credentials, secret values, private data, and runtime state out of Git.
+Keep credentials, private data, and runtime state out of Git.
 
 ## Changes
 
-Keep changes in this repository. Get approval from Eliware Operations before external changes.
+Keep changes in this repository. Get Eliware Operations approval before external changes.
 
 ## Application
 

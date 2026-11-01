@@ -1,6 +1,6 @@
 # Container deployment
 
-The GHCR image runs the Ask Discord assistant as the unprivileged `node` user. The publish workflow builds for the runner architecture, pushes a version tag, and records an image digest. Publication does not deploy the bot.
+The GHCR image runs the Ask Discord assistant as the unprivileged `node` user. The repository maintainers own the image build inputs. The publish workflow runs on `ubuntu-latest` and leaves the build platform unset, so Docker uses the runner default. It pushes a version tag and records an image digest. Publication does not deploy the bot.
 
 ## Build and run from source
 
@@ -15,7 +15,7 @@ Use `GET /health` to check that the process responds. Use `GET /ready` to check 
 
 ## Run a published image
 
-The package is available from the public `ghcr.io/eliware/ask` registry. Use a version tag for an approved release, or use the immutable digest recorded by the publish workflow.
+The image is published to `ghcr.io/eliware/ask`. Package settings determine who can pull it. Use a version tag for an approved release, or use the immutable digest recorded by the publish workflow.
 
 1. Set the required values in an untracked `.env` file or deployment secret store.
 2. Pull the selected version with `docker pull ghcr.io/eliware/ask:v15.1.0`.
