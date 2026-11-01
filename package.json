@@ -22,6 +22,7 @@
     "test": "eliware-test",
     "lint": "eliware-test --lint",
     "audit": "eliware-test --audit",
+    "validate:container": "node scripts/validate-container-image.mjs",
     "format": "eliware-test --format",
     "format:check": "eliware-test --format-check"
   },

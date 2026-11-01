@@ -25,3 +25,5 @@
 - Split long quoted replies to keep each message under Discord's 2,000-character limit.
 - Fixed Docker Compose health-check command quoting.
 - Improved response parsing and log sanitization.
+- Excluded local `.env` files from Docker builds, kept `.env.example`, and added image validation.
+- Cleared readiness when Discord invalidates its session. A later `clientReady` event restores readiness.

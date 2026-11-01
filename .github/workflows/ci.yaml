@@ -27,3 +27,4 @@ jobs:
       - run: npm -g install npm@latest
       - run: npm ci
       - run: npm test
+      - run: npm run validate:container
