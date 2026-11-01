@@ -3,6 +3,8 @@ services:
     build: .
     image: ask:local
     env_file: .env
+    environment:
+      HEALTH_HOST: ${HEALTH_HOST:-127.0.0.1}
     restart: unless-stopped
     healthcheck:
       test:

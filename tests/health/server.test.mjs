@@ -88,3 +88,22 @@ test("binds to loopback by default", async () => {
 
   expect(boundHost).toBe("127.0.0.1");
 });
+
+test("binds to an explicitly configured host", async () => {
+  let boundHost;
+  const server = {
+    listening: false,
+    once() {},
+    off() {},
+    listen(_port, host, callback) {
+      boundHost = host;
+      callback();
+    },
+    address: () => null,
+  };
+  const health = createHealthServer({ host: "0.0.0.0", serverFactory: () => server });
+
+  await health.start();
+
+  expect(boundHost).toBe("0.0.0.0");
+});

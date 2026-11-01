@@ -2,15 +2,18 @@
 
 Set these environment values before starting Ask. A local install can read them from an untracked `.env` file.
 
-| Variable            | Required | Description                           |
-| ------------------- | -------- | ------------------------------------- |
-| `DISCORD_CLIENT_ID` | Yes      | The Discord application ID.           |
-| `DISCORD_TOKEN`     | Yes      | The bot token for that application.   |
-| `OPENAI_API_KEY`    | Yes      | The API key used for OpenAI requests. |
+| Variable            | Required | Description                                                    |
+| ------------------- | -------- | -------------------------------------------------------------- |
+| `DISCORD_CLIENT_ID` | Yes      | The Discord application ID.                                    |
+| `DISCORD_TOKEN`     | Yes      | The bot token for that application.                            |
+| `OPENAI_API_KEY`    | Yes      | The API key used for OpenAI requests.                          |
+| `HEALTH_HOST`       | No       | The address for the health server. It defaults to `127.0.0.1`. |
 
 Copy `.env.example` to `.env` for local use. Keep `.env` out of Git. Do not share its values in logs or support requests. A deployment can provide the same values through its secret store.
 
 At startup, Ask checks that all three values are nonempty. Ask stops before creating clients when a value is missing.
+
+Set `HEALTH_HOST=0.0.0.0` when Kubernetes HTTP probes must connect through the Pod IP. Compose reads this value from the project environment. Keep the default for local runs.
 
 ## Discord setup
 

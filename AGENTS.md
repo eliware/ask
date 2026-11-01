@@ -52,7 +52,7 @@ Document commands, events, permissions, intents, and supported locales in README
 
 Image: ghcr.io/eliware/ask
 
-Pull command: docker pull ghcr.io/eliware/ask:v15.1.0
+Pull command: docker pull ghcr.io/eliware/ask:v15.1.1
 
 Supported tags: vMAJOR.MINOR.PATCH
 

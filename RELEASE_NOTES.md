@@ -1,5 +1,11 @@
 # Release Notes
 
+## 15.1.1 — 2026-11-01
+
+### Changed
+
+- Added optional `HEALTH_HOST` configuration for health server binding. The default remains `127.0.0.1`.
+
 ## 15.1.0 — 2026-11-01
 
 ### Added

@@ -76,7 +76,7 @@ test("starts the bot with its package version, intents, and runtime root", async
   await expect(startApplication(dependencies)).resolves.toBe(client);
 
   expect(dependencies.registerHandlers).toHaveBeenCalledWith({ log: logger });
-  expect(dependencies.createHealthServer).toHaveBeenCalledWith();
+  expect(dependencies.createHealthServer).toHaveBeenCalledWith({ host: "127.0.0.1" });
   expect(dependencies.initializeOpenAI).toHaveBeenCalledWith({ log: logger });
   expect(createDiscord).toHaveBeenCalledWith(
     expect.objectContaining({
@@ -94,6 +94,22 @@ test("starts the bot with its package version, intents, and runtime root", async
   await getSignalHandlers().shutdownHook();
   await getSignalHandlers().shutdownHook();
   expect(client.shutdown).toHaveBeenCalledTimes(1);
+});
+
+test("uses the configured health server host", async () => {
+  const { dependencies, getSignalHandlers } = makeDependencies({
+    environment: {
+      DISCORD_CLIENT_ID: "test-client-id",
+      DISCORD_TOKEN: "test-discord-token",
+      OPENAI_API_KEY: "test-openai-key",
+      HEALTH_HOST: "0.0.0.0",
+    },
+  });
+
+  await startApplication(dependencies);
+
+  expect(dependencies.createHealthServer).toHaveBeenCalledWith({ host: "0.0.0.0" });
+  await getSignalHandlers().shutdownHook();
 });
 
 test("skips Discord cleanup when no client was created", async () => {
