@@ -1,13 +1,6 @@
 import { safeSerialize } from "@eliware/common";
-import { defaultSplit } from "../response/formatting.mjs";
-
-async function splitText(text, max) {
-  try {
-    const mod = await import("@eliware/discord");
-    if (typeof mod.splitMsg === "function") return mod.splitMsg(text, max);
-  } catch {}
-  return defaultSplit(text, max);
-}
+import { createMessageSender } from "./sender.mjs";
+import { createTypingManager } from "./typing.mjs";
 
 export function createMessageInteraction({ client, message, locale, text, log }) {
   const interaction = {
@@ -25,39 +18,11 @@ export function createMessageInteraction({ client, message, locale, text, log })
     options: { getString: () => text },
     _omitBlockquote: true,
   };
-  const stopTyping = () => {
-    if (interaction._typingInterval) {
-      clearInterval(interaction._typingInterval);
-      interaction._typingInterval = null;
-    }
-  };
-  const send = async (response, ephemeral = false) => {
-    const content = response?.content ?? response;
-    const files = response?.files || null;
-    const chunks = await splitText(
-      typeof content === "string" ? content : JSON.stringify(content),
-      2000,
-    );
-    const target = ephemeral ? message.author : message;
-    const sendOne = async (chunk, first) => {
-      const payload = files && first ? { content: chunk, files } : chunk;
-      return target === message.author ? target.send(payload) : target.reply(payload);
-    };
-    for (let i = 0; i < chunks.length; i++) await sendOne(chunks[i], i === 0);
-  };
-  interaction.deferReply = async () => {
-    try {
-      await message.channel?.sendTyping?.();
-    } catch {}
-    if (message.channel?.sendTyping && !interaction._typingInterval)
-      interaction._typingInterval = setInterval(() => {
-        try {
-          message.channel.sendTyping();
-        } catch {}
-      }, 8000);
-  };
+  const send = createMessageSender(message);
+  const typing = createTypingManager(message.channel);
+  interaction.deferReply = typing.start;
   interaction.reply = async (response) => {
-    stopTyping();
+    typing.stop();
     try {
       await send(response, Boolean(response?.flags & (1 << 6)));
     } catch (error) {
@@ -65,13 +30,13 @@ export function createMessageInteraction({ client, message, locale, text, log })
     }
   };
   interaction.editReply = async (response) => {
-    stopTyping();
+    typing.stop();
     try {
       await send(response);
     } catch (error) {
       log.error("mock interaction.editReply failed", { error: safeSerialize(error) });
     }
   };
-  interaction.stopTyping = stopTyping;
+  interaction.stopTyping = typing.stop;
   return interaction;
 }

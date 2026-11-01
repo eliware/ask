@@ -38,3 +38,20 @@ test("returns no history when client channel lookup rejects", async () => {
 
   expect(history).toEqual([]);
 });
+
+test("fetches history from the client when interaction has no fetcher", async () => {
+  const fetch = jest.fn(async () => new Map([["1", { content: "from client", author: {} }]]));
+  const clientFetch = jest.fn(async () => ({ messages: { fetch } }));
+  const history = await fetchConversationHistory({
+    client: { user: { id: "bot" }, channels: { fetch: clientFetch } },
+    interaction: { channel: { messages: {} } },
+    channelId: "channel",
+    log: { debug: jest.fn() },
+  });
+
+  expect(clientFetch).toHaveBeenCalledWith("channel");
+  expect(fetch).toHaveBeenCalledWith({ limit: 100 });
+  expect(history).toEqual([
+    { role: "user", content: [{ type: "input_text", text: "from client" }] },
+  ]);
+});

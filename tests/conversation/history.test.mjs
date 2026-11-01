@@ -38,25 +38,6 @@ test("builds system, channel history, and query input", async () => {
   expect(input[0].content[0].text).toContain("en-US");
 });
 
-test("fetches history from the client when interaction has no fetcher", async () => {
-  const fetch = jest.fn(async () => new Map([["1", { content: "from client", author: {} }]]));
-  const interaction = { channel: { messages: {} } };
-  const input = await buildConversationInput({
-    client: {
-      user: { id: "bot" },
-      channels: { fetch: jest.fn(async () => ({ messages: { fetch } })) },
-    },
-    interaction,
-    channelId: "channel",
-    query: "query",
-    locale: "en",
-    log,
-  });
-
-  expect(fetch).toHaveBeenCalledWith({ limit: 100 });
-  expect(input.at(-2).content[0].text).toBe("from client");
-});
-
 test("handles failed fetches and unavailable channels", async () => {
   const input1 = await buildConversationInput({
     interaction: {

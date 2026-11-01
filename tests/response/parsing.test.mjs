@@ -1,26 +1,4 @@
-import { decodeBase64Image, normalizeOutputs, parseResponse } from "../../src/response/parsing.mjs";
-
-test("decodeBase64Image decodes and returns null on invalid input", () => {
-  expect(decodeBase64Image("aGVsbG8=")).toEqual(Buffer.from("hello"));
-  expect(decodeBase64Image(Symbol("bad"))).toBeNull();
-  expect(decodeBase64Image("bad")).toBeNull();
-  const from = Buffer.from;
-  Buffer.from = () => {
-    throw new Error("bad buffer");
-  };
-  expect(decodeBase64Image("aGVsbG8=")).toBeNull();
-  Buffer.from = from;
-});
-
-test("normalizeOutputs handles arrays, objects, and missing values", () => {
-  const array = [{ content: "a" }];
-  expect(normalizeOutputs({ outputs: array })).toBe(array);
-  expect(normalizeOutputs({ output: array })).toBe(array);
-  expect(normalizeOutputs({ outputs: { a: 1, b: 2 } })).toEqual([1, 2]);
-  expect(normalizeOutputs({ output: { a: 3, b: 4 } })).toEqual([3, 4]);
-  expect(normalizeOutputs({ outputs: "no", output: null })).toEqual([]);
-  expect(normalizeOutputs(null)).toEqual([]);
-});
+import { parseResponse } from "../../src/response/parsing.mjs";
 
 test("parseResponse handles generation images and all content forms", () => {
   const result = parseResponse({

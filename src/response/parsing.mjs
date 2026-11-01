@@ -1,26 +1,6 @@
-export function decodeBase64Image(value) {
-  try {
-    if (
-      typeof value !== "string" ||
-      !value ||
-      value.length % 4 !== 0 ||
-      !/^[A-Za-z0-9+/]*={0,2}$/.test(value)
-    )
-      return null;
-    return Buffer.from(value, "base64");
-  } catch {
-    return null;
-  }
-}
-export function normalizeOutputs(response) {
-  if (Array.isArray(response?.outputs)) return response.outputs;
-  if (Array.isArray(response?.output)) return response.output;
-  if (response?.outputs && typeof response.outputs === "object")
-    return Object.values(response.outputs);
-  if (response?.output && typeof response.output === "object")
-    return Object.values(response.output);
-  return [];
-}
+import { decodeBase64Image } from "./images.mjs";
+import { getFallbackText, normalizeOutputs } from "./outputs.mjs";
+
 export function parseResponse(response) {
   let replyText = "";
   const images = [];
@@ -90,13 +70,4 @@ export function parseResponse(response) {
       replyText || getFallbackText(response?.output_text) || getFallbackText(response?.text),
     images,
   };
-}
-
-function getFallbackText(value) {
-  if (typeof value === "string") return value;
-  if (!value || typeof value !== "object") return "";
-  if (typeof value.text === "string") return value.text;
-  if (typeof value.output_text === "string") return value.output_text;
-  if (typeof value.content === "string") return value.content;
-  return "";
 }
