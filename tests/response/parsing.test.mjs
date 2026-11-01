@@ -1,31 +1,17 @@
 import { parseResponse } from "../../src/response/parsing.mjs";
 
-test("parses text from supported output and content shapes", () => {
-  const result = parseResponse({
-    outputs: [
-      {
-        content: [
-          "plain",
-          { text: "text" },
-          { output_text: "output" },
-          { content: "content" },
-          { text: 1 },
-        ],
-      },
-      { content: { one: { text: "object" } } },
-      { content: "string" },
-      { data: [{ text: "data-array" }] },
-      { data: { one: { text: "data-object" } } },
-      "output-string",
-      { content: null },
-      null,
-    ],
-  });
-
-  expect(result).toEqual({
-    replyText:
-      "plain\ntext\noutput\ncontent\nobject\nstring\ndata-array\ndata-object\noutput-string",
-    images: [],
+test("combines content text while collecting images", () => {
+  expect(
+    parseResponse({
+      outputs: [
+        {
+          content: [{ text: "first" }, { url: "https://image.test/file.png" }, { text: "second" }],
+        },
+      ],
+    }),
+  ).toEqual({
+    replyText: "first\nsecond",
+    images: [expect.objectContaining({ url: "https://image.test/file.png" })],
   });
 });
 

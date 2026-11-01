@@ -1,5 +1,6 @@
-import { defaultRedactPatterns, redactStringField } from "./redaction.mjs";
+import { defaultRedactPatterns } from "./redaction.mjs";
 import { sanitizeLogString, truncateLogField } from "./strings.mjs";
+import { traverseLogValue } from "./traversal.mjs";
 
 export default function sanitizeForLog(obj, seen = new WeakSet(), depth = 0, opts = {}) {
   const {
@@ -9,52 +10,16 @@ export default function sanitizeForLog(obj, seen = new WeakSet(), depth = 0, opt
     maxEntries = 200,
     redactPatterns = defaultRedactPatterns,
   } = opts || {};
-  if (depth > maxDepth) return "<<max-depth>>";
-  if (obj === null || obj === undefined) return obj;
-  if (typeof obj === "string") return sanitizeLogString(obj, maxString);
-  if (typeof obj === "number" || typeof obj === "boolean") return obj;
-  if (Buffer.isBuffer(obj)) return `[Buffer length=${obj.length}]`;
-  if (Array.isArray(obj)) {
-    if (seen.has(obj)) return "<<circular>>";
-    seen.add(obj);
-    const out = [];
-    for (let i = 0; i < Math.min(obj.length, maxArray); i++) {
-      try {
-        out.push(sanitizeForLog(obj[i], seen, depth + 1, opts));
-      } catch (err) {
-        out.push(`<<error serializing index ${i}: ${String(err)}>>`);
-      }
-    }
-    if (obj.length > maxArray) out.push(`<<${obj.length - maxArray} more items...>>`);
-    return out;
-  }
-  if (typeof obj === "object") {
-    if (seen.has(obj)) return "<<circular>>";
-    seen.add(obj);
-    const out = {};
-    let count = 0;
-    let entries;
-    try {
-      entries = Object.entries(obj);
-    } catch (err) {
-      return `<<error serializing: ${String(err)}>>`;
-    }
-    for (const [key, value] of entries) {
-      if (++count > maxEntries) {
-        out.__more = `<<truncated, more than ${maxEntries} keys>>`;
-        break;
-      }
-      try {
-        const redacted = redactStringField(key, value, redactPatterns);
-        if (redacted !== undefined) out[key] = redacted;
-        else if (typeof value === "string" && value.length > maxString)
-          out[key] = truncateLogField(value, maxString);
-        else out[key] = sanitizeForLog(value, seen, depth + 1, opts);
-      } catch (err) {
-        out[key] = `<<error serializing: ${String(err)}>>`;
-      }
-    }
-    return out;
-  }
-  return String(obj);
+  const options = { maxDepth, maxString, maxArray, maxEntries, redactPatterns };
+  const sanitizeValue = (value, visited, level) => {
+    if (level > maxDepth) return "<<max-depth>>";
+    if (value === null || value === undefined) return value;
+    if (typeof value === "string") return sanitizeLogString(value, maxString);
+    if (typeof value === "number" || typeof value === "boolean") return value;
+    if (Buffer.isBuffer(value)) return `[Buffer length=${value.length}]`;
+    if (typeof value === "object")
+      return traverseLogValue(value, sanitizeValue, visited, level, options, truncateLogField);
+    return String(value);
+  };
+  return sanitizeValue(obj, seen, depth);
 }

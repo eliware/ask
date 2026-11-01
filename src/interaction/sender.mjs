@@ -1,4 +1,5 @@
 import { splitMessage } from "./splitting.mjs";
+import { deliverMessageChunk } from "./delivery.mjs";
 
 export function createMessageSender(message) {
   return async function send(response, ephemeral = false) {
@@ -8,12 +9,9 @@ export function createMessageSender(message) {
       typeof content === "string" ? content : JSON.stringify(content),
       2000,
     );
-    const target = ephemeral ? message.author : message;
     const sendOne = async (chunk, first) => {
       const payload = files && first ? { content: chunk, files } : chunk;
-      if (target === message.author) return target.send(payload);
-      if (first || !message.channel?.send) return message.reply(payload);
-      return message.channel.send(payload);
+      return deliverMessageChunk(message, payload, ephemeral, first);
     };
     for (let i = 0; i < chunks.length; i++) await sendOne(chunks[i], i === 0);
   };
