@@ -1,4 +1,5 @@
 import { createServer } from "node:http";
+import { createReadinessState } from "./readiness.mjs";
 import { createHealthRequestHandler } from "./routes.mjs";
 
 export function createHealthServer({
@@ -6,8 +7,8 @@ export function createHealthServer({
   port = 3000,
   serverFactory = createServer,
 } = {}) {
-  let ready = false;
-  const server = serverFactory(createHealthRequestHandler(() => ready));
+  const readiness = createReadinessState();
+  const server = serverFactory(createHealthRequestHandler(readiness.isReady));
 
   return {
     start: () =>
@@ -26,9 +27,7 @@ export function createHealthServer({
         }
         server.close((error) => (error ? reject(error) : resolve()));
       }),
-    setReady(value) {
-      ready = Boolean(value);
-    },
+    setReady: readiness.setReady,
     address: () => server.address(),
   };
 }

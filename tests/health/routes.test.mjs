@@ -14,19 +14,18 @@ test("answers health checks", () => {
 });
 
 test("reports readiness from the supplied state", () => {
-  const response = makeResponse();
-  const isReady = jest.fn(() => false);
-  createHealthRequestHandler(isReady)({ method: "GET", url: "/ready" }, response);
-  expect(response.writeHead).toHaveBeenCalledWith(503, { "content-type": "application/json" });
-  expect(response.end).toHaveBeenCalledWith('{"status":"not ready"}');
-  expect(isReady).toHaveBeenCalledTimes(1);
-
-  const readyResponse = makeResponse();
-  createHealthRequestHandler(() => true)({ method: "GET", url: "/ready" }, readyResponse);
-  expect(readyResponse.writeHead).toHaveBeenCalledWith(200, {
-    "content-type": "application/json",
-  });
-  expect(readyResponse.end).toHaveBeenCalledWith('{"status":"ready"}');
+  const cases = [
+    [false, 503, '{"status":"not ready"}'],
+    [true, 200, '{"status":"ready"}'],
+  ];
+  for (const [ready, status, body] of cases) {
+    const response = makeResponse();
+    const isReady = jest.fn(() => ready);
+    createHealthRequestHandler(isReady)({ method: "GET", url: "/ready" }, response);
+    expect(response.writeHead).toHaveBeenCalledWith(status, { "content-type": "application/json" });
+    expect(response.end).toHaveBeenCalledWith(body);
+    expect(isReady).toHaveBeenCalledTimes(1);
+  }
 });
 
 test("rejects unsupported methods and unknown paths", () => {
