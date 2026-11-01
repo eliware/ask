@@ -27,7 +27,9 @@ export async function startApplication({
     shutdown.setHealthServer(healthServer);
     registerSignals({ log, shutdownHook: shutdown.shutdownHook });
     if (shutdown.isShuttingDown()) return undefined;
-    await healthServer?.start();
+    const healthStart = healthServer?.start();
+    shutdown.setHealthStart(healthStart);
+    await healthStart;
     if (shutdown.isShuttingDown()) {
       await shutdown.shutdownHealthServer();
       return undefined;

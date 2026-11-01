@@ -30,4 +30,4 @@ Send `SIGINT` or `SIGTERM` to the process. Ask closes its Discord client during 
 
 ## Data sent for a response
 
-Ask sends the current question and available recent channel messages to the OpenAI API. The API request sets `store` to `false`. Discord receives the response in the channel or direct message that started the request.
+Ask sends the current question and no more than 100 recent text messages from the channel to the OpenAI API. Those messages can include content from other channel members. The API request sets `store` to `false`. Get agreement from message authors before using Ask with private channel content. Discord receives the response in the channel or direct message that started the request.

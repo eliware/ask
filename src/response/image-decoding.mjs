@@ -7,7 +7,8 @@ export function decodeBase64Image(value) {
       !/^[A-Za-z0-9+/]*={0,2}$/.test(value)
     )
       return null;
-    return Buffer.from(value, "base64");
+    const decoded = Buffer.from(value, "base64");
+    return decoded.toString("base64") === value ? decoded : null;
   } catch {
     return null;
   }

@@ -22,3 +22,14 @@ test("reports missing locales and locale key mismatches", () => {
   expect(errors).toContain("it.json");
   expect(errors).not.toContain("en-US.json");
 });
+
+test("reports empty locale values", () => {
+  const catalog = {
+    files: ["en-US.json", "fr.json"],
+    names: ["en-US", "fr"],
+    values: { "en-US.json": { greeting: "Hello" }, "fr.json": { greeting: " " } },
+    reference: { greeting: "Hello" },
+  };
+
+  expect(validateLocaleCatalogData(catalog, ["en-US", "fr"])).toContain("fr.json");
+});

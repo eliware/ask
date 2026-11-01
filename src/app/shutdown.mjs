@@ -2,6 +2,8 @@ export function createShutdownManager({ log, healthServer }) {
   let client;
   let shuttingDown = false;
   let activeHealthServer = healthServer;
+  let healthStart;
+  let healthShutdown;
 
   async function shutdownClient(target = client) {
     try {
@@ -11,13 +13,18 @@ export function createShutdownManager({ log, healthServer }) {
     }
   }
 
-  async function shutdownHealthServer() {
-    try {
-      activeHealthServer?.setReady(false);
-      await activeHealthServer?.close();
-    } catch (error) {
-      log.warn("Health server shutdown failed", { error: error?.message || String(error) });
-    }
+  function shutdownHealthServer() {
+    if (healthShutdown) return healthShutdown;
+    healthShutdown = (async () => {
+      try {
+        await healthStart?.catch(() => {});
+        activeHealthServer?.setReady(false);
+        await activeHealthServer?.close();
+      } catch (error) {
+        log.warn("Health server shutdown failed", { error: error?.message || String(error) });
+      }
+    })();
+    return healthShutdown;
   }
 
   return {
@@ -26,6 +33,9 @@ export function createShutdownManager({ log, healthServer }) {
     },
     setHealthServer(value) {
       activeHealthServer = value;
+    },
+    setHealthStart(value) {
+      healthStart = value;
     },
     isShuttingDown: () => shuttingDown,
     shutdownClient,

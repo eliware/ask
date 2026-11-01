@@ -153,7 +153,7 @@ test("closes health server when shutdown arrives during its startup", async () =
   await expect(startApplication(dependencies)).resolves.toBeUndefined();
   await shutdownPromise;
 
-  expect(healthServer.close).toHaveBeenCalledTimes(2);
+  expect(healthServer.close).toHaveBeenCalledTimes(1);
   expect(dependencies.registerHandlers).not.toHaveBeenCalled();
 });
 
