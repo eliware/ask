@@ -1,4 +1,5 @@
 import { defaultSplit } from "../response/formatting.mjs";
+import { safeSerialize } from "@eliware/common";
 
 async function splitText(text, max) {
   try {
@@ -22,5 +23,26 @@ export function createMessageSender(message) {
       return target === message.author ? target.send(payload) : target.reply(payload);
     };
     for (let i = 0; i < chunks.length; i++) await sendOne(chunks[i], i === 0);
+  };
+}
+
+export function createMessageReplyMethods({ send, stopTyping, log }) {
+  return {
+    reply: async (response) => {
+      stopTyping();
+      try {
+        await send(response, Boolean(response?.flags & (1 << 6)));
+      } catch (error) {
+        log.error("mock interaction.reply failed", { error: safeSerialize(error) });
+      }
+    },
+    editReply: async (response) => {
+      stopTyping();
+      try {
+        await send(response);
+      } catch (error) {
+        log.error("mock interaction.editReply failed", { error: safeSerialize(error) });
+      }
+    },
   };
 }

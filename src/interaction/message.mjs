@@ -1,5 +1,4 @@
-import { safeSerialize } from "@eliware/common";
-import { createMessageSender } from "./sender.mjs";
+import { createMessageReplyMethods, createMessageSender } from "./sender.mjs";
 import { createTypingManager } from "./typing.mjs";
 
 export function createMessageInteraction({ client, message, locale, text, log }) {
@@ -21,22 +20,7 @@ export function createMessageInteraction({ client, message, locale, text, log })
   const send = createMessageSender(message);
   const typing = createTypingManager(message.channel);
   interaction.deferReply = typing.start;
-  interaction.reply = async (response) => {
-    typing.stop();
-    try {
-      await send(response, Boolean(response?.flags & (1 << 6)));
-    } catch (error) {
-      log.error("mock interaction.reply failed", { error: safeSerialize(error) });
-    }
-  };
-  interaction.editReply = async (response) => {
-    typing.stop();
-    try {
-      await send(response);
-    } catch (error) {
-      log.error("mock interaction.editReply failed", { error: safeSerialize(error) });
-    }
-  };
+  Object.assign(interaction, createMessageReplyMethods({ send, stopTyping: typing.stop, log }));
   interaction.stopTyping = typing.stop;
   return interaction;
 }

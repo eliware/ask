@@ -1,37 +1,15 @@
 import { parseResponse } from "../../src/response/parsing.mjs";
 
-test("parseResponse handles generation images and all content forms", () => {
+test("parses text from supported output and content shapes", () => {
   const result = parseResponse({
     outputs: [
-      { type: "image_generation_call", id: "ig_call", result: "aGVsbG8=", revised_prompt: "rev" },
-      { id: "ig_1", result: "aGVsbG8=" },
-      { type: "image_generation_call", result: "bad" },
-      { type: "image_generation_call", result: "aGVsbG8=" },
-      { type: "image_generation_call", result: "aGVsbG8=" },
-      { id: "not_ig", result: "aGVsbG8=" },
       {
         content: [
           "plain",
           { text: "text" },
           { output_text: "output" },
           { content: "content" },
-          {
-            text: "x",
-            b64_json: "aGVsbG8=",
-            filename: "x.jpg",
-            mime: "image/jpeg",
-            description: "desc",
-          },
-          { base64: "aGVsbG8=" },
-          { image: { b64: "aGVsbG8=" } },
-          { image: { b64_json: "aGVsbG8=" } },
-          { image: { base64: "aGVsbG8=" } },
-          { image: { url: "https://a" } },
-          { url: "https://b" },
-          { src: "https://c" },
-          { href: "https://d", filename: "d", description: "D" },
-          { text: 1, b64_json: "", url: "" },
-          { b64_json: "bad" },
+          { text: 1 },
         ],
       },
       { content: { one: { text: "object" } } },
@@ -43,42 +21,59 @@ test("parseResponse handles generation images and all content forms", () => {
       null,
     ],
   });
-  expect(result.replyText).toBe(
-    "plain\ntext\noutput\ncontent\nx\nobject\nstring\ndata-array\ndata-object\noutput-string",
-  );
-  expect(result.images).toHaveLength(13);
-  expect(result.images[0]).toMatchObject({ buffer: Buffer.from("hello"), description: "rev" });
-  expect(result.images[1]).toMatchObject({ buffer: Buffer.from("hello") });
-  expect(result.images).toEqual(
-    expect.arrayContaining([expect.objectContaining({ filename: "x.jpg", mime: "image/jpeg" })]),
-  );
-});
 
-test("parseResponse uses fallback text", () => {
-  expect(parseResponse({ output_text: "fallback" })).toEqual({ replyText: "fallback", images: [] });
-  expect(parseResponse({ text: "text fallback" })).toEqual({
-    replyText: "text fallback",
+  expect(result).toEqual({
+    replyText:
+      "plain\ntext\noutput\ncontent\nobject\nstring\ndata-array\ndata-object\noutput-string",
     images: [],
   });
-  expect(parseResponse({})).toEqual({ replyText: "", images: [] });
 });
 
-test("ignores nontext fallback objects on an image response", () => {
+test("coordinates image extraction for generated images", () => {
   expect(
     parseResponse({
-      output_text: { image: "generated" },
-      text: { image: "generated" },
-      output: [{ type: "image_generation_call", id: "ig_image", result: "aGVsbG8=" }],
+      output: [{ type: "image_generation_call", id: "ig_generated", result: "aGVsbG8=" }],
     }),
   ).toEqual({
     replyText: "",
     images: [
       expect.objectContaining({
         buffer: Buffer.from("hello"),
-        filename: "image_ig_image.png",
+        filename: "image_ig_generated.png",
       }),
     ],
   });
+});
+
+test("coordinates image extraction from response content", () => {
+  expect(parseResponse({ outputs: [{ content: [{ b64_json: "aGVsbG8=" }] }] })).toEqual({
+    replyText: "",
+    images: [expect.objectContaining({ buffer: Buffer.from("hello"), filename: "image.png" })],
+  });
+  expect(
+    parseResponse({
+      outputs: [
+        { type: "image_generation_call", result: "invalid" },
+        { content: [{ b64_json: "invalid", url: "https://ignored.test" }] },
+      ],
+    }),
+  ).toEqual({ replyText: "", images: [] });
+});
+
+test("uses fallback text and ignores nontext fallback objects", () => {
+  expect(parseResponse({ output_text: "fallback" })).toEqual({ replyText: "fallback", images: [] });
+  expect(parseResponse({ text: "text fallback" })).toEqual({
+    replyText: "text fallback",
+    images: [],
+  });
+  expect(
+    parseResponse({
+      output_text: { image: "generated" },
+      text: { image: "generated" },
+      output: [{ type: "image_generation_call", id: "ig_image", result: "aGVsbG8=" }],
+    }).replyText,
+  ).toBe("");
+  expect(parseResponse({})).toEqual({ replyText: "", images: [] });
 });
 
 test("extracts text fields from fallback objects", () => {

@@ -1,23 +1,13 @@
-import { decodeBase64Image } from "./images.mjs";
+import { extractContentImage, extractGeneratedImage } from "./images.mjs";
 import { getFallbackText, normalizeOutputs } from "./outputs.mjs";
 
 export function parseResponse(response) {
   let replyText = "";
   const images = [];
   for (const out of normalizeOutputs(response)) {
-    if (
-      out &&
-      (out.type === "image_generation_call" || (out.id && String(out.id).startsWith("ig_"))) &&
-      typeof out.result === "string"
-    ) {
-      const buffer = decodeBase64Image(out.result);
-      if (buffer)
-        images.push({
-          buffer,
-          filename: `image_${out.id || Date.now()}.png`,
-          mime: "image/png",
-          description: out.revised_prompt || null,
-        });
+    const generatedImage = extractGeneratedImage(out);
+    if (generatedImage.handled) {
+      if (generatedImage.image) images.push(generatedImage.image);
       continue;
     }
     let contents = Array.isArray(out?.content)
@@ -39,30 +29,9 @@ export function parseResponse(response) {
           ? content
           : content?.text || content?.output_text || content?.content;
       if (typeof text === "string" && text) replyText += (replyText ? "\n" : "") + text;
-      const b64 =
-        content?.b64_json ||
-        content?.base64 ||
-        content?.image?.b64 ||
-        content?.image?.b64_json ||
-        content?.image?.base64;
-      if (typeof b64 === "string" && b64) {
-        const buffer = decodeBase64Image(b64);
-        if (buffer)
-          images.push({
-            buffer,
-            filename: content?.filename || "image.png",
-            mime: content?.mime || "image/png",
-            description: content?.description || null,
-          });
-        continue;
-      }
-      const url = content?.image?.url || content?.url || content?.src || content?.href;
-      if (typeof url === "string" && url)
-        images.push({
-          url,
-          filename: content?.filename || "image.png",
-          description: content?.description || null,
-        });
+      const extractedImage = extractContentImage(content);
+      if (extractedImage.image) images.push(extractedImage.image);
+      if (extractedImage.handled) continue;
     }
   }
   return {

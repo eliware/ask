@@ -7,7 +7,11 @@ jest.setTimeout(10_000);
 const log = () => ({ error: jest.fn() });
 
 test("creates a message-backed interaction and sends replies", async () => {
+  const replies = [];
+  const privateMessages = [];
   const message = {
+    author: { send: async (value) => privateMessages.push(value) },
+    reply: async (value) => replies.push(value),
     channel: { id: "c", sendTyping: async () => {} },
   };
   const interaction = createMessageInteraction({
@@ -17,6 +21,10 @@ test("creates a message-backed interaction and sends replies", async () => {
     text: "hi",
     log: log(),
   });
+  await interaction.reply({ content: "hello" });
+  await interaction.reply({ content: "private", flags: 1 << 6 });
+  expect(replies).toEqual(["hello"]);
+  expect(privateMessages).toEqual(["private"]);
   expect(interaction.commandName).toBe("ask");
   expect(interaction.guild).toBeUndefined();
   expect(interaction.guildId).toBeNull();
@@ -67,30 +75,6 @@ test("splits message text before adding an image URL to the next chunk", async (
   expect(replies).toHaveLength(2);
   expect(replies[0]).toHaveLength(2000);
   expect(replies[1].trim()).toBe(url);
-});
-
-test("logs reply and edit failures", async () => {
-  const logger = log();
-  const message = {
-    author: {
-      send: async () => {
-        throw new Error("send");
-      },
-    },
-    reply: async () => {
-      throw new Error("reply");
-    },
-  };
-  const interaction = createMessageInteraction({
-    client: {},
-    message,
-    locale: "en",
-    text: "x",
-    log: logger,
-  });
-  await interaction.reply("bad");
-  await interaction.editReply("bad");
-  expect(logger.error).toHaveBeenCalledTimes(2);
 });
 
 test("wires typing controls onto the interaction", async () => {
