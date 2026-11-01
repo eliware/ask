@@ -15,6 +15,9 @@ export default async function ({ client, log, msg, commandHandlers, ...contextDa
 
   const isDirect = !message.guild;
   const isMentioned = message.mentions?.has?.(client.user) || false;
+  const namePattern = /^\s*ask(?:\b\s*[,!:]?\s*|$)/i;
+  const messageContent = message.content || "";
+  const isAddressedByName = namePattern.test(messageContent);
   let isReplyToBot = false;
   try {
     const referenceId = message.reference?.messageId || message.reference?.message?.id;
@@ -30,11 +33,13 @@ export default async function ({ client, log, msg, commandHandlers, ...contextDa
   } catch (error) {
     log.debug("failed to resolve referenced message", { error: safeSerialize(error) });
   }
-  if (!isDirect && !isMentioned && !isReplyToBot) return;
+  if (!isDirect && !isMentioned && !isReplyToBot && !isAddressedByName) return;
 
-  const mentionPattern = new RegExp(`<@!?\\${client.user.id}>`, "g");
-  const text =
-    (message.content || "").replace(isMentioned ? mentionPattern : /$^/, "").trim() || "Hello!";
+  const mentionPattern = /<@!?[\w-]+>|<@&[\w-]+>|<#\w+>/g;
+  const addressedText = isAddressedByName
+    ? messageContent.replace(namePattern, "")
+    : messageContent;
+  const text = addressedText.replace(mentionPattern, "").trim() || "Hello!";
   const interaction = createMessageInteraction({ client, message, locale, text, log });
   try {
     let handler = commandHandlers?.ask;

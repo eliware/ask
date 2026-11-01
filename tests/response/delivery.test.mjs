@@ -60,6 +60,26 @@ test("delivers real response, attachments, URLs, and followups", async () => {
   expect(calls[0][1].files).toBeDefined();
   expect(calls.some(([type]) => type === "follow")).toBe(true);
 });
+test("keeps slash replies within the Discord message limit with image URLs", async () => {
+  const sent = [];
+  const url = `https://images.example.test/${"x".repeat(80)}`;
+  await deliverResponse(
+    { reply: async (message) => sent.push(message) },
+    "a".repeat(1990),
+    [{ url }],
+    false,
+    log,
+  );
+
+  expect(sent.length).toBeGreaterThan(1);
+  expect(sent.every((message) => message.content.length <= 2000)).toBe(true);
+  expect(sent.map((message) => message.content).join("\n")).toContain(url);
+});
+test("uses a fallback message when no text or images exist", async () => {
+  let sent;
+  await deliverResponse({ reply: async (message) => (sent = message) }, "", [], false, log);
+  expect(sent.content).toMatch(/could not create/);
+});
 test("falls back to reply for followups and logs failures", async () => {
   const calls = [];
   const interaction = { reply: async (value) => calls.push(value) };
@@ -105,14 +125,16 @@ test("delivers attachment-only and deferred empty responses", async () => {
 });
 test("covers deferred real delivery and URL-only output", async () => {
   let edited;
+  const followUps = [];
   const interaction = {
     editReply: async (value) => {
       edited = value;
     },
-    followUp: async () => {},
+    followUp: async (value) => followUps.push(value),
   };
   await deliverResponse(interaction, "short", [{ url: "https://x.test/a" }, {}], true, log);
-  expect(edited.content).toContain("https://x.test/a");
+  expect(edited.content).toBe("> short");
+  expect(followUps[0].content).toBe("https://x.test/a");
   let sent;
   await deliverResponse(
     {

@@ -39,6 +39,24 @@ test("handles missing query", async () => {
   expect(replied.content).toBe("help");
 });
 
+test("does not log the private prompt or interaction object", async () => {
+  const calls = [];
+  const privatePrompt = "please keep this private";
+  const testLog = {
+    debug: (...args) => calls.push(args),
+    error: () => {},
+  };
+
+  await ask(
+    { client: null, log: testLog, msg: () => "help", openai: openai() },
+    makeInteraction(privatePrompt),
+  );
+
+  expect(calls[0]).toEqual(["ask Request"]);
+  expect(JSON.stringify(calls)).not.toContain(privatePrompt);
+  expect(JSON.stringify(calls)).not.toContain('"interaction"');
+});
+
 test("continues after rate-limit failure and defer failure", async () => {
   const interaction = makeInteraction();
   let replied;

@@ -4,5 +4,7 @@ services:
     image: ask:local
     env_file: .env
     restart: unless-stopped
+    environment:
+      HEALTH_HOST: 0.0.0.0
     ports:
       - "127.0.0.1:3000:3000"

@@ -19,7 +19,7 @@ function extractViolations(error) {
 }
 
 export default async function ({ client, log, msg, openai }, interaction) {
-  log.debug("ask Request", { interaction });
+  log.debug("ask Request");
   const context = await getRequestContext({ client, interaction, log });
   if (!context.query)
     return interaction.reply({ content: msg("help", "Please provide a query."), flags: 1 << 6 });

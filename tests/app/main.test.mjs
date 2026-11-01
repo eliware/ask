@@ -76,6 +76,7 @@ test("starts the bot with its package version, intents, and runtime root", async
   await expect(startApplication(dependencies)).resolves.toBe(client);
 
   expect(dependencies.registerHandlers).toHaveBeenCalledWith({ log: logger });
+  expect(dependencies.createHealthServer).toHaveBeenCalledWith({ host: "127.0.0.1" });
   expect(dependencies.initializeOpenAI).toHaveBeenCalledWith({ log: logger });
   expect(createDiscord).toHaveBeenCalledWith(
     expect.objectContaining({
@@ -155,6 +156,21 @@ test("supports startup without a health server", async () => {
   delete dependencies.createHealthServer;
   await startApplication(dependencies);
   await getSignalHandlers().shutdownHook();
+});
+
+test("allows Compose to bind health checks for Docker port forwarding", async () => {
+  const { dependencies, healthServer, getSignalHandlers } = makeDependencies({
+    environment: {
+      DISCORD_CLIENT_ID: "test-client-id",
+      DISCORD_TOKEN: "test-discord-token",
+      OPENAI_API_KEY: "test-openai-key",
+      HEALTH_HOST: "0.0.0.0",
+    },
+  });
+  await startApplication(dependencies);
+  expect(dependencies.createHealthServer).toHaveBeenCalledWith({ host: "0.0.0.0" });
+  await getSignalHandlers().shutdownHook();
+  expect(healthServer.close).toHaveBeenCalledTimes(1);
 });
 
 test("shuts down a Discord client created after a stop signal", async () => {

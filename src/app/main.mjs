@@ -16,7 +16,7 @@ export async function startApplication({
 }) {
   configureEnvironment({ path: join(rootDir, ".env"), quiet: true });
   validateConfiguration(environment);
-  const healthServer = createHealthServer?.();
+  const healthServer = createHealthServer?.({ host: environment.HEALTH_HOST || "127.0.0.1" });
   await healthServer?.start();
   registerHandlers({ log });
 

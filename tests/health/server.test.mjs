@@ -69,3 +69,22 @@ test("reports server close errors", async () => {
   const health = createHealthServer({ serverFactory: () => server });
   await expect(health.close()).rejects.toThrow("close failed");
 });
+
+test("binds to loopback by default", async () => {
+  let boundHost;
+  const server = {
+    listening: false,
+    once() {},
+    off() {},
+    listen(_port, host, callback) {
+      boundHost = host;
+      callback();
+    },
+    address: () => null,
+  };
+  const health = createHealthServer({ serverFactory: () => server });
+
+  await health.start();
+
+  expect(boundHost).toBe("127.0.0.1");
+});

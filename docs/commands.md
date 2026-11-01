@@ -18,10 +18,10 @@ The `query` option is required. Ask may include at most 100 earlier text message
 - In a direct message or group direct message, send a prompt.
 - Send `!help` to get localized help in a message.
 
-Ask ignores messages from bots. Ask ignores server messages unless they address Ask or reply to its own message. If a message trigger has no prompt text, Ask sends `Hello!` as the prompt.
+Ask ignores messages from bots. Ask ignores server messages unless they address Ask by name, tag Ask, or reply to its own message. Ask removes Discord user, role, and channel references before it sends the prompt. If a message trigger has no prompt text, Ask sends `Hello!` as the prompt.
 
 ## Response behavior
 
-Ask can answer questions, summarize text, rewrite text, look up web results, and create images. Message-trigger replies use plain text. Ask splits long replies into chunks with a 2,000-character maximum. Slash-command replies use citation formatting and may span multiple messages.
+Ask can answer questions, summarize text, rewrite text, look up web results, and create images. Message-trigger replies use plain text. Ask splits long replies into chunks with a 2,000-character maximum. Slash-command replies use blockquote formatting and may span multiple messages.
 
 Ask uses the request locale or the server locale for its response language. Users can request a different language or answer length in the prompt. Localized slash-command names and help messages are available for the locale files in `locales/`.

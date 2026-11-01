@@ -54,12 +54,27 @@ describe("messageCreate", () => {
 
   test("handles mention, removes mention, and uses guild locale", async () => {
     const message = makeMessage({
-      content: "<@!bot-id> please help",
+      content: "<@!bot-id> <@&role-id> <#channel-id> please help",
       guild: { preferredLocale: "de" },
       mentions: { has: jest.fn(() => true) },
     });
     const ask = jest.fn(async (_ctx, interaction) => expect(interaction.text).toBe("please help"));
     await run(message, { commandHandlers: { ask } });
+    expect(ask).toHaveBeenCalled();
+  });
+
+  test.each([
+    ["Ask, <@&role-id> what is here?", "what is here?"],
+    ["Ask what is here?", "what is here?"],
+    ["Ask", "Hello!"],
+  ])("accepts the name prefix %s", async (content, expected) => {
+    const message = makeMessage({ content, guild: { preferredLocale: "en-US" } });
+    const ask = jest.fn(async (_ctx, interaction) => {
+      expect(interaction.text).toBe(expected);
+    });
+
+    await run(message, { commandHandlers: { ask } });
+
     expect(ask).toHaveBeenCalled();
   });
 

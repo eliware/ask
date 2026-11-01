@@ -2,7 +2,7 @@ import { createServer } from "node:http";
 import { createHealthRequestHandler } from "./routes.mjs";
 
 export function createHealthServer({
-  host = "0.0.0.0",
+  host = "127.0.0.1",
   port = 3000,
   serverFactory = createServer,
 } = {}) {

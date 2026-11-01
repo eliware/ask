@@ -13,12 +13,13 @@ export async function deliverResponse(interaction, replyText, images, deferred, 
       message.content = `${message.content ? `${message.content}\n\n` : ""}${urls.join("\n")}`;
     return deferred ? interaction.editReply(message) : interaction.reply(message);
   }
-  const splitter = defaultSplit;
-  const chunks = text ? splitter(addBlockquote(text), 4000) : [];
+  const chunks = [
+    ...(text ? defaultSplit(addBlockquote(text), 2000) : []),
+    ...urls.flatMap((url) => defaultSplit(url, 2000)),
+  ];
   if (chunks.length) {
     const first = { content: chunks[0] };
     if (files.length) first.files = files;
-    if (urls.length) first.content += `\n\n${urls.join("\n")}`;
     if (deferred) await interaction.editReply(first);
     else await interaction.reply(first);
     for (const chunk of chunks.slice(1)) {
@@ -33,7 +34,6 @@ export async function deliverResponse(interaction, replyText, images, deferred, 
   }
   const message = {};
   if (files.length) message.files = files;
-  if (urls.length) message.content = urls.join("\n");
   if (!message.files && !message.content) message.content = "Sorry, I could not create a reply.";
   return deferred ? interaction.editReply(message) : interaction.reply(message);
 }
