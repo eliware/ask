@@ -55,3 +55,22 @@ test("adds image URLs to message-backed responses without text", async () => {
 
   expect(sent.content).toBe("u");
 });
+
+test("routes message-backed replies without blockquotes", async () => {
+  let messageReply;
+  let slashReply;
+  await deliverResponse(
+    {
+      _omitBlockquote: true,
+      reply: async (value) => (messageReply = value),
+    },
+    "answer",
+    [],
+    false,
+    log,
+  );
+  await deliverResponse({ reply: async (value) => (slashReply = value) }, "answer", [], false, log);
+
+  expect(messageReply).toEqual({ content: "answer" });
+  expect(slashReply).toEqual({ content: "> answer" });
+});

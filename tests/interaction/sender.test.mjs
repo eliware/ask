@@ -1,41 +1,25 @@
 import { createMessageSender } from "../../src/interaction/sender.mjs";
 
-test("sends chunks, files, objects, and private replies", async () => {
-  const sent = [];
-  const replied = [];
-  const message = {
-    author: { send: async (value) => sent.push(value) },
-    reply: async (value) => replied.push(value),
-  };
-  const send = createMessageSender(message);
-
-  await send({ content: { answer: 1 }, files: ["file"] });
-  await send({ content: "x".repeat(2100), files: ["second"] });
-
-  expect(replied[0]).toEqual({ content: '{"answer":1}', files: ["file"] });
-  expect(sent).toEqual([]);
-  expect(replied[1]).toHaveProperty("files", ["second"]);
-  expect(replied).toHaveLength(3);
-  expect(replied[2]).toHaveLength(100);
-});
-
-test("prepares serialized response content and files for delivery", async () => {
+test("delivers the first chunk as a reply and later chunks to the channel", async () => {
   const replies = [];
+  const messages = [];
   const send = createMessageSender({
     author: {},
     reply: async (value) => replies.push(value),
+    channel: { send: async (value) => messages.push(value) },
   });
 
-  await send({ content: { answer: 1 }, files: ["image"] });
+  await send("x".repeat(2100));
 
-  expect(replies).toEqual([{ content: '{"answer":1}', files: ["image"] }]);
+  expect(replies).toEqual(["x".repeat(2000)]);
+  expect(messages).toEqual(["x".repeat(100)]);
 });
 
-test("prepares plain text responses", async () => {
-  const replies = [];
-  const send = createMessageSender({ author: {}, reply: async (value) => replies.push(value) });
+test("delivers private chunks to the author", async () => {
+  const sent = [];
+  const send = createMessageSender({ author: { send: async (value) => sent.push(value) } });
 
-  await send("plain text");
+  await send("private", true);
 
-  expect(replies).toEqual(["plain text"]);
+  expect(sent).toEqual(["private"]);
 });
