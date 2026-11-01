@@ -31,6 +31,7 @@ test("uses fallbacks and data options", async () => {
   const context = await getRequestContext({
     client: null,
     interaction: {
+      guildLocale: "fr-CA",
       guild: { preferredLocale: "fr", id: "g" },
       data: { options: [{ value: "data query" }] },
       member: { user: { id: "member", username: "Member" } },
@@ -39,7 +40,7 @@ test("uses fallbacks and data options", async () => {
     log: { debug() {} },
   });
   expect(context).toMatchObject({
-    locale: "fr",
+    locale: "fr-CA",
     query: "data query",
     userId: "member",
     userName: "Member",

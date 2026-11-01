@@ -5,7 +5,7 @@ const rootDir = process.cwd();
 const logger = { warn: jest.fn() };
 
 function makeDependencies(overrides = {}) {
-  const client = { shutdown: jest.fn(), destroy: jest.fn() };
+  const client = { shutdown: jest.fn() };
   let signalHandlers;
   const createDiscord = jest.fn(async () => client);
   const dependencies = {
@@ -46,14 +46,13 @@ test("starts the bot with its package version, intents, and runtime root", async
   expect(client.shutdown).toHaveBeenCalledTimes(1);
 });
 
-test("destroys clients without a shutdown method", async () => {
-  const client = { destroy: jest.fn() };
+test("skips Discord cleanup when no client was created", async () => {
   const { dependencies, getSignalHandlers } = makeDependencies({
-    createDiscord: jest.fn(async () => client),
+    createDiscord: jest.fn(async () => null),
   });
   await startApplication(dependencies);
   await getSignalHandlers().shutdownHook();
-  expect(client.destroy).toHaveBeenCalledTimes(1);
+  expect(logger.warn).not.toHaveBeenCalled();
 });
 
 test.each([

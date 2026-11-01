@@ -21,8 +21,7 @@ export async function startApplication({
       if (shuttingDown) return;
       shuttingDown = true;
       try {
-        if (client?.shutdown) await client.shutdown();
-        else client?.destroy();
+        if (client) await client.shutdown();
       } catch (error) {
         log.warn("Discord shutdown failed", { error: error?.message || String(error) });
       }

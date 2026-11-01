@@ -1,9 +1,9 @@
 export async function requestAnswer(openai, input) {
   return openai.responses.create({
-    model: "gpt-5.6-luna",
+    model: "gpt-6-luna",
     input,
     text: { format: { type: "text" }, verbosity: "low" },
-    reasoning: { effort: "medium", summary: null },
+    reasoning: { effort: "low", summary: null },
     tools: [
       { type: "web_search", user_location: { type: "approximate" }, search_context_size: "medium" },
       {

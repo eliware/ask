@@ -44,12 +44,13 @@ describe("interactionCreate", () => {
       {
         commandName: "ask",
         locale: "",
+        guildLocale: "es-MX",
         guild: { preferredLocale: "es" },
       },
     );
 
     commandHandler.mock.calls[0][0].msg("key", "Default");
-    expect(msg).toHaveBeenCalledWith("es", "key", "Default", undefined);
+    expect(msg).toHaveBeenCalledWith("es-MX", "key", "Default", undefined);
   });
 
   test("falls back to English when no locale is available", async () => {
