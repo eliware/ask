@@ -22,6 +22,6 @@ Ask ignores messages from bots. Ask ignores server messages unless they address 
 
 ## Response behavior
 
-Ask can answer questions, summarize text, rewrite text, look up web results, and create images. Message-trigger replies use plain text. Ask splits long replies into chunks with a 2,000-character maximum. Slash-command replies use blockquote formatting and may span multiple messages.
+Ask can answer questions, summarize text, rewrite text, look up web results, and create images. Message-trigger replies use plain text. Ask splits long replies into chunks with a 2,000-character maximum. The first chunk replies to the request, and later chunks post as separate messages. Slash-command replies use blockquote formatting and may span multiple messages.
 
 Ask uses the request locale or the server locale for its response language. Users can request a different language or answer length in the prompt. Localized slash-command names and help messages are available for the locale files in `locales/`.
