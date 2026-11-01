@@ -1,4 +1,5 @@
 import { createServer } from "node:http";
+import { createHealthServerLifecycle } from "./lifecycle.mjs";
 import { createReadinessState } from "./readiness.mjs";
 import { createHealthRequestHandler } from "./routes.mjs";
 
@@ -9,25 +10,10 @@ export function createHealthServer({
 } = {}) {
   const readiness = createReadinessState();
   const server = serverFactory(createHealthRequestHandler(readiness.isReady));
+  const lifecycle = createHealthServerLifecycle(server, { host, port });
 
   return {
-    start: () =>
-      new Promise((resolve, reject) => {
-        server.once("error", reject);
-        server.listen(port, host, () => {
-          server.off("error", reject);
-          resolve();
-        });
-      }),
-    close: () =>
-      new Promise((resolve, reject) => {
-        if (!server.listening) {
-          resolve();
-          return;
-        }
-        server.close((error) => (error ? reject(error) : resolve()));
-      }),
+    ...lifecycle,
     setReady: readiness.setReady,
-    address: () => server.address(),
   };
 }

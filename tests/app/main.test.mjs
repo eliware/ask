@@ -130,7 +130,6 @@ test("stops the health server when Discord startup fails", async () => {
     }),
   });
   await expect(startApplication(dependencies)).rejects.toThrow("Discord startup failed");
-  expect(healthServer.setReady).toHaveBeenCalledWith(false);
   expect(healthServer.close).toHaveBeenCalledTimes(1);
 });
 

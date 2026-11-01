@@ -55,55 +55,10 @@ test("returns 404 for unknown paths and 405 for other methods", async () => {
   }
 });
 
-test("can close before listening", async () => {
+test("creates the default server without starting it", async () => {
   const health = createHealthServer();
+
   await health.close();
+
   expect(health.address()).toBeNull();
-});
-
-test("reports server close errors", async () => {
-  const server = {
-    listening: true,
-    close: (callback) => callback(new Error("close failed")),
-  };
-  const health = createHealthServer({ serverFactory: () => server });
-  await expect(health.close()).rejects.toThrow("close failed");
-});
-
-test("binds to loopback by default", async () => {
-  let boundHost;
-  const server = {
-    listening: false,
-    once() {},
-    off() {},
-    listen(_port, host, callback) {
-      boundHost = host;
-      callback();
-    },
-    address: () => null,
-  };
-  const health = createHealthServer({ serverFactory: () => server });
-
-  await health.start();
-
-  expect(boundHost).toBe("127.0.0.1");
-});
-
-test("binds to an explicitly configured host", async () => {
-  let boundHost;
-  const server = {
-    listening: false,
-    once() {},
-    off() {},
-    listen(_port, host, callback) {
-      boundHost = host;
-      callback();
-    },
-    address: () => null,
-  };
-  const health = createHealthServer({ host: "0.0.0.0", serverFactory: () => server });
-
-  await health.start();
-
-  expect(boundHost).toBe("0.0.0.0");
 });

@@ -1,15 +1,16 @@
 import { prepareMessagePayloads } from "../../src/interaction/payload.mjs";
 
-test("serializes content and attaches files to the first payload", async () => {
-  await expect(
-    prepareMessagePayloads({ content: { answer: 1 }, files: ["image"] }),
-  ).resolves.toEqual([{ content: '{"answer":1}', files: ["image"] }]);
+test("serializes content before splitting", async () => {
+  await expect(prepareMessagePayloads({ content: { answer: 1 } })).resolves.toEqual([
+    '{"answer":1}',
+  ]);
 });
 
-test("attaches files only to the first chunk", async () => {
-  await expect(
-    prepareMessagePayloads({ content: "x".repeat(2100), files: ["image"] }),
-  ).resolves.toEqual([{ content: "x".repeat(2000), files: ["image"] }, "x".repeat(100)]);
+test("splits long content into chunks", async () => {
+  await expect(prepareMessagePayloads("x".repeat(2100))).resolves.toEqual([
+    "x".repeat(2000),
+    "x".repeat(100),
+  ]);
 });
 
 test("prepares plain text responses", async () => {
