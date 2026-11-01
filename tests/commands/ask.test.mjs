@@ -1,8 +1,13 @@
 import ask from "../../src/commands/ask.mjs";
+import { loadDiscordCommandFile } from "../../test-fixtures/command-file.mjs";
 import { validateDiscordCommand } from "../../test-fixtures/discord-command-contract.mjs";
 
 test("Ask command definition matches the supported Discord schema", () => {
   expect(validateDiscordCommand("ask")).toEqual([]);
+});
+
+test("loads command definitions from JSON files", () => {
+  expect(loadDiscordCommandFile("ask")).toMatchObject({ type: 1, name: "ask" });
 });
 
 const log = { debug() {}, error() {} };

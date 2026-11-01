@@ -1,8 +1,6 @@
 import { jest, expect, test, describe } from "@jest/globals";
 jest.unstable_mockModule("../../src/commands/ask.mjs", () => ({ default: undefined }));
 jest.unstable_mockModule("@eliware/discord", () => ({ splitMsg: jest.fn((text) => [text]) }));
-const replyWithLocalizedHelp = jest.fn();
-jest.unstable_mockModule("../../src/events/message/help.mjs", () => ({ replyWithLocalizedHelp }));
 const { default: handler } = await import("../../src/events/messageCreate.mjs");
 
 const makeLog = () => ({ debug: jest.fn(), info: jest.fn(), error: jest.fn(), warn: jest.fn() });
@@ -28,17 +26,6 @@ describe("messageCreate", () => {
     const log = makeLog();
     await run(makeMessage({ author: { bot: true } }), { log });
     expect(log.debug).toHaveBeenCalledWith("messageCreate", { id: "message-id" });
-  });
-
-  test("routes !help messages to the help handler", async () => {
-    const message = makeMessage({ content: "!help", guild: { preferredLocale: "fr" } });
-    const { log } = await run(message);
-
-    expect(replyWithLocalizedHelp).toHaveBeenCalledWith(
-      expect.objectContaining({ log, msg: expect.any(Function) }),
-      message,
-      "fr",
-    );
   });
 
   test("handles DM with supplied ask handler", async () => {

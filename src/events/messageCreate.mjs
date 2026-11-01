@@ -3,17 +3,14 @@ import { createMessageInteraction } from "../interaction/message.mjs";
 import { isAddressedByName } from "./message/addressing.mjs";
 import { isMessageTriggered } from "./message/triggers.mjs";
 import { extractMessagePrompt } from "./message/prompt.mjs";
-import { replyWithLocalizedHelp } from "./message/help.mjs";
+import { handleMessageHelp } from "./message/help-handler.mjs";
 
 export default async function ({ client, log, msg, commandHandlers, ...contextData }, message) {
   log.debug("messageCreate", { id: message.id });
   if (message.author?.bot) return;
   const locale = message.guild?.preferredLocale || "en-US";
   const localeMsg = (key, defaultMsg) => msg(locale, key, defaultMsg, log);
-  if (message.content === "!help") {
-    await replyWithLocalizedHelp({ log, msg }, message, locale);
-    return;
-  }
+  if (await handleMessageHelp({ log, msg }, message, locale)) return;
 
   const isDirect = !message.guild;
   const isMentioned = message.mentions?.has?.(client.user) || false;

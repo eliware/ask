@@ -1,9 +1,6 @@
-import { readFileSync } from "node:fs";
-import { join } from "node:path";
+import { loadDiscordCommandFile } from "./command-file.mjs";
 import { validateDiscordCommandDefinition } from "./command-schema.mjs";
 
 export function validateDiscordCommand(name) {
-  const filePath = join(process.cwd(), "commands", name + ".json");
-  const command = JSON.parse(readFileSync(filePath, "utf8"));
-  return validateDiscordCommandDefinition(command);
+  return validateDiscordCommandDefinition(loadDiscordCommandFile(name));
 }
