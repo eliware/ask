@@ -1,4 +1,5 @@
 import { createServer } from "node:http";
+import { createHealthRequestHandler } from "./routes.mjs";
 
 export function createHealthServer({
   host = "0.0.0.0",
@@ -6,27 +7,7 @@ export function createHealthServer({
   serverFactory = createServer,
 } = {}) {
   let ready = false;
-  const server = serverFactory((request, response) => {
-    const path = request.url?.split("?", 1)[0];
-    if (request.method !== "GET") {
-      response.writeHead(405, { "content-type": "application/json" });
-      response.end(JSON.stringify({ status: "method not allowed" }));
-      return;
-    }
-    if (path === "/health") {
-      response.writeHead(200, { "content-type": "application/json" });
-      response.end(JSON.stringify({ status: "ok" }));
-      return;
-    }
-    if (path === "/ready") {
-      const status = ready ? 200 : 503;
-      response.writeHead(status, { "content-type": "application/json" });
-      response.end(JSON.stringify({ status: ready ? "ready" : "not ready" }));
-      return;
-    }
-    response.writeHead(404, { "content-type": "application/json" });
-    response.end(JSON.stringify({ status: "not found" }));
-  });
+  const server = serverFactory(createHealthRequestHandler(() => ready));
 
   return {
     start: () =>
