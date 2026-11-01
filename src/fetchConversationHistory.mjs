@@ -11,6 +11,9 @@ export async function fetchConversationHistory({ client, interaction, channelId,
     }
     if (!fetched?.values) return [];
     return Array.from(fetched.values())
+      .filter(
+        (message) => !interaction.sourceMessageId || message.id !== interaction.sourceMessageId,
+      )
       .reverse()
       .map((message) => {
         const text = String(message.content || "").trim();

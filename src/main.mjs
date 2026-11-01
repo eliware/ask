@@ -1,6 +1,7 @@
 import { readFileSync } from "node:fs";
 import { join } from "node:path";
 import { config } from "dotenv";
+import { validateConfiguration } from "./configuration.mjs";
 
 export async function startApplication({
   createDiscord,
@@ -9,8 +10,11 @@ export async function startApplication({
   registerHandlers,
   registerSignals,
   rootDir,
+  configureEnvironment = config,
+  environment = process.env,
 }) {
-  config({ path: join(rootDir, ".env"), quiet: true });
+  configureEnvironment({ path: join(rootDir, ".env"), quiet: true });
+  validateConfiguration(environment);
   registerHandlers({ log });
 
   let client;

@@ -20,7 +20,7 @@ test("creates a message-backed interaction and sends replies", async () => {
     log: log(),
   });
   await interaction.reply({ content: "hello" });
-  expect(replies).toEqual(["> hello"]);
+  expect(replies).toEqual(["hello"]);
   expect(interaction.guild).toBeUndefined();
   expect(interaction.guildId).toBeNull();
   expect(interaction.channelId).toBe("c");
@@ -31,6 +31,7 @@ test("exposes message metadata and handles objects, files, and ephemeral replies
   const sent = [];
   const replied = [];
   const message = {
+    id: "source-message",
     guild: { id: "g" },
     author: { id: "u", send: async (value) => sent.push(value) },
     member: { id: "m" },
@@ -47,10 +48,12 @@ test("exposes message metadata and handles objects, files, and ephemeral replies
   await interaction.editReply({ content: { answer: 1 }, files: ["file"] });
   await interaction.reply({ content: "private", flags: 1 << 6 });
   await interaction.editReply({ content: "x".repeat(2100), files: ["second"] });
-  expect(replied[0]).toEqual({ content: '> {"answer":1}', files: ["file"] });
+  expect(replied[0]).toEqual({ content: '{"answer":1}', files: ["file"] });
   expect(replied[1]).toHaveProperty("files", ["second"]);
   expect(replied).toHaveLength(3);
-  expect(sent).toEqual(["> private"]);
+  expect(replied[2]).toHaveLength(100);
+  expect(interaction.sourceMessageId).toBe("source-message");
+  expect(sent).toEqual(["private"]);
   expect(interaction.guildId).toBe("g");
   expect(interaction.user).toBe(message.author);
   expect(interaction.member).toBe(message.member);

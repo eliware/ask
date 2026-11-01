@@ -10,6 +10,8 @@ Set these environment values before starting Ask. A local install can read them 
 
 Copy `.env.example` to `.env` for local use. Keep `.env` out of Git. Do not share its values in logs or support requests. A deployment can provide the same values through its secret store.
 
+At startup, Ask checks that all three values are nonempty. Ask stops before creating clients when a value is missing.
+
 ## Discord setup
 
 Invite Ask with the `bot` and `applications.commands` scopes. Grant View Channels, Send Messages, and Read Message History in channels where Ask can send replies. Ask does not require Administrator permission.

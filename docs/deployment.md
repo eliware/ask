@@ -16,8 +16,8 @@ The Compose entry builds the local Dockerfile and starts again unless stopped. T
 The package is available from the public `ghcr.io/eliware/ask` registry. Use a version tag for an approved release, or use the immutable digest recorded by the publish workflow.
 
 1. Set the required values in an untracked `.env` file or deployment secret store.
-2. Pull the selected version with `docker pull ghcr.io/eliware/ask:v14.0.0`.
-3. Run the selected image with `docker run --env-file .env ghcr.io/eliware/ask:v14.0.0`.
+2. Pull the selected version with `docker pull ghcr.io/eliware/ask:v15.1.0`.
+3. Run the selected image with `docker run --env-file .env ghcr.io/eliware/ask:v15.1.0`.
 
 For a deployment, replace the example version with an approved release tag. Record the SHA-256 digest and deploy by digest when the platform supports it. Publication does not grant deployment approval.
 

@@ -5,13 +5,15 @@ test("returns recent channel messages in chronological conversation order", asyn
   const history = await fetchConversationHistory({
     client: { user: { id: "bot" } },
     interaction: {
+      sourceMessageId: "current",
       channel: {
         messages: {
           fetch: jest.fn(
             async () =>
               new Map([
-                ["new", { content: " latest ", author: { id: "user" } }],
-                ["old", { content: "answer", author: { id: "bot" } }],
+                ["current", { id: "current", content: "current request", author: { id: "user" } }],
+                ["new", { id: "new", content: " latest ", author: { id: "user" } }],
+                ["old", { id: "old", content: "answer", author: { id: "bot" } }],
               ]),
           ),
         },

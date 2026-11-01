@@ -1,5 +1,5 @@
 import { safeSerialize } from "@eliware/common";
-import { addBlockquote, defaultSplit } from "./formatResponse.mjs";
+import { defaultSplit } from "./formatResponse.mjs";
 
 async function splitText(text, max) {
   try {
@@ -18,6 +18,7 @@ export function createMessageInteraction({ client, message, locale, text, log })
     guildId: message.guild?.id || null,
     channelId: message.channel?.id || null,
     channel: message.channel,
+    sourceMessageId: message.id,
     user: message.author,
     member: message.member || null,
     data: { options: [{ value: text }] },
@@ -34,7 +35,7 @@ export function createMessageInteraction({ client, message, locale, text, log })
     const content = response?.content ?? response;
     const files = response?.files || null;
     const chunks = await splitText(
-      addBlockquote(typeof content === "string" ? content : JSON.stringify(content)),
+      typeof content === "string" ? content : JSON.stringify(content),
       2000,
     );
     const target = ephemeral ? message.author : message;

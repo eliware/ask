@@ -104,7 +104,7 @@ describe("messageCreate", () => {
   test("uses localized fallback when ask handler is absent", async () => {
     const message = makeMessage({ guild: undefined });
     await run(message, { commandHandlers: {} });
-    expect(message.author.send).toHaveBeenCalledWith("> en-US:help:Try /ask <anything>.");
+    expect(message.author.send).toHaveBeenCalledWith("en-US:help:Try /ask <anything>.");
   });
 
   test("logs handler errors and still stops typing", async () => {

@@ -16,11 +16,48 @@ function makeDependencies(overrides = {}) {
     registerSignals: jest.fn((handlers) => {
       signalHandlers = handlers;
     }),
+    configureEnvironment: jest.fn(),
+    environment: {
+      DISCORD_CLIENT_ID: "test-client-id",
+      DISCORD_TOKEN: "test-discord-token",
+      OPENAI_API_KEY: "test-openai-key",
+    },
     rootDir,
     ...overrides,
   };
   return { dependencies, client, createDiscord, getSignalHandlers: () => signalHandlers };
 }
+
+test("rejects missing configuration before registering or initializing services", async () => {
+  const { dependencies, createDiscord } = makeDependencies({
+    environment: { DISCORD_CLIENT_ID: "test-client-id", DISCORD_TOKEN: "test-discord-token" },
+  });
+  await expect(startApplication(dependencies)).rejects.toThrow(
+    "Missing required environment values: OPENAI_API_KEY",
+  );
+  expect(dependencies.registerHandlers).not.toHaveBeenCalled();
+  expect(dependencies.initializeOpenAI).not.toHaveBeenCalled();
+  expect(createDiscord).not.toHaveBeenCalled();
+});
+
+test("uses default dotenv configuration and process environment", async () => {
+  const names = ["DISCORD_CLIENT_ID", "DISCORD_TOKEN", "OPENAI_API_KEY"];
+  const values = ["test-client-id", "test-discord-token", "test-openai-key"];
+  const originalValues = Object.fromEntries(names.map((name) => [name, process.env[name]]));
+  const { dependencies, client, getSignalHandlers } = makeDependencies();
+  delete dependencies.configureEnvironment;
+  delete dependencies.environment;
+  Object.assign(process.env, Object.fromEntries(names.map((name, index) => [name, values[index]])));
+  try {
+    await expect(startApplication(dependencies)).resolves.toBe(client);
+    await getSignalHandlers().shutdownHook();
+  } finally {
+    for (const name of names) {
+      if (originalValues[name] === undefined) delete process.env[name];
+      else process.env[name] = originalValues[name];
+    }
+  }
+});
 
 test("starts the bot with its package version, intents, and runtime root", async () => {
   const { dependencies, client, createDiscord, getSignalHandlers } = makeDependencies();

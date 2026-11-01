@@ -2,7 +2,7 @@
 
 ## @eliware/ask [![License](https://img.shields.io/github/license/eliware/ask)](https://github.com/eliware/ask/blob/main/LICENSE) [![CI](https://github.com/eliware/ask/actions/workflows/ci.yaml/badge.svg)](https://github.com/eliware/ask/actions/workflows/ci.yaml)
 
-A Discord assistant for short answers, web lookup, and image generation. Supports slash commands, direct-message triggers, localization, and usage tracking.
+A Discord assistant for short answers, web lookup, and image generation. Supports slash commands, direct-message triggers, and localization.
 
 ## Table of Contents
 
