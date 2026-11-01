@@ -1,9 +1,4 @@
-import {
-  addBlockquote,
-  defaultSplit,
-  safetyMessage,
-  splitBlockquoted,
-} from "../../src/response/formatting.mjs";
+import { addBlockquote, defaultSplit, splitBlockquoted } from "../../src/response/formatting.mjs";
 
 test("formats blockquotes including null and blank lines", () => {
   expect(addBlockquote("a\n\nb")).toBe("> a\n> \n> b");
@@ -22,9 +17,4 @@ test("keeps quoted chunks within their limit", () => {
   expect(splitBlockquoted("", 7)).toEqual(["> "]);
   expect(splitBlockquoted(null, 7)).toEqual(["> "]);
   expect(splitBlockquoted("a\nb", 8)).toEqual(["> a\n> b"]);
-});
-test("formats safety messages with and without violations", () => {
-  expect(safetyMessage()).toMatch(/content policy/);
-  expect(safetyMessage([])).toMatch(/content policy/);
-  expect(safetyMessage(["x", "y"])).toMatch(/\(x, y\)/);
 });

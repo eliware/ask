@@ -1,4 +1,5 @@
-import { createMessageReplyMethods, createMessageSender } from "./sender.mjs";
+import { createMessageReplyMethods } from "./reply-methods.mjs";
+import { createMessageSender } from "./sender.mjs";
 import { createTypingManager } from "./typing.mjs";
 
 export function createMessageInteraction({ client, message, locale, text, log }) {

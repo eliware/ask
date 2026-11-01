@@ -4,7 +4,7 @@ import { buildConversationInput } from "../conversation/history.mjs";
 import { requestAnswer } from "../openai/request.mjs";
 import { parseResponse } from "../response/parsing.mjs";
 import { deliverResponse } from "../response/delivery.mjs";
-import { safetyMessage } from "../response/formatting.mjs";
+import { safetyMessage } from "../response/safety-message.mjs";
 
 function extractViolations(error) {
   if (Array.isArray(error?.error?.safety_violations))

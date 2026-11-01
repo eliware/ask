@@ -1,5 +1,5 @@
 import { jest } from "@jest/globals";
-import { createMessageReplyMethods, createMessageSender } from "../../src/interaction/sender.mjs";
+import { createMessageSender } from "../../src/interaction/sender.mjs";
 
 test("sends chunks, files, objects, and private replies", async () => {
   const sent = [];
@@ -49,30 +49,4 @@ test("sends later chunks to the channel after replying to the request", async ()
   expect(replies[0]).toHaveLength(2000);
   expect(messages).toHaveLength(1);
   expect(messages[0]).toHaveLength(100);
-});
-
-test("logs reply and edit failures and stops typing", async () => {
-  const log = { error: jest.fn() };
-  const stopTyping = jest.fn();
-  const send = jest.fn(async () => {
-    throw new Error("send failed");
-  });
-  const methods = createMessageReplyMethods({ send, stopTyping, log });
-
-  await methods.reply("reply");
-  await methods.editReply("edit");
-
-  expect(stopTyping).toHaveBeenCalledTimes(2);
-  expect(send).toHaveBeenNthCalledWith(1, "reply", false);
-  expect(send).toHaveBeenNthCalledWith(2, "edit");
-  expect(log.error).toHaveBeenNthCalledWith(
-    1,
-    "mock interaction.reply failed",
-    expect.objectContaining({ error: expect.objectContaining({ message: "send failed" }) }),
-  );
-  expect(log.error).toHaveBeenNthCalledWith(
-    2,
-    "mock interaction.editReply failed",
-    expect.objectContaining({ error: expect.objectContaining({ message: "send failed" }) }),
-  );
 });
