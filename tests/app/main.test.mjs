@@ -22,7 +22,6 @@ function makeDependencies(overrides = {}) {
       signalHandlers = handlers;
     }),
     createHealthServer: jest.fn(() => healthServer),
-    configureEnvironment: jest.fn(),
     environment: {
       DISCORD_CLIENT_ID: "test-client-id",
       DISCORD_TOKEN: "test-discord-token",
@@ -57,7 +56,6 @@ test("starts the bot with default dotenv configuration, version, intents, and ru
   const values = ["test-client-id", "test-discord-token", "test-openai-key"];
   const originalValues = Object.fromEntries(names.map((name) => [name, process.env[name]]));
   const { dependencies, client, createDiscord, getSignalHandlers } = makeDependencies();
-  delete dependencies.configureEnvironment;
   delete dependencies.environment;
   Object.assign(process.env, Object.fromEntries(names.map((name, index) => [name, values[index]])));
   delete process.env.HEALTH_HOST;
