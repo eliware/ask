@@ -1,10 +1,10 @@
 import { safeSerialize } from "@eliware/common";
-import { getRequestContext } from "../requestContext.mjs";
-import { buildConversationInput } from "../conversationHistory.mjs";
-import { requestAnswer } from "../openaiRequest.mjs";
-import { parseResponse } from "../responseParsing.mjs";
-import { deliverResponse } from "../responseDelivery.mjs";
-import { safetyMessage } from "../formatResponse.mjs";
+import { getRequestContext } from "../interaction/request-context.mjs";
+import { buildConversationInput } from "../conversation/history.mjs";
+import { requestAnswer } from "../openai/request.mjs";
+import { parseResponse } from "../response/parsing.mjs";
+import { deliverResponse } from "../response/delivery.mjs";
+import { safetyMessage } from "../response/formatting.mjs";
 
 function extractViolations(error) {
   if (Array.isArray(error?.error?.safety_violations))

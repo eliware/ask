@@ -1,4 +1,4 @@
-import { decodeBase64Image, normalizeOutputs, parseResponse } from "../src/responseParsing.mjs";
+import { decodeBase64Image, normalizeOutputs, parseResponse } from "../../src/response/parsing.mjs";
 
 test("decodeBase64Image decodes and returns null on invalid input", () => {
   expect(decodeBase64Image("aGVsbG8=")).toEqual(Buffer.from("hello"));

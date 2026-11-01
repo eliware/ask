@@ -1,5 +1,5 @@
 import { jest } from "@jest/globals";
-import { getRequestContext } from "../src/requestContext.mjs";
+import { getRequestContext } from "../../src/interaction/request-context.mjs";
 
 test("builds context from interaction fields", async () => {
   const context = await getRequestContext({

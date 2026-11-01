@@ -1,4 +1,4 @@
-import sanitizeForLog from "../src/sanitizeForLog.mjs";
+import sanitizeForLog from "../../src/logging/sanitize-for-log.mjs";
 
 test("handles primitives and depth limits", () => {
   expect(sanitizeForLog(null)).toBeNull();

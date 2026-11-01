@@ -1,4 +1,4 @@
-import { fetchConversationHistory } from "./fetchConversationHistory.mjs";
+import { fetchConversationHistory } from "./fetch-history.mjs";
 
 export async function buildConversationInput({
   client,

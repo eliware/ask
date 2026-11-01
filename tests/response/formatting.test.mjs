@@ -1,4 +1,4 @@
-import { addBlockquote, defaultSplit, safetyMessage } from "../src/formatResponse.mjs";
+import { addBlockquote, defaultSplit, safetyMessage } from "../../src/response/formatting.mjs";
 
 test("formats blockquotes including null and blank lines", () => {
   expect(addBlockquote("a\n\nb")).toBe("> a\n> \n> b");

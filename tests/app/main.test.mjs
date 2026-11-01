@@ -1,5 +1,5 @@
 import { expect, jest, test } from "@jest/globals";
-import { startApplication } from "../src/main.mjs";
+import { startApplication } from "../../src/app/main.mjs";
 
 const rootDir = process.cwd();
 const logger = { warn: jest.fn() };

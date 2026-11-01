@@ -1,5 +1,5 @@
 import { expect, test } from "@jest/globals";
-import { validateConfiguration } from "../src/configuration.mjs";
+import { validateConfiguration } from "../../src/configuration/validate.mjs";
 
 const requiredValues = {
   DISCORD_CLIENT_ID: "test-client-id",

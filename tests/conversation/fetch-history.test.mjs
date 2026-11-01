@@ -1,5 +1,5 @@
 import { expect, jest, test } from "@jest/globals";
-import { fetchConversationHistory } from "../src/fetchConversationHistory.mjs";
+import { fetchConversationHistory } from "../../src/conversation/fetch-history.mjs";
 
 test("returns recent channel messages in chronological conversation order", async () => {
   const history = await fetchConversationHistory({

@@ -1,5 +1,5 @@
 import { jest } from "@jest/globals";
-import { initializeOpenAI } from "../src/openaiClient.mjs";
+import { initializeOpenAI } from "../../src/openai/client.mjs";
 
 test("initializes and logs the OpenAI client", async () => {
   const log = { info: jest.fn(), error: jest.fn() };

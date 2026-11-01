@@ -1,5 +1,5 @@
 import { safeSerialize } from "@eliware/common";
-import { defaultSplit } from "./formatResponse.mjs";
+import { defaultSplit } from "../response/formatting.mjs";
 
 async function splitText(text, max) {
   try {

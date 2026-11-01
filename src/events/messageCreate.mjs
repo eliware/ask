@@ -1,5 +1,5 @@
 import { safeSerialize } from "@eliware/common";
-import { createMessageInteraction } from "../messageInteraction.mjs";
+import { createMessageInteraction } from "../interaction/message.mjs";
 
 export default async function ({ client, log, msg, commandHandlers, ...contextData }, message) {
   log.debug("messageCreate", { id: message.id });

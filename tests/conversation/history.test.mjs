@@ -1,5 +1,5 @@
 import { jest } from "@jest/globals";
-import { buildConversationInput } from "../src/conversationHistory.mjs";
+import { buildConversationInput } from "../../src/conversation/history.mjs";
 
 const log = { debug: jest.fn() };
 

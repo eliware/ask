@@ -1,4 +1,4 @@
-import { deliverResponse } from "../src/responseDelivery.mjs";
+import { deliverResponse } from "../../src/response/delivery.mjs";
 
 const log = { debug() {} };
 test("delivers mock response with files and URLs", async () => {

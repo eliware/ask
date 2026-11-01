@@ -1,7 +1,7 @@
 import { readFileSync } from "node:fs";
 import { join } from "node:path";
 import { config } from "dotenv";
-import { validateConfiguration } from "./configuration.mjs";
+import { validateConfiguration } from "../configuration/validate.mjs";
 
 export async function startApplication({
   createDiscord,

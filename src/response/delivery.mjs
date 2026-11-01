@@ -1,4 +1,4 @@
-import { addBlockquote, defaultSplit } from "./formatResponse.mjs";
+import { addBlockquote, defaultSplit } from "./formatting.mjs";
 export async function deliverResponse(interaction, replyText, images, deferred, log) {
   const text = typeof replyText === "string" ? replyText.trim() : "";
   const files = images

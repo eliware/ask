@@ -2,8 +2,8 @@
 import { join } from "node:path";
 import { createDiscord } from "@eliware/discord";
 import { log, registerHandlers, registerSignals } from "@eliware/common";
-import { initializeOpenAI } from "../src/openaiClient.mjs";
-import { startApplication } from "../src/main.mjs";
+import { initializeOpenAI } from "../src/openai/client.mjs";
+import { startApplication } from "../src/app/main.mjs";
 
 await startApplication({
   createDiscord,

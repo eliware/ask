@@ -1,6 +1,6 @@
 import { jest } from "@jest/globals";
-import { createMessageInteraction } from "../src/messageInteraction.mjs";
-import { deliverResponse } from "../src/responseDelivery.mjs";
+import { createMessageInteraction } from "../../src/interaction/message.mjs";
+import { deliverResponse } from "../../src/response/delivery.mjs";
 
 jest.setTimeout(10_000);
 
@@ -145,7 +145,7 @@ test("falls back to default splitting when discord splitter is unavailable", asy
   jest.resetModules();
   jest.unstable_mockModule("@eliware/discord", () => ({}));
   const { createMessageInteraction: createFallbackInteraction } =
-    await import("../src/messageInteraction.mjs");
+    await import("../../src/interaction/message.mjs");
   const replies = [];
   const message = { author: {}, reply: async (value) => replies.push(value) };
   const interaction = createFallbackInteraction({
