@@ -1,6 +1,6 @@
 import { safeSerialize } from "@eliware/common";
 import { getRequestContext } from "../interaction/request-context.mjs";
-import { buildConversationInput } from "../conversation/history.mjs";
+import { buildConversationInput } from "../conversation/input.mjs";
 import { requestAnswer } from "../openai/request.mjs";
 import { parseResponse } from "../response/parsing.mjs";
 import { deliverResponse } from "../response/delivery.mjs";
