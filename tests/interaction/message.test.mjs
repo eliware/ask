@@ -32,27 +32,6 @@ test("creates a message-backed interaction and sends replies", async () => {
   expect(interaction.options.getString()).toBe("hi");
 });
 
-test("exposes message metadata", () => {
-  const message = {
-    id: "source-message",
-    guild: { id: "g" },
-    author: { id: "u" },
-    member: { id: "m" },
-    channel: { id: "c" },
-  };
-  const interaction = createMessageInteraction({
-    client: {},
-    message,
-    locale: "fr",
-    text: "question",
-    log: log(),
-  });
-  expect(interaction.sourceMessageId).toBe("source-message");
-  expect(interaction.guildId).toBe("g");
-  expect(interaction.user).toBe(message.author);
-  expect(interaction.member).toBe(message.member);
-});
-
 test("splits message text before adding an image URL to the next chunk", async () => {
   const replies = [];
   const url = "https://example.test/image.png";

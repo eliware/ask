@@ -1,5 +1,6 @@
 import { jest, expect, test, describe } from "@jest/globals";
 import handler from "../../src/events/clientReady.mjs";
+import invalidatedHandler from "../../src/events/invalidated.mjs";
 
 describe("clientReady", () => {
   test("logs readiness without presence", async () => {
@@ -25,5 +26,17 @@ describe("clientReady", () => {
     const client = { user: { tag: "test#0001", setPresence: jest.fn() } };
     await handler({ log, healthServer }, client);
     expect(healthServer.setReady).toHaveBeenCalledWith(true);
+  });
+
+  test("restores readiness after invalidation", async () => {
+    const healthServer = { setReady: jest.fn() };
+    const log = { debug: jest.fn(), info: jest.fn() };
+    const client = { user: { tag: "test#0001", setPresence: jest.fn() } };
+
+    await handler({ log, healthServer }, client);
+    await invalidatedHandler({ log, healthServer });
+    await handler({ log, healthServer }, client);
+
+    expect(healthServer.setReady.mock.calls).toEqual([[true], [false], [true]]);
   });
 });
