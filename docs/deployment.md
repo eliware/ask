@@ -1,0 +1,28 @@
+# Container deployment
+
+The GHCR image runs the Ask Discord assistant as the unprivileged `node` user. The publish workflow builds for the runner architecture, pushes a version tag, and records an image digest. Publication does not deploy the bot.
+
+## Build and run from source
+
+1. Set the required values in an untracked `.env` file.
+2. Run `docker compose up -d --build` from the repository root.
+3. Run `docker compose logs -f ask` to view container logs.
+4. Run `docker compose down` to stop and remove the container.
+
+The Compose entry builds the local Dockerfile and starts again unless stopped. The bot does not expose a network port.
+
+## Run a published image
+
+The package is available from the public `ghcr.io/eliware/ask` registry. Use a version tag for an approved release, or use the immutable digest recorded by the publish workflow.
+
+1. Set the required values in an untracked `.env` file or deployment secret store.
+2. Pull the selected version with `docker pull ghcr.io/eliware/ask:v14.0.0`.
+3. Run the selected image with `docker run --env-file .env ghcr.io/eliware/ask:v14.0.0`.
+
+For a deployment, replace the example version with an approved release tag. Record the SHA-256 digest and deploy by digest when the platform supports it. Publication does not grant deployment approval.
+
+The GHCR workflow starts on version tags that match `vMAJOR.MINOR.PATCH`. It checks the package version, publishes the image, verifies its digest, and records the digest in the workflow summary.
+
+## Stop a container
+
+Send a stop signal to the container or run `docker compose down`. Ask closes its Discord client during shutdown.

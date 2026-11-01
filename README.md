@@ -25,59 +25,55 @@ A Discord assistant for short answers, web lookup, and image generation. Support
 
 ## Features
 
-Ask answers questions, looks up web results, and creates images through Discord. It supports address mentions, replies, direct messages, localized help, and recent channel context.
+Ask answers questions, looks up web results, and creates images through Discord. It supports localized commands, direct messages, address mentions, replies, and channel context.
 
 ## Requirements
 
-Use Node.js 26 or later and npm 12 or later for repository validation. Bot startup requires a Discord application and an OpenAI API key.
+Use Node.js 26 or later and npm 12 or later. Bot startup requires a Discord application and an OpenAI API key.
 
 ## Setup
 
-Copy `.env.example` to an untracked `.env` file. Set `DISCORD_CLIENT_ID`, `DISCORD_TOKEN`, and `OPENAI_API_KEY` in that file. Run `npm ci` from the repository root.
+Follow the [setup guide](docs/README.md) to configure Discord, set environment values, and start the bot.
 
 ## Usage
 
-Run `node bin/ask.mjs` to start the bot. Use `/ask <question>`, address the bot, reply to its message, or send a direct message. Use `!help` for localized help. Read the [release notes](RELEASE_NOTES.md) for release history.
-
-The GHCR image packages this Discord assistant. The image builds for `linux/amd64` and uses the public `ghcr.io/eliware/ask` package. Pull version 14.0.0 with `docker pull ghcr.io/eliware/ask:v14.0.0`. Image publication does not deploy the bot. Deploy with an immutable version tag and record its SHA-256 digest.
+Read the [user guides](docs/README.md) for commands, configuration, and deployment. Read [release notes](RELEASE_NOTES.md) for release history.
 
 ## Development
 
-Read [AGENTS.md](AGENTS.md), [docs/README.md](docs/README.md), and [specs/README.md](specs/README.md) before you change files. Command adapters live in `commands/`. Event adapters live in `events/`. Handlers live in `src/commands/` and `src/events/`. Locale files live in `locales/`.
+Read [AGENTS.md](AGENTS.md), [the documentation index](docs/README.md), and [the specifications index](specs/README.md) before changing files.
 
 ## Testing
 
-Run focused tests first during development. Run one test file with `npm test -- tests/path/to/example.test.mjs`. Run multiple test files with `npm test -- tests/path/to/first.test.mjs tests/path/to/second.test.mjs`. Run `npm test` for final validation. CI runs `npm ci` and `npm test`.
+Run `npm test` for aggregate validation. CI installs dependencies with `npm ci` and runs `npm test`.
 
 ## Troubleshooting
 
-If the bot cannot connect, verify the Discord application ID, token, and enabled intents. If OpenAI requests fail, verify the API key and provider status.
+Use the [troubleshooting guide](docs/troubleshooting.md) to check credentials, Discord access, and provider errors.
 
 ## Security
 
-Keep Discord and OpenAI credentials in an untracked `.env` file or an approved secret store. Do not commit credentials or log tokens or private message content.
+Keep Discord and OpenAI credentials in an untracked `.env` file or an approved secret store. Do not share tokens or private message content.
 
 ## Configuration
 
-The application requires `DISCORD_CLIENT_ID`, `DISCORD_TOKEN`, and `OPENAI_API_KEY`. The `.env.example` file lists these variables. The application has no optional environment variables.
+Set `DISCORD_CLIENT_ID`, `DISCORD_TOKEN`, and `OPENAI_API_KEY`. See the [configuration guide](docs/configuration.md).
 
 ## Operations
 
-Run `node bin/ask.mjs` to start the bot. A termination signal closes the Discord client. Build a local image with `docker build -t ask .`. Run it with `docker run --env-file .env ask`.
-
-The root [Dockerfile](Dockerfile) starts the bot as the unprivileged `node` user. Image publication does not deploy the bot. Use a separate GitOps handoff to deploy it.
+Run `node bin/ask.mjs` for a local start. The public GHCR image packages Ask for container use. Pull it with a version tag or deploy by its recorded SHA-256 digest. Publication does not deploy the bot. See the [deployment guide](docs/deployment.md) for container commands and shutdown behavior.
 
 ## Commands
 
-The bot provides the `/ask` command with one required `query` string. It can answer, summarize, rewrite, look up web results, and create images. The `!help` command provides localized usage details. Command definitions and adapters are in `commands/`. Handlers are in `src/commands/`.
+Use `/ask` with a required question or prompt. Use `/help` or `!help` for localized help. See the [command guide](docs/commands.md).
 
 ## Events
 
-The bot handles interactions, messages, readiness, warnings, errors, debug events, and invalidation. It ignores messages from bots and unrelated server messages. It uses recent channel messages when Discord provides them.
+The bot handles command interactions, messages, readiness, warnings, errors, debug events, and invalidation. It ignores bot messages and unrelated server messages.
 
 ## Intents and permissions
 
-The bot requests the `Guilds`, `GuildMessages`, `MessageContent`, and `DirectMessages` intents. Enable the privileged Message Content intent in the Discord Developer Portal. Grant View Channels, Send Messages, and Read Message History permissions. Do not grant administrator permissions.
+The bot requests the `Guilds`, `GuildMessages`, `MessageContent`, and `DirectMessages` intents. Enable Message Content in the Discord Developer Portal. Grant View Channels, Send Messages, and Read Message History. Do not grant administrator access. Supported locales are `bg`, `cs`, `da`, `de`, `el`, `en-GB`, `en-US`, `es-419`, `es-ES`, `fi`, `fr`, `hi`, `hr`, `hu`, `id`, `it`, `ja`, `ko`, `lt`, `nl`, `no`, `pl`, `pt-BR`, `ro`, `ru`, `sv-SE`, `th`, `tr`, `uk`, `vi`, `zh-CN`, and `zh-TW`.
 
 ## Support
 

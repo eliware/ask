@@ -1,11 +1,23 @@
 # Troubleshooting
 
-Check that `DISCORD_CLIENT_ID`, `DISCORD_TOKEN`, and `OPENAI_API_KEY` have values in the untracked `.env` file or deployment secret store. Do not share these values in logs or support requests.
+## Ask will not start
 
-If the bot cannot connect, check that the application ID and bot token belong to the same Discord application. Confirm that the bot is online and that its invite includes the `applications.commands` scope.
+Check that `DISCORD_CLIENT_ID`, `DISCORD_TOKEN`, and `OPENAI_API_KEY` have values. Confirm that the application ID and bot token belong to the same Discord application. Keep the values private when you inspect logs.
 
-If `/ask` does not appear, check the command scope and that Discord has synchronized the command definitions. If message requests do not work, enable the Message Content privileged intent and grant access to the channel. Direct messages require the Direct Messages intent.
+## A command does not appear
 
-If an answer, web lookup, or image request fails, check the OpenAI API key, account access, and provider status. Check application logs for the error, but remove tokens and private message content before sharing logs.
+Confirm that you invited Ask with the `applications.commands` scope. Start Ask again after changing command definitions. Discord may require time to refresh command data.
 
-Use the root README for required intents, permissions, and setup details.
+## Ask cannot read or answer a message
+
+Enable Message Content in the Discord Developer Portal. Check that the bot can view the channel, send messages, and read message history. For direct messages, confirm that the user opened a conversation with the bot.
+
+## OpenAI requests fail
+
+Check the OpenAI API key, account access, and provider status. Check the application error logs for the request failure. Remove tokens and private message content before sharing logs.
+
+## An image or web lookup does not appear
+
+Confirm that the request asks for a web lookup or image. Check that Discord allows Ask to send the reply or file. Check application logs for provider errors.
+
+For setup and permission steps, see [Configuration](configuration.md). For supported request forms, see [Commands](commands.md).

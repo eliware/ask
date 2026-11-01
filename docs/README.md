@@ -1,28 +1,19 @@
-# Ask documentation
+# Ask user guides
 
-Use this directory to learn how to configure, use, and troubleshoot the Ask Discord application. The root README describes features, requirements, permissions, and the published container image.
+Use these guides to install, configure, use, and troubleshoot the Ask Discord assistant. The root README summarizes features, requirements, and permissions.
 
-## Setup
+## Start here
 
-Install Node.js 26 or later and npm 12 or later. Run `npm ci` from the repository root. Copy `.env.example` to an untracked `.env` file, then set `DISCORD_CLIENT_ID`, `DISCORD_TOKEN`, and `OPENAI_API_KEY`.
+1. Start with the usage guide to create the Discord application, set credentials, and start Ask.
+2. Use the command guide to learn commands and message triggers.
+3. Use the configuration guide to check settings and Discord access.
+4. Use the deployment guide to run the container image or stop the bot.
+5. Use the troubleshooting guide if a command or connection fails.
 
-## Run the bot
+## Guides
 
-Start the bot with `node bin/ask.mjs`. Use `/ask` with a question, address the bot with a prompt, reply to one of its messages, or send it a direct message. The bot can answer, summarize, rewrite, find web results, and create images. Message requests can include recent channel context. Use `!help` for localized help.
-
-## Connect Discord
-
-Create a Discord application and bot. Invite it with the `applications.commands` scope and the permissions listed in the root README. Enable the privileged Message Content intent for message-based requests. Keep the application ID, token, and OpenAI key private.
-
-## Stop the bot
-
-Send a termination signal to stop the bot. The application closes its Discord client during shutdown.
-
-## Support
-
-See the troubleshooting guide for connection, permission, and provider checks. For community support, use the Discord link in the root README.
-
-## Contents
-
-- [Usage](usage.md)
+- [Usage and setup](usage.md)
+- [Commands and message triggers](commands.md)
+- [Configuration and permissions](configuration.md)
+- [Container deployment](deployment.md)
 - [Troubleshooting](troubleshooting.md)

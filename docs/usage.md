@@ -1,9 +1,33 @@
-# Usage
+# Setup and first run
 
-Start the bot with `node bin/ask.mjs`. The application loads its settings, registers its command definitions, loads event handlers and locales, then connects to Discord.
+Ask requires a Discord application, a bot token, and an OpenAI API key. Use Node.js 26 or later and npm 12 or later for a local install.
 
-Use `/ask` with a question. You can also address the bot with a prompt, reply to one of its messages, or send a direct message. The bot can answer questions, summarize or rewrite text, look up web results, and create images. Message-based requests can use recent channel context when Discord provides it.
+## Create the Discord application
 
-Use `!help` to see localized help. The bot ignores messages from other bots and unrelated server messages.
+1. Create an application in the Discord Developer Portal.
+2. Add a bot to the application and copy its token.
+3. Copy the application ID from the application page.
+4. Enable the privileged Message Content intent on the Bot page.
+5. Invite the bot with the `bot` and `applications.commands` scopes.
+6. Grant View Channels, Send Messages, and Read Message History in each server channel where Ask can send replies.
 
-Send a termination signal to stop the process. The application closes the Discord client during shutdown. Do not expose a production bot while testing local changes.
+Ask requires the Message Content intent for message triggers and channel context. Do not grant Administrator permission.
+
+## Configure a local install
+
+1. Clone the repository and open its root directory.
+2. Copy `.env.example` to `.env`.
+3. Set `DISCORD_CLIENT_ID`, `DISCORD_TOKEN`, and `OPENAI_API_KEY` in `.env`.
+4. Run `npm ci` to install the locked dependencies.
+5. Run `node bin/ask.mjs` to start Ask.
+6. Invite the bot to a test server before you try server commands.
+
+See [Configuration](configuration.md) for each value and [Commands](commands.md) for ways to use Ask.
+
+## Stop a local install
+
+Send `SIGINT` or `SIGTERM` to the process. Ask closes its Discord client during shutdown.
+
+## Data sent for a response
+
+Ask sends the current question and available recent channel messages to the OpenAI API. The API request sets `store` to `false`. Discord receives the response in the channel or direct message that started the request.
