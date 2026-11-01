@@ -1,5 +1,7 @@
 import { safeSerialize } from "@eliware/common";
 import { createMessageInteraction } from "../interaction/message.mjs";
+import { isAddressedByName, isMessageTriggered } from "./message/triggers.mjs";
+import { extractMessagePrompt } from "./message/prompt.mjs";
 
 export default async function ({ client, log, msg, commandHandlers, ...contextData }, message) {
   log.debug("messageCreate", { id: message.id });
@@ -15,9 +17,8 @@ export default async function ({ client, log, msg, commandHandlers, ...contextDa
 
   const isDirect = !message.guild;
   const isMentioned = message.mentions?.has?.(client.user) || false;
-  const namePattern = /^\s*ask(?:\b\s*[,!:]?\s*|$)/i;
   const messageContent = message.content || "";
-  const isAddressedByName = namePattern.test(messageContent);
+  const addressedByName = isAddressedByName(messageContent);
   let isReplyToBot = false;
   try {
     const referenceId = message.reference?.messageId || message.reference?.message?.id;
@@ -33,13 +34,9 @@ export default async function ({ client, log, msg, commandHandlers, ...contextDa
   } catch (error) {
     log.debug("failed to resolve referenced message", { error: safeSerialize(error) });
   }
-  if (!isDirect && !isMentioned && !isReplyToBot && !isAddressedByName) return;
+  if (!isMessageTriggered({ isDirect, isMentioned, isReplyToBot, addressedByName })) return;
 
-  const mentionPattern = /<@!?[\w-]+>|<@&[\w-]+>|<#\w+>/g;
-  const addressedText = isAddressedByName
-    ? messageContent.replace(namePattern, "")
-    : messageContent;
-  const text = addressedText.replace(mentionPattern, "").trim() || "Hello!";
+  const text = extractMessagePrompt(messageContent, addressedByName);
   const interaction = createMessageInteraction({ client, message, locale, text, log });
   try {
     let handler = commandHandlers?.ask;
