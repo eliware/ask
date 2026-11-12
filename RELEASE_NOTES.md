@@ -1,5 +1,12 @@
 # Release Notes
 
+## 15.1.2 — 2026-11-12
+
+### Changed
+
+- Updated outdated dependencies and refreshed the lockfile.
+- Updated the package version to 15.1.2.
+
 ## 15.1.1 — 2026-11-01
 
 ### Added
