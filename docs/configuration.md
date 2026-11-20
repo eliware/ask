@@ -1,28 +1,41 @@
 # Configuration and Discord access
 
-Set these environment values before starting Ask. A local install can read them from an untracked `.env` file.
+Set these environment values before you start Ask. A source install reads `.env` from the repository root. Docker Compose reads `.env` from the directory where `docker compose` runs.
 
-| Variable            | Required | Description                                                    |
-| ------------------- | -------- | -------------------------------------------------------------- |
-| `DISCORD_CLIENT_ID` | Yes      | The Discord application ID.                                    |
-| `DISCORD_TOKEN`     | Yes      | The bot token for that application.                            |
-| `OPENAI_API_KEY`    | Yes      | The API key used for OpenAI requests.                          |
-| `HEALTH_HOST`       | No       | The address for the health server. It defaults to `127.0.0.1`. |
+| Variable            | Required | Description                                            |
+| ------------------- | -------- | ------------------------------------------------------ |
+| `DISCORD_CLIENT_ID` | Yes      | The Discord application ID.                            |
+| `DISCORD_TOKEN`     | Yes      | The bot token for that application.                    |
+| `OPENAI_API_KEY`    | Yes      | The API key for OpenAI requests.                       |
+| `HEALTH_HOST`       | No       | The health server address. The default is `127.0.0.1`. |
 
-Copy `.env.example` to `.env` for local use. Keep `.env` out of Git. Do not share its values in logs or support requests. A deployment can provide the same values through its secret store.
+Copy `.env.example` to `.env` for a source install. Replace every example value. Ask stops before it creates clients if a required value is missing or empty.
 
-At startup, Ask checks that all three values are nonempty. Ask stops before creating clients when a value is missing.
+Keep `.env` out of Git. Use a deployment secret store for deployed instances. Do not include credentials in logs, screenshots, or support requests.
 
-Set `HEALTH_HOST=0.0.0.0` when Kubernetes HTTP probes must connect through the Pod IP. Compose reads this value from the project environment. Keep the default for local runs.
+## Health server
 
-## Discord setup
+Ask serves `GET /health` and `GET /ready` on port `3000`. The health route returns `200` while its server responds. The readiness route returns `503` until Discord connects.
 
-Invite Ask with the `bot` and `applications.commands` scopes. Grant View Channels, Send Messages, and Read Message History in channels where Ask can send replies. Ask does not require Administrator permission.
+Set `HEALTH_HOST=0.0.0.0` when a Kubernetes HTTP check must access the health server through a Pod IP. Keep the default for local runs. Docker Compose checks the route inside the container and does not publish the health port.
 
-Enable the privileged Message Content intent in the Discord Developer Portal. Ask requests the `Guilds`, `GuildMessages`, `MessageContent`, and `DirectMessages` intents. It does not request data about server members, online states, voice calls, or reactions.
+## Discord access
 
-The slash command supports server, bot direct-message, and group direct-message contexts. Server message triggers require channel access. Direct-message triggers require the Direct Messages intent.
+Invite Ask with the `bot` and `applications.commands` scopes. Grant View Channels, Send Messages, and Read Message History in channels where Ask requires context or sends replies. Grant Attach Files for generated image files and Embed Links for linked image previews. Ask does not require Administrator permission.
+
+Enable the privileged Message Content intent in the Discord Developer Portal. Ask requests these intents:
+
+- `Guilds`
+- `GuildMessages`
+- `MessageContent`
+- `DirectMessages`
+
+Ask does not request server member lists, online status, voice, reactions, or scheduled-event data. Slash commands support server, bot direct-message, and group direct-message contexts. Server message triggers require channel access.
 
 ## Locale behavior
 
-Ask uses the interaction locale first. It uses the server locale for server messages. It uses English (United States) when no locale is available. The locale files under `locales/` define supported command and help translations.
+Slash commands use the Discord request locale first, then the server locale, then English (United States). Server message triggers use the server locale. Direct-message triggers use English (United States). Users can request a different response language in their prompt.
+
+Ask provides command and help translations for these locales:
+
+`bg`, `cs`, `da`, `de`, `el`, `en-GB`, `en-US`, `es-419`, `es-ES`, `fi`, `fr`, `hi`, `hr`, `hu`, `id`, `it`, `ja`, `ko`, `lt`, `nl`, `no`, `pl`, `pt-BR`, `ro`, `ru`, `sv-SE`, `th`, `tr`, `uk`, `vi`, `zh-CN`, and `zh-TW`.

@@ -1,32 +1,48 @@
 # Container deployment
 
-The GHCR image uses `ghcr.io/eliware/centos10-node26:latest` and runs Ask as the unprivileged `node` user. The image listens on port `3000` for health checks. The repository maintainers own the image build inputs. The publish workflow runs on `ubuntu-latest` and leaves the build platform unset, so Docker uses the runner default. It pushes a version tag and records an image digest. Publication does not deploy the bot.
+The Ask container uses `ghcr.io/eliware/centos10-node26:latest`. It runs as the unprivileged `node` user and listens on port `3000` for health checks. Docker Compose builds the local Dockerfile and keeps the health port private.
 
 ## Build and run from source
 
-1. Set the required values in an untracked `.env` file.
-2. Run `docker compose up -d --build` from the repository root.
-3. Run `docker compose logs -f ask` to view container logs.
-4. Run `docker compose down` to stop and remove the container.
+Install Docker Engine with Docker Compose. Create `.env` in the repository root and set the values listed in [configuration](configuration.md).
 
-The Compose entry builds the local Dockerfile and starts again unless stopped. Docker checks `/ready` inside the container. Compose keeps the health port private. Direct runs use `127.0.0.1` by default.
+Run these commands from the repository root:
 
-Set `HEALTH_HOST=0.0.0.0` for a Kubernetes deployment that uses HTTP probes. Kubernetes probes connect to the Pod IP, so the health server must listen on an address that accepts connections from outside the container loopback interface. Keep `HEALTH_HOST` unset for local runs.
+```sh
+docker compose up -d --build
+docker compose ps
+docker compose logs -f ask
+```
 
-Use `GET /health` to check that the process responds. Use `GET /ready` to check the Discord client status. The endpoint returns `503` until the client emits `clientReady`, then returns `200`. Both endpoints listen on port `3000` inside the container.
+Check the `ask` container status in `docker compose ps`. Docker marks the container healthy after `/ready` returns `200`. The container remains unhealthy until Discord connects.
+
+Run this command to stop and remove the container:
+
+```sh
+docker compose down
+```
+
+## Health checks
+
+Ask serves `GET /health` and `GET /ready` on port `3000`. `/health` returns `200` while the health server replies. `/ready` returns `503` until the Discord client connects. Ask also clears readiness when Discord invalidates its session.
+
+Docker Compose checks `/ready` from inside the container. It does not publish port `3000` to the host. For a Kubernetes HTTP check, set `HEALTH_HOST=0.0.0.0` so the check can access the server through the Pod IP.
 
 ## Run a published image
 
-The image is published to `ghcr.io/eliware/ask`. Package settings determine who can pull it. Use a version tag for an approved release, or use the immutable digest recorded by the publish workflow.
+The image name is `ghcr.io/eliware/ask`. Package settings control access. Use an approved version tag or the immutable digest from the release workflow.
 
-1. Set the required values in an untracked `.env` file or deployment secret store.
-2. When an approved version tag is available, replace `<version>` with that tag and pull the image with `docker pull ghcr.io/eliware/ask:<version>`.
-3. Run the selected image with `docker run --env-file .env ghcr.io/eliware/ask:<version>`.
+Replace `<version>` with an approved tag, then run:
 
-For a deployment, replace the example version with an approved release tag. Record the SHA-256 digest and deploy by digest when the platform supports it. Publication does not grant deployment approval.
+```sh
+docker pull ghcr.io/eliware/ask:<version>
+docker run --rm --env-file .env -p 127.0.0.1:3000:3000 ghcr.io/eliware/ask:<version>
+```
 
-The GHCR workflow starts on version tags that match `vMAJOR.MINOR.PATCH`. It checks the package version, publishes the image, verifies its digest, and records the digest in the workflow summary.
+Set `HEALTH_HOST=0.0.0.0` in `.env` to check the container health routes from the host. Keep credentials in `.env` or a deployment secret store. Publication does not deploy Ask. For a deployment, follow the deployment owner's approval process and use the recorded SHA-256 digest when the platform supports digest references.
+
+The publish workflow runs for tags that match `vMAJOR.MINOR.PATCH`. It checks the package version, publishes a version tag, verifies the image digest, and records the digest in the workflow summary.
 
 ## Stop a container
 
-Send a stop signal to the container or run `docker compose down`. Ask closes its Discord client during shutdown.
+Run `docker compose down` or send a stop signal to the container. Ask closes its Discord client during shutdown.

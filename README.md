@@ -25,15 +25,15 @@ A Discord assistant for short answers, web lookup, and image generation. Support
 
 ## Features
 
-Ask provides answers, web lookup, and image generation through Discord. See the [user guides](docs/README.md) for setup and request details.
+Ask answers questions, looks up web results, summarizes text, rewrites text, and creates images in Discord.
 
 ## Requirements
 
-Use Node.js 26 or later and npm 12 or later. Provide a Discord application and an OpenAI API key.
+Use Node.js 26 or later and npm 12 or later to run Ask from source. Create a Discord application and an OpenAI API key.
 
 ## Setup
 
-Follow the [setup guide](docs/usage.md) to configure Discord, set environment values, and start Ask.
+Follow the [setup guide](docs/usage.md) to configure Discord, set credentials, and start Ask.
 
 ## Usage
 
@@ -41,41 +41,39 @@ Read the [user guides](docs/README.md) for commands, configuration, and deployme
 
 ## Development
 
-Read [AGENTS.md](AGENTS.md), [the documentation index](docs/README.md), and [the specifications index](specs/README.md) before changing files.
+Read [AGENTS.md](AGENTS.md) for repository instructions. Read [the documentation index](docs/README.md) and [the specifications index](specs/README.md) for maintained guidance and requirements.
 
 ## Testing
 
-Run `npm test` for aggregate validation. CI installs dependencies with `npm ci` and runs `npm test`.
+Run `npm test` to validate the repository.
 
 ## Troubleshooting
 
-Use the [troubleshooting guide](docs/troubleshooting.md) to check credentials, Discord access, and provider errors.
+Use the [troubleshooting guide](docs/troubleshooting.md) to resolve setup, Discord, and provider issues.
 
 ## Security
 
-Keep Discord and OpenAI credentials in an untracked `.env` file or an approved secret store. Do not share tokens or private message content.
+Keep Discord and OpenAI credentials private. Do not share tokens or private message content.
 
 ## Configuration
 
-Set `DISCORD_CLIENT_ID`, `DISCORD_TOKEN`, and `OPENAI_API_KEY`. See the [configuration guide](docs/configuration.md).
+Set the required environment values. See the [configuration guide](docs/configuration.md) for details.
 
 ## Operations
 
-Run `node bin/ask.mjs` to start Ask locally. The GHCR image packages Ask for container use. The repository workflow builds on `ubuntu-latest` and leaves the build platform unset, so Docker uses the runner default.
-
-Package settings control image access. Pull an approved version or deploy by its recorded SHA-256 digest. Publication does not deploy the bot. See the [deployment guide](docs/deployment.md) for container commands and shutdown behavior.
+Run `node bin/ask.mjs` from source or use Docker Compose. See the [deployment guide](docs/deployment.md) for container instructions.
 
 ## Commands
 
-Use `/ask` with a required question or prompt. Use `/help` or `!help` for localized help. See the [command guide](docs/commands.md).
+Use `/ask query:<text>` or `/help`. You can tag Ask, reply to an Ask message, or message Ask directly. See the [command guide](docs/commands.md).
 
 ## Events
 
-The bot handles command interactions, messages, readiness, warnings, errors, debug events, and invalidation. It ignores bot messages and unrelated server messages.
+Ask handles commands and messages. It marks readiness after Discord connects and clears readiness when Discord invalidates a session. It logs warnings, errors, and debug events. See the [user guides](docs/README.md).
 
 ## Intents and permissions
 
-The bot requests the `Guilds`, `GuildMessages`, `MessageContent`, and `DirectMessages` intents. Enable Message Content in the Discord Developer Portal. Grant View Channels, Send Messages, and Read Message History. Do not grant administrator access. Supported locales are `bg`, `cs`, `da`, `de`, `el`, `en-GB`, `en-US`, `es-419`, `es-ES`, `fi`, `fr`, `hi`, `hr`, `hu`, `id`, `it`, `ja`, `ko`, `lt`, `nl`, `no`, `pl`, `pt-BR`, `ro`, `ru`, `sv-SE`, `th`, `tr`, `uk`, `vi`, `zh-CN`, and `zh-TW`.
+Ask requests the `Guilds`, `GuildMessages`, `MessageContent`, and `DirectMessages` intents. Enable Message Content and grant View Channels, Send Messages, and Read Message History. Grant Attach Files for generated images and Embed Links for image previews. Ask does not require Administrator permission. See [Discord access](docs/configuration.md#discord-access).
 
 ## Support
 

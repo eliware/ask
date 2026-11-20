@@ -1,27 +1,37 @@
 # Troubleshooting
 
-## Ask will not start
+## Ask stops during startup
 
-Check that `DISCORD_CLIENT_ID`, `DISCORD_TOKEN`, and `OPENAI_API_KEY` have values. Confirm that the application ID and bot token belong to the same Discord application. Keep the values private when you inspect logs.
+Set `DISCORD_CLIENT_ID`, `DISCORD_TOKEN`, and `OPENAI_API_KEY`. Check that each value is nonempty and belongs to the intended account. For Docker Compose, keep `.env` in the repository root.
 
-## Discord connection status
+## Discord does not connect
 
-The `/ready` endpoint returns `503` until Discord emits the `clientReady` event. Check `docker compose logs -f ask` for startup errors. Confirm that the bot token is valid and Discord responds.
+Check that the bot token is current and belongs to the application ID. Enable Message Content in the Discord Developer Portal. Read startup errors with `docker compose logs -f ask` or from the terminal where Ask runs.
 
-## A command does not appear
+## A slash command does not appear
 
-Confirm that you invited Ask with the `applications.commands` scope. Start Ask again after changing command definitions. Discord may require time to refresh command data.
+Invite Ask with both the `bot` and `applications.commands` scopes. Confirm that Discord lists Ask in the server or direct-message conversation. Start Ask again after command changes and allow Discord time to refresh the command list.
 
-## Ask cannot read or answer a message
+## Ask does not answer a server message
 
-Enable Message Content in the Discord Developer Portal. Check that the bot can view the channel, send messages, and read message history. For direct messages, confirm that the user opened a conversation with the bot.
+Ask replies when a message tags it, starts with its name, or replies to one of its messages. Enable the Message Content intent. Grant View Channels, Send Messages, and Read Message History where Ask requires access.
+
+Ask ignores bot-authored messages and other server messages. Put the prompt after the tag or Ask's name. Ask removes user, role, and channel references before it sends the prompt.
+
+## Ask does not answer in a direct message
+
+Open a direct message with the bot and send a prompt. In a group direct message, use a slash command when Discord offers it. Ask handles message triggers only when Discord sends those messages to the bot.
+
+## Docker reports that Ask is unhealthy
+
+Run `docker compose ps` and `docker compose logs -f ask`. `/ready` returns `503` until Discord connects. Check the Discord token and network access before you change the health check.
 
 ## OpenAI requests fail
 
-Check the OpenAI API key, account access, and provider status. Check the application error logs for the request failure. Remove tokens and private message content before sharing logs.
+Check the OpenAI API key, account access, and provider result. Remove credentials and private message content before you share logs or screenshots.
 
-## An image or web lookup does not appear
+## Web results or images do not appear
 
-Confirm that the request asks for a web lookup or image. Check that Discord allows Ask to send the reply or file. Check application logs for provider errors.
+Ask for web lookup or image creation in the prompt. Check the OpenAI response and application logs. Confirm that Discord lets Ask send text and attach files in the channel.
 
-For setup and permission steps, see [Configuration](configuration.md). For supported request forms, see [Commands](commands.md).
+See [setup](usage.md) for configuration steps. See [commands](commands.md) for request examples and [configuration](configuration.md) for permissions.

@@ -2,11 +2,11 @@
 
 ## Project
 
-This repository is `eliware/ask`. It provides a Discord assistant for short answers.
+This repository contains the Ask Discord assistant.
 
 ## Scope and boundaries
 
-Use README.md for repository purpose and ownership. Keep canonical requirements in their specifications.
+Keep canonical requirements in their specifications.
 
 ## Layout
 
@@ -18,9 +18,7 @@ Keep each source module and test module focused on one responsibility.
 
 ## Validation
 
-Use Node.js 26 or later and npm 12 or later.
-
-Use native ESM for maintained JavaScript modules.
+Use Node.js 26 or later and native ESM for maintained JavaScript modules.
 Run `npm test` for aggregate validation.
 Run `npm run lint` for lint checks.
 Run `npm run audit` for dependency checks.
@@ -33,7 +31,7 @@ Keep credentials, private data, and runtime state out of Git.
 
 ## Changes
 
-Keep changes in this repository. Get Eliware Operations approval before external changes.
+Change files in this repository.
 
 ## Application
 
@@ -46,7 +44,7 @@ Run the full `npm test` suite for final validation before a commit, milestone, o
 
 ## Discord
 
-Document commands, events, permissions, intents, and supported locales in README.md.
+Keep Discord guidance aligned with application behavior.
 
 ## GHCR publication
 
