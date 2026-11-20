@@ -1,5 +1,4 @@
-import __stringsModule from "./strings.mjs";
-const { sanitizeLogString } = __stringsModule;
+import sanitizeLogString from "./string-sanitizer.mjs";
 
 export default function normalizeLogValue(value, maxString) {
   if (value === null || value === undefined) return { handled: true, value };

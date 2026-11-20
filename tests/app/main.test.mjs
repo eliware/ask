@@ -89,28 +89,6 @@ test("starts the bot with default dotenv configuration, version, intents, and ru
   }
 });
 
-test("skips Discord cleanup when no client was created", async () => {
-  const { dependencies, getSignalHandlers } = makeDependencies({
-    createDiscord: jest.fn(async () => null),
-  });
-  await startApplication(dependencies);
-  await getSignalHandlers().shutdownHook();
-  expect(logger.warn).not.toHaveBeenCalled();
-});
-
-test.each([
-  [new Error("shutdown failed"), "shutdown failed"],
-  [{}, "[object Object]"],
-])("logs client shutdown failures", async (error, message) => {
-  const client = { shutdown: jest.fn(async () => Promise.reject(error)) };
-  const { dependencies, getSignalHandlers } = makeDependencies({
-    createDiscord: jest.fn(async () => client),
-  });
-  await startApplication(dependencies);
-  await getSignalHandlers().shutdownHook();
-  expect(logger.warn).toHaveBeenCalledWith("Discord shutdown failed", { error: message });
-});
-
 test("does not connect when shutdown is requested during startup", async () => {
   const { dependencies, getSignalHandlers } = makeDependencies({
     initializeOpenAI: jest.fn(async () => {
@@ -223,16 +201,6 @@ test("closes the health server when handler registration fails", async () => {
   expect(healthServer.start).toHaveBeenCalledTimes(1);
   expect(healthServer.setReady).toHaveBeenCalledWith(false);
   expect(healthServer.close).toHaveBeenCalledTimes(1);
-});
-
-test("logs health server shutdown failures", async () => {
-  const { dependencies, healthServer, getSignalHandlers } = makeDependencies();
-  healthServer.close.mockRejectedValue({});
-  await startApplication(dependencies);
-  await getSignalHandlers().shutdownHook();
-  expect(logger.warn).toHaveBeenCalledWith("Health server shutdown failed", {
-    error: "[object Object]",
-  });
 });
 
 test("supports startup without a health server", async () => {

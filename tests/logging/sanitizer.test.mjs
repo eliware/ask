@@ -1,7 +1,6 @@
-import __stringsModule from "../../src/logging/strings.mjs";
+import truncateLogField from "../../src/logging/field-truncation.mjs";
 import sanitizeLogValue from "../../src/logging/sanitizer.mjs";
 
-const { truncateLogField } = __stringsModule;
 const options = { maxDepth: 2, maxString: 20, maxArray: 5, maxEntries: 10, redactPatterns: [] };
 
 test("normalizes primitive values and enforces the depth limit", () => {

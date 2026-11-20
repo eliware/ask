@@ -1,6 +1,5 @@
 import { defaultRedactPatterns } from "./redaction.mjs";
-import __stringsModule from "./strings.mjs";
-const { truncateLogField } = __stringsModule;
+import truncateLogField from "./field-truncation.mjs";
 import sanitizeLogValue from "./sanitizer.mjs";
 
 export default function sanitizeForLog(obj, seen = new WeakSet(), depth = 0, opts = {}) {

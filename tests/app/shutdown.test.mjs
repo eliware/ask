@@ -15,6 +15,16 @@ test("shuts down the client and health server only once", async () => {
   expect(healthServer.setReady).toHaveBeenCalledWith(false);
   expect(healthServer.close).toHaveBeenCalledTimes(1);
 });
+
+test("skips Discord cleanup when no client was created", async () => {
+  const log = { warn: jest.fn() };
+  const manager = createShutdownManager({ log });
+
+  await manager.shutdownHook();
+
+  expect(log.warn).not.toHaveBeenCalled();
+});
+
 test("logs client and health server shutdown failures", async () => {
   const log = { warn: jest.fn() };
   const client = { shutdown: jest.fn(async () => Promise.reject(new Error("client failed"))) };
@@ -33,4 +43,29 @@ test("logs client and health server shutdown failures", async () => {
   expect(log.warn).toHaveBeenNthCalledWith(2, "Health server shutdown failed", {
     error: "health failed",
   });
+});
+
+test("stringifies non-error health server failures", async () => {
+  const log = { warn: jest.fn() };
+  const healthServer = {
+    setReady: jest.fn(),
+    close: jest.fn(async () => Promise.reject({})),
+  };
+  const manager = createShutdownManager({ log, healthServer });
+
+  await manager.shutdownHook();
+
+  expect(log.warn).toHaveBeenCalledWith("Health server shutdown failed", {
+    error: "[object Object]",
+  });
+});
+
+test("stringifies non-error shutdown failures", async () => {
+  const log = { warn: jest.fn() };
+  const manager = createShutdownManager({ log });
+  manager.setClient({ shutdown: jest.fn(async () => Promise.reject({})) });
+
+  await manager.shutdownHook();
+
+  expect(log.warn).toHaveBeenCalledWith("Discord shutdown failed", { error: "[object Object]" });
 });
