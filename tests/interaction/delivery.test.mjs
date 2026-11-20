@@ -1,14 +1,14 @@
 import deliverMessageChunk from "../../src/interaction/delivery.mjs";
 
-test("sends later channel payloads through the channel", async () => {
-  const messages = [];
+test("sends private payloads to the author", async () => {
+  const sent = [];
   const message = {
-    author: {},
+    author: { send: async (payload) => sent.push(payload) },
     reply: async () => {},
-    channel: { send: async (payload) => messages.push(payload) },
+    channel: { send: async () => {} },
   };
 
-  await deliverMessageChunk(message, "later", false, false);
+  await deliverMessageChunk(message, "private", true, false);
 
-  expect(messages).toEqual(["later"]);
+  expect(sent).toEqual(["private"]);
 });

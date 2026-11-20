@@ -1,5 +1,6 @@
 import createSlashChunks from "./chunks.mjs";
 import createSlashFallback from "./fallback.mjs";
+import deliverSlashFollowUps from "./follow-up.mjs";
 
 export default async function deliverSlashResponse(interaction, text, files, urls, deferred, log) {
   const chunks = createSlashChunks(text, urls);
@@ -8,14 +9,7 @@ export default async function deliverSlashResponse(interaction, text, files, url
     if (files.length) first.files = files;
     if (deferred) await interaction.editReply(first);
     else await interaction.reply(first);
-    for (const chunk of chunks.slice(1)) {
-      try {
-        if (interaction.followUp) await interaction.followUp({ content: chunk });
-        else await interaction.reply({ content: chunk });
-      } catch (error) {
-        log.debug("Failed to send follow-up chunk", { error: error?.message || String(error) });
-      }
-    }
+    await deliverSlashFollowUps(interaction, chunks.slice(1), log);
     return;
   }
   const message = createSlashFallback(files);
