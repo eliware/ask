@@ -1,8 +1,7 @@
 import { defaultRedactPatterns } from "./redaction.mjs";
 import __stringsModule from "./strings.mjs";
 const { truncateLogField } = __stringsModule;
-import traverseLogValue from "./traversal.mjs";
-import normalizeLogValue from "./values.mjs";
+import sanitizeLogValue from "./sanitizer.mjs";
 
 export default function sanitizeForLog(obj, seen = new WeakSet(), depth = 0, opts = {}) {
   const {
@@ -13,11 +12,5 @@ export default function sanitizeForLog(obj, seen = new WeakSet(), depth = 0, opt
     redactPatterns = defaultRedactPatterns,
   } = opts || {};
   const options = { maxDepth, maxString, maxArray, maxEntries, redactPatterns };
-  const sanitizeValue = (value, visited, level) => {
-    if (level > maxDepth) return "<<max-depth>>";
-    const normalized = normalizeLogValue(value, maxString);
-    if (normalized.handled) return normalized.value;
-    return traverseLogValue(value, sanitizeValue, visited, level, options, truncateLogField);
-  };
-  return sanitizeValue(obj, seen, depth);
+  return sanitizeLogValue(obj, seen, depth, options, truncateLogField);
 }

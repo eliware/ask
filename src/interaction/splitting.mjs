@@ -1,10 +1,6 @@
-import __formattingModule from "../response/formatting.mjs";
-const { defaultSplit } = __formattingModule;
+import selectMessageSplitter from "./splitter.mjs";
 
 export default async function splitMessage(text, max) {
-  try {
-    const mod = await import("@eliware/discord");
-    if (typeof mod.splitMsg === "function") return mod.splitMsg(text, max);
-  } catch {}
-  return defaultSplit(text, max);
+  const splitter = await selectMessageSplitter();
+  return splitter(text, max);
 }
