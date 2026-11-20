@@ -29,10 +29,4 @@ function splitBlockquoted(text, max) {
   return chunks;
 }
 
-function defaultSplit(text, max) {
-  const out = [];
-  for (let i = 0; i < text.length; i += max) out.push(text.slice(i, i + max));
-  return out;
-}
-
-export default { addBlockquote, splitBlockquoted, defaultSplit };
+export default { addBlockquote, splitBlockquoted };

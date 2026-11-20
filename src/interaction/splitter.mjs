@@ -1,6 +1,4 @@
-import __formattingModule from "../response/formatting.mjs";
-
-const { defaultSplit } = __formattingModule;
+import defaultSplit from "../response/splitting.mjs";
 
 export default async function selectMessageSplitter() {
   try {

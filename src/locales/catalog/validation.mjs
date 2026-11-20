@@ -1,20 +1,20 @@
+import findMissingLocales from "./missing.mjs";
+import hasLocaleKeyMismatch from "./keys.mjs";
+import hasInvalidLocaleValues from "./values.mjs";
+
 export default function validateLocaleCatalogData(
   { files, names, values, reference },
   supportedLocales,
 ) {
   const referenceKeys = Object.keys(reference);
-  const errors = [];
-  for (const locale of supportedLocales) {
-    if (!names.includes(locale)) errors.push("missing " + locale);
-  }
+  const errors = findMissingLocales(names, supportedLocales);
   for (const file of files) {
     const localizedValues = values[file];
-    const missing = referenceKeys.filter((key) => !(key in localizedValues));
-    const extra = Object.keys(localizedValues).filter((key) => !referenceKeys.includes(key));
-    const empty = Object.values(localizedValues).some(
-      (value) => typeof value !== "string" || !value.trim(),
-    );
-    if (missing.length || extra.length || empty) errors.push(file);
+    if (
+      hasLocaleKeyMismatch(localizedValues, referenceKeys) ||
+      hasInvalidLocaleValues(localizedValues)
+    )
+      errors.push(file);
   }
   return errors;
 }

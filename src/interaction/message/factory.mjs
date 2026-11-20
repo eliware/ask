@@ -1,14 +1,12 @@
 import createMessageReplyMethods from "../reply-methods.mjs";
 import createMessageSender from "../sender.mjs";
-import createTypingManager from "../typing.mjs";
+import setupMessageTyping from "./typing.mjs";
 import createMessageMetadata from "../metadata.mjs";
 
 export default function createMessageInteractionFactory({ client, message, locale, text, log }) {
   const interaction = createMessageMetadata({ client, message, locale, text });
   const send = createMessageSender(message);
-  const typing = createTypingManager(message.channel);
-  interaction.deferReply = typing.start;
-  Object.assign(interaction, createMessageReplyMethods({ send, stopTyping: typing.stop, log }));
-  interaction.stopTyping = typing.stop;
+  const stopTyping = setupMessageTyping(interaction, message.channel);
+  Object.assign(interaction, createMessageReplyMethods({ send, stopTyping, log }));
   return interaction;
 }

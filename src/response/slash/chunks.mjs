@@ -1,5 +1,6 @@
 import __formattingModule from "../formatting.mjs";
-const { defaultSplit, splitBlockquoted } = __formattingModule;
+import defaultSplit from "../splitting.mjs";
+const { splitBlockquoted } = __formattingModule;
 
 export default function createSlashChunks(text, urls) {
   return [
