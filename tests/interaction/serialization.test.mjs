@@ -11,3 +11,7 @@ test("serializes null and undefined values", () => {
   expect(serializeMessageContent(null)).toBe("null");
   expect(serializeMessageContent(undefined)).toBeUndefined();
 });
+
+test("does not serialize file metadata as message content", () => {
+  expect(serializeMessageContent({ files: [{ name: "image.png" }] })).toBe("");
+});

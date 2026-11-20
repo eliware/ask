@@ -9,3 +9,9 @@ test("prepares message content and attaches files to the first payload", async (
 test("leaves prepared payloads without files", async () => {
   await expect(prepareSenderPayloads({ content: "answer" })).resolves.toEqual(["answer"]);
 });
+
+test("keeps files when a response has no text payload", async () => {
+  await expect(prepareSenderPayloads({ files: ["image"] })).resolves.toEqual([
+    { files: ["image"] },
+  ]);
+});

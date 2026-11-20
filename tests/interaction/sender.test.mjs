@@ -8,3 +8,12 @@ test("prepares and sends a message response", async () => {
 
   expect(replies).toEqual(["answer"]);
 });
+
+test("delivers files when the message response has no text", async () => {
+  const replies = [];
+  const send = createMessageSender({ author: {}, reply: async (value) => replies.push(value) });
+
+  await send({ files: ["image"] });
+
+  expect(replies).toEqual([{ files: ["image"] }]);
+});
