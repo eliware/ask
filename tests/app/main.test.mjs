@@ -135,10 +135,10 @@ test("closes health server when shutdown arrives during its startup", async () =
   expect(dependencies.registerHandlers).not.toHaveBeenCalled();
 });
 
-test("stops startup when shutdown arrives during handler registration", async () => {
+test("closes health services when shutdown arrives during handler registration", async () => {
   let shutdownHook;
   let shutdownPromise;
-  const { dependencies } = makeDependencies({
+  const { dependencies, healthServer } = makeDependencies({
     registerSignals: jest.fn((handlers) => {
       shutdownHook = handlers.shutdownHook;
     }),
@@ -148,6 +148,8 @@ test("stops startup when shutdown arrives during handler registration", async ()
   });
 
   await expect(startApplication(dependencies)).resolves.toBeUndefined();
+  expect(healthServer.setReady).toHaveBeenCalledWith(false);
+  expect(healthServer.close).toHaveBeenCalledTimes(1);
   await shutdownPromise;
 
   expect(dependencies.initializeOpenAI).not.toHaveBeenCalled();

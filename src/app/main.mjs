@@ -19,6 +19,10 @@ export default async function startApplication({
   validateConfiguration(environment);
   let healthServer;
   const shutdown = createShutdownManager({ log });
+  const finishShutdown = async () => {
+    await shutdown.shutdownHealthServer();
+    return undefined;
+  };
 
   try {
     healthServer = createHealthServer?.({
@@ -26,7 +30,7 @@ export default async function startApplication({
     });
     shutdown.setHealthServer(healthServer);
     registerSignals({ log, shutdownHook: shutdown.shutdownHook });
-    if (shutdown.isShuttingDown()) return undefined;
+    if (shutdown.isShuttingDown()) return finishShutdown();
     const healthStart = healthServer?.start();
     shutdown.setHealthStart(healthStart);
     await healthStart;
@@ -35,12 +39,12 @@ export default async function startApplication({
       return undefined;
     }
     registerHandlers({ log });
-    if (shutdown.isShuttingDown()) return undefined;
+    if (shutdown.isShuttingDown()) return finishShutdown();
 
     const packageJson = JSON.parse(readFileSync(join(rootDir, "package.json"), "utf8"));
     const presence = createPresence(packageJson.version);
     const openai = await initializeOpenAI({ log });
-    if (shutdown.isShuttingDown()) return undefined;
+    if (shutdown.isShuttingDown()) return finishShutdown();
 
     const createdClient = await createDiscord({
       log,

@@ -11,9 +11,9 @@ export default function createTypingManager(channel) {
       await channel?.sendTyping?.();
     } catch {}
     if (channel?.sendTyping && !typingInterval)
-      typingInterval = setInterval(() => {
+      typingInterval = setInterval(async () => {
         try {
-          channel.sendTyping();
+          await channel.sendTyping();
         } catch {}
       }, 8000);
   };

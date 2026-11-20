@@ -9,7 +9,7 @@ Ask needs a Discord application, a bot token, and an OpenAI API key. Use Node.js
 3. Copy the application ID from the application page.
 4. Enable the privileged Message Content intent on the Bot page.
 5. Use OAuth2 URL Generator to select the `bot` and `applications.commands` scopes.
-6. Select View Channels, Send Messages, and Read Message History permissions.
+6. Select View Channels, Send Messages, and Read Message History permissions. Select Attach Files for generated images and Embed Links for image previews.
 7. Open the generated URL and add the bot to your server.
 
 Ask requires the Message Content intent to read message triggers and channel context. Ask does not require Administrator permission.

@@ -6,14 +6,11 @@ test("starts, refreshes, and stops typing while handling failures", async () => 
   const sendTyping = jest
     .fn()
     .mockRejectedValueOnce(new Error("initial"))
-    .mockImplementation(() => {
-      throw new Error("refresh");
-    });
+    .mockRejectedValueOnce(new Error("refresh"));
   const typing = createTypingManager({ sendTyping });
 
   await typing.start();
-  jest.advanceTimersByTime(8000);
-  await Promise.resolve();
+  await jest.advanceTimersByTimeAsync(8000);
   typing.stop();
   expect(sendTyping).toHaveBeenCalledTimes(2);
 

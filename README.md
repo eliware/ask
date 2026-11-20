@@ -73,7 +73,7 @@ Ask handles commands and messages. It marks readiness after Discord connects and
 
 ## Intents and permissions
 
-Ask requests the `Guilds`, `GuildMessages`, `MessageContent`, and `DirectMessages` intents. Enable Message Content and grant View Channels, Send Messages, and Read Message History. Grant Attach Files for generated images and Embed Links for image previews. Ask does not require Administrator permission. See [Discord access](docs/configuration.md#discord-access).
+Ask requests the `Guilds`, `GuildMessages`, `MessageContent`, and `DirectMessages` intents. Enable Message Content and give the bot View Channels, Send Messages, and Read Message History in channels where it runs. Give the bot Attach Files for generated images and Embed Links for image previews. Ask does not require Administrator permission. See [Discord access](docs/configuration.md#discord-access).
 
 ## Support
 

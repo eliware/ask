@@ -21,7 +21,7 @@ Set `HEALTH_HOST=0.0.0.0` when a Kubernetes HTTP check must access the health se
 
 ## Discord access
 
-Invite Ask with the `bot` and `applications.commands` scopes. Grant View Channels, Send Messages, and Read Message History in channels where Ask requires context or sends replies. Grant Attach Files for generated image files and Embed Links for linked image previews. Ask does not require Administrator permission.
+Invite Ask with the `bot` and `applications.commands` scopes. Give the bot View Channels, Send Messages, and Read Message History in channels where it requires context or sends replies. Give the bot Attach Files for generated image files and Embed Links for linked image previews. Ask does not require Administrator permission.
 
 Enable the privileged Message Content intent in the Discord Developer Portal. Ask requests these intents:
 
