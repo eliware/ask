@@ -1,5 +1,6 @@
 import decodeBase64Image from "../image-decoding.mjs";
-import isGeneratedImageOutput from "./generated-predicate.mjs";
+import isGeneratedImageOutput from "./generated/predicate.mjs";
+import generatedImageFilename from "./generated/filename.mjs";
 
 export default function extractGeneratedImage(output) {
   const isGeneratedImage = isGeneratedImageOutput(output);
@@ -10,7 +11,7 @@ export default function extractGeneratedImage(output) {
     image: buffer
       ? {
           buffer,
-          filename: `image_${output.id || Date.now()}.png`,
+          filename: generatedImageFilename(output.id),
           mime: "image/png",
           description: output.revised_prompt || null,
         }

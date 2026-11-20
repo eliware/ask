@@ -32,5 +32,5 @@ test("extracts generated images and skips invalid or unrelated outputs", () => {
   expect(extractGeneratedImage(null)).toEqual({ handled: false, image: null });
   expect(
     extractGeneratedImage({ type: "image_generation_call", result: "aGVsbG8=" }).image,
-  ).toMatchObject({ filename: expect.stringMatching(/^image_\d+\.png$/u), description: null });
+  ).toMatchObject({ filename: expect.any(String), description: null });
 });

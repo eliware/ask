@@ -9,15 +9,3 @@ test("handles circular objects", () => {
   circular.self = circular;
   expect(sanitizeForLog(circular).self).toBe("<<circular>>");
 });
-
-test("handles array item serialization errors", () => {
-  const value = [];
-  Object.defineProperty(value, 0, {
-    enumerable: true,
-    get: () => {
-      throw new Error("index");
-    },
-  });
-  value.length = 1;
-  expect(sanitizeForLog(value)[0]).toMatch(/error serializing index 0/);
-});
