@@ -2,8 +2,7 @@ import __contentModule from "./content.mjs";
 const { extractContentText, getContentItems } = __contentModule;
 import __generatedModule from "./images/generated.mjs";
 const { isGeneratedImageOutput } = __generatedModule;
-import __outputsModule from "./outputs.mjs";
-const { selectFallbackText } = __outputsModule;
+import selectFallbackText from "./output/fallback.mjs";
 
 export default function collectResponseText(outputs, response) {
   let text = "";

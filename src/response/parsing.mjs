@@ -1,5 +1,4 @@
-import __outputsModule from "./outputs.mjs";
-const { normalizeOutputs } = __outputsModule;
+import normalizeOutputs from "./output/normalize.mjs";
 import collectResponseText from "./text.mjs";
 import collectResponseImages from "./images/collection.mjs";
 
