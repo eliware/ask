@@ -3,29 +3,10 @@ import deliverSlashResponse from "../../../src/response/slash/delivery.mjs";
 
 const log = { debug() {} };
 
-test("delivers image attachments without text", async () => {
-  let sent;
-  await deliverSlashResponse(
-    { reply: async (value) => (sent = value) },
-    "",
-    [{ attachment: Buffer.from("image"), name: "image.png" }],
-    [],
-    false,
-    log,
-  );
-  expect(sent).toEqual({ files: [{ attachment: Buffer.from("image"), name: "image.png" }] });
-});
-
 test("replies when slash output has no chunks", async () => {
   const reply = jest.fn();
   await deliverSlashResponse({ reply }, "", [], [], false, log);
   expect(reply).toHaveBeenCalled();
-});
-
-test("edits deferred replies when slash output has no chunks", async () => {
-  const editReply = jest.fn();
-  await deliverSlashResponse({ editReply }, "", [], [], true, log);
-  expect(editReply).toHaveBeenCalled();
 });
 
 test("delivers long responses, attachments, URLs, and follow-ups", async () => {
@@ -73,17 +54,20 @@ test("falls back to replies for follow-ups and logs failures", async () => {
   await deliverSlashResponse(failing, "a".repeat(5000), [], [], false, log);
 });
 
-test("delivers attachments without text and deferred empty replies", async () => {
+test("delivers attachments without text and handles deferred empty replies", async () => {
   let sent;
   await deliverSlashResponse(
     { reply: async (value) => (sent = value) },
     "",
-    [{ attachment: Buffer.from("x"), name: "x" }],
+    [{ attachment: Buffer.from("image"), name: "image.png" }],
     [],
     false,
     log,
   );
-  expect(sent.files).toBeDefined();
+  expect(sent).toEqual({ files: [{ attachment: Buffer.from("image"), name: "image.png" }] });
+  const editReply = jest.fn();
+  await deliverSlashResponse({ editReply }, "", [], [], true, log);
+  expect(editReply).toHaveBeenCalled();
 });
 
 test("delivers deferred text and URL-only output", async () => {
