@@ -1,6 +1,6 @@
 import __contentModule from "./content.mjs";
 const { extractContentText, getContentItems } = __contentModule;
-import isGeneratedImageOutput from "./images/generated/predicate.mjs";
+import isGeneratedImageOutput from "./images/image-generation/predicate.mjs";
 import selectFallbackText from "./output/fallback.mjs";
 
 export default function collectResponseText(outputs, response) {
