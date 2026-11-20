@@ -1,9 +1,8 @@
 import __addressingModule from "./addressing.mjs";
 const { removeNameAddress } = __addressingModule;
-
-const mentionPattern = /<@!?[\w-]+>|<@&[\w-]+>|<#[\w-]+>/g;
+import removeMessageMentions from "./mentions.mjs";
 
 export default function extractMessagePrompt(content, addressedByName) {
   const addressedText = addressedByName ? removeNameAddress(content) : content;
-  return addressedText.replace(mentionPattern, "").trim() || "Hello!";
+  return removeMessageMentions(addressedText).trim() || "Hello!";
 }
