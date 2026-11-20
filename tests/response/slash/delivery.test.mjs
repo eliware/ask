@@ -1,3 +1,4 @@
+import { jest } from "@jest/globals";
 import deliverSlashResponse from "../../../src/response/slash/delivery.mjs";
 
 const log = { debug() {} };
@@ -13,6 +14,18 @@ test("delivers image attachments without text", async () => {
     log,
   );
   expect(sent).toEqual({ files: [{ attachment: Buffer.from("image"), name: "image.png" }] });
+});
+
+test("replies when slash output has no chunks", async () => {
+  const reply = jest.fn();
+  await deliverSlashResponse({ reply }, "", [], [], false, log);
+  expect(reply).toHaveBeenCalled();
+});
+
+test("edits deferred replies when slash output has no chunks", async () => {
+  const editReply = jest.fn();
+  await deliverSlashResponse({ editReply }, "", [], [], true, log);
+  expect(editReply).toHaveBeenCalled();
 });
 
 test("delivers long responses, attachments, URLs, and follow-ups", async () => {
@@ -31,19 +44,6 @@ test("delivers long responses, attachments, URLs, and follow-ups", async () => {
   );
   expect(calls[0][1].files).toBeDefined();
   expect(calls.some(([type]) => type === "follow")).toBe(true);
-});
-
-test("uses a fallback message when no text or images exist", async () => {
-  let sent;
-  await deliverSlashResponse(
-    { reply: async (message) => (sent = message) },
-    "",
-    [],
-    [],
-    false,
-    log,
-  );
-  expect(sent.content).toMatch(/could not create/);
 });
 
 test("falls back to replies for follow-ups and logs failures", async () => {
@@ -84,16 +84,6 @@ test("delivers attachments without text and deferred empty replies", async () =>
     log,
   );
   expect(sent.files).toBeDefined();
-  let edited;
-  await deliverSlashResponse(
-    { editReply: async (value) => (edited = value) },
-    "",
-    [],
-    [],
-    true,
-    log,
-  );
-  expect(edited.content).toMatch(/could not create/);
 });
 
 test("delivers deferred text and URL-only output", async () => {

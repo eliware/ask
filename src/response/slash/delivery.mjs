@@ -1,4 +1,5 @@
 import createSlashChunks from "./chunks.mjs";
+import createSlashFallback from "./fallback.mjs";
 
 export default async function deliverSlashResponse(interaction, text, files, urls, deferred, log) {
   const chunks = createSlashChunks(text, urls);
@@ -17,8 +18,6 @@ export default async function deliverSlashResponse(interaction, text, files, url
     }
     return;
   }
-  const message = {};
-  if (files.length) message.files = files;
-  if (!message.files && !message.content) message.content = "Sorry, I could not create a reply.";
+  const message = createSlashFallback(files);
   return deferred ? interaction.editReply(message) : interaction.reply(message);
 }

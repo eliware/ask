@@ -1,4 +1,4 @@
-import redactStringField from "./redaction.mjs";
+import sanitizeObjectField from "./field.mjs";
 
 export default function traverseObjectFields(
   obj,
@@ -8,7 +8,7 @@ export default function traverseObjectFields(
   opts,
   truncateLogField,
 ) {
-  const { maxString, maxEntries, redactPatterns } = opts;
+  const { maxEntries } = opts;
   const out = {};
   let count = 0;
   let entries;
@@ -22,15 +22,7 @@ export default function traverseObjectFields(
       out.__more = `<<truncated, more than ${maxEntries} keys>>`;
       break;
     }
-    try {
-      const redacted = redactStringField(key, value, redactPatterns);
-      if (redacted !== undefined) out[key] = redacted;
-      else if (typeof value === "string" && value.length > maxString)
-        out[key] = truncateLogField(value, maxString);
-      else out[key] = sanitizeValue(value, seen, depth + 1);
-    } catch (error) {
-      out[key] = `<<error serializing: ${String(error)}>>`;
-    }
+    out[key] = sanitizeObjectField(key, value, sanitizeValue, seen, depth, opts, truncateLogField);
   }
   return out;
 }
