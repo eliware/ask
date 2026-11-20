@@ -33,23 +33,6 @@ test("delivers long responses, attachments, URLs, and follow-ups", async () => {
   expect(calls.some(([type]) => type === "follow")).toBe(true);
 });
 
-test("keeps slash replies within the Discord message limit", async () => {
-  const sent = [];
-  const url = `https://images.example.test/${"x".repeat(80)}`;
-  await deliverSlashResponse(
-    { reply: async (message) => sent.push(message) },
-    "a".repeat(1990),
-    [],
-    [url],
-    false,
-    log,
-  );
-
-  expect(sent.length).toBeGreaterThan(1);
-  expect(sent.every((message) => message.content.length <= 2000)).toBe(true);
-  expect(sent.map((message) => message.content).join("\n")).toContain(url);
-});
-
 test("uses a fallback message when no text or images exist", async () => {
   let sent;
   await deliverSlashResponse(

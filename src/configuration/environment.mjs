@@ -1,6 +1,6 @@
 import { config } from "dotenv";
-import { join } from "node:path";
+import getEnvironmentPath from "./path.mjs";
 
 export default function loadEnvironment(rootDir, configure = config) {
-  configure({ path: join(rootDir, ".env"), quiet: true });
+  configure({ path: getEnvironmentPath(rootDir), quiet: true });
 }

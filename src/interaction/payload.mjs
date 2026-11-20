@@ -1,6 +1,6 @@
 import splitMessage from "./splitting.mjs";
+import serializeMessageContent from "./serialization.mjs";
 
 export default async function prepareMessagePayloads(response) {
-  const content = response?.content ?? response;
-  return splitMessage(typeof content === "string" ? content : JSON.stringify(content), 2000);
+  return splitMessage(serializeMessageContent(response), 2000);
 }
