@@ -5,6 +5,7 @@ const { isAddressedByName } = __addressingModule;
 import isMessageTriggered from "./message/triggers.mjs";
 import extractMessagePrompt from "./message/prompt.mjs";
 import routeMessageHelp from "./message/help-routing.mjs";
+import isReplyToBot from "./message/reply-detection.mjs";
 
 export default async function ({ client, log, msg, commandHandlers, ...contextData }, message) {
   log.debug("messageCreate", { id: message.id });
@@ -17,22 +18,9 @@ export default async function ({ client, log, msg, commandHandlers, ...contextDa
   const isMentioned = message.mentions?.has?.(client.user) || false;
   const messageContent = message.content || "";
   const addressedByName = isAddressedByName(messageContent);
-  let isReplyToBot = false;
-  try {
-    const referenceId = message.reference?.messageId || message.reference?.message?.id;
-    if (referenceId) {
-      const referencePromise = message.fetchReference
-        ? message.fetchReference()
-        : message.channel?.messages?.fetch
-          ? message.channel.messages.fetch(referenceId)
-          : null;
-      const reference = await Promise.resolve(referencePromise).catch(() => null);
-      isReplyToBot = reference?.author?.id === client.user?.id;
-    }
-  } catch (error) {
-    log.debug("failed to resolve referenced message", { error: safeSerialize(error) });
-  }
-  if (!isMessageTriggered({ isDirect, isMentioned, isReplyToBot, addressedByName })) return;
+  const replyingToBot = await isReplyToBot(message, client, log);
+  if (!isMessageTriggered({ isDirect, isMentioned, isReplyToBot: replyingToBot, addressedByName }))
+    return;
 
   const text = extractMessagePrompt(messageContent, addressedByName);
   const interaction = createMessageInteraction({ client, message, locale, text, log });

@@ -1,5 +1,6 @@
 import findMissingLocales from "./missing.mjs";
-import hasLocaleKeyMismatch from "./keys.mjs";
+import hasMissingLocaleKeys from "./missing-keys.mjs";
+import hasExtraLocaleKeys from "./extra-keys.mjs";
 import hasInvalidLocaleValues from "./values.mjs";
 
 export default function validateLocaleCatalogData(
@@ -11,7 +12,8 @@ export default function validateLocaleCatalogData(
   for (const file of files) {
     const localizedValues = values[file];
     if (
-      hasLocaleKeyMismatch(localizedValues, referenceKeys) ||
+      hasMissingLocaleKeys(localizedValues, referenceKeys) ||
+      hasExtraLocaleKeys(localizedValues, referenceKeys) ||
       hasInvalidLocaleValues(localizedValues)
     )
       errors.push(file);

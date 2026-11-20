@@ -88,29 +88,6 @@ describe("messageCreate", () => {
     expect(ask).toHaveBeenCalled();
   });
 
-  test("handles legacy reference fetch and ignores unrelated messages", async () => {
-    const fetch = jest.fn(async () => ({ author: { id: "other" } }));
-    const message = makeMessage({
-      reference: { message: { id: "ref-id" } },
-      channel: { messages: { fetch } },
-    });
-    await run(message, { commandHandlers: { ask: jest.fn() } });
-    expect(fetch).toHaveBeenCalledWith("ref-id");
-    expect(message.reply).not.toHaveBeenCalled();
-  });
-
-  test("ignores reference lookup failures", async () => {
-    const log = makeLog();
-    const message = makeMessage({
-      reference: { messageId: "ref-id" },
-      fetchReference: jest.fn(async () => {
-        throw new Error("no access");
-      }),
-    });
-    await run(message, { log, commandHandlers: { ask: jest.fn() } });
-    expect(log.debug).toHaveBeenCalledWith("messageCreate", { id: "message-id" });
-  });
-
   test("uses localized fallback when ask handler is absent", async () => {
     const message = makeMessage({ guild: undefined });
     await run(message, { commandHandlers: {} });
@@ -137,28 +114,6 @@ describe("messageCreate", () => {
   test("ignores unrelated guild messages", async () => {
     const message = makeMessage({ guild: { preferredLocale: "en-US" } });
     await run(message, { commandHandlers: { ask: jest.fn() } });
-    expect(message.reply).not.toHaveBeenCalled();
-  });
-
-  test("handles referenced message when no fetch method exists", async () => {
-    const message = makeMessage({ reference: { messageId: "ref-id" }, channel: {} });
-    await run(message, { commandHandlers: { ask: jest.fn() } });
-    expect(message.reply).not.toHaveBeenCalled();
-  });
-
-  test("logs unexpected reference resolution errors", async () => {
-    const log = makeLog();
-    const message = makeMessage({ guild: { preferredLocale: "en-US" } });
-    Object.defineProperty(message, "reference", {
-      get: () => {
-        throw new Error("bad reference");
-      },
-    });
-    await run(message, { log, commandHandlers: { ask: jest.fn() } });
-    expect(log.debug).toHaveBeenCalledWith(
-      "failed to resolve referenced message",
-      expect.objectContaining({ error: expect.anything() }),
-    );
     expect(message.reply).not.toHaveBeenCalled();
   });
 });

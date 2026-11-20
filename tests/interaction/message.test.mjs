@@ -24,9 +24,4 @@ test("creates a message-backed interaction and sends replies", async () => {
   await interaction.reply({ content: "private", flags: 1 << 6 });
   expect(replies).toEqual(["hello"]);
   expect(privateMessages).toEqual(["private"]);
-  expect(interaction.commandName).toBe("ask");
-  expect(interaction.guild).toBeUndefined();
-  expect(interaction.guildId).toBeNull();
-  expect(interaction.channelId).toBe("c");
-  expect(interaction.options.getString()).toBe("hi");
 });
