@@ -1,10 +1,10 @@
-export function addBlockquote(text) {
+function addBlockquote(text) {
   return String(text ?? "")
     .split(/\r?\n/)
     .map((line) => (line.trim() === "" ? "> " : `> ${line}`))
     .join("\n");
 }
-export function splitBlockquoted(text, max) {
+function splitBlockquoted(text, max) {
   const quotedLines = [];
   for (const line of String(text ?? "").split(/\r?\n/u)) {
     if (!line.length) {
@@ -29,8 +29,10 @@ export function splitBlockquoted(text, max) {
   return chunks;
 }
 
-export function defaultSplit(text, max) {
+function defaultSplit(text, max) {
   const out = [];
   for (let i = 0; i < text.length; i += max) out.push(text.slice(i, i + max));
   return out;
 }
+
+export default { addBlockquote, splitBlockquoted, defaultSplit };

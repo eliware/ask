@@ -28,7 +28,8 @@ logs/
 
 # Ignore environment secrets
 .env*
-!.env*.example
+!.env.example
+!**/.env.example
 
 # Ignore machine-specific files
 .vscode/

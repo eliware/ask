@@ -1,6 +1,13 @@
-import { redactStringField } from "./redaction.mjs";
+import redactStringField from "./redaction.mjs";
 
-export function traverseObjectFields(obj, sanitizeValue, seen, depth, opts, truncateLogField) {
+export default function traverseObjectFields(
+  obj,
+  sanitizeValue,
+  seen,
+  depth,
+  opts,
+  truncateLogField,
+) {
   const { maxString, maxEntries, redactPatterns } = opts;
   const out = {};
   let count = 0;

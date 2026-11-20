@@ -1,7 +1,8 @@
 import { defaultRedactPatterns } from "./redaction.mjs";
-import { truncateLogField } from "./strings.mjs";
-import { traverseLogValue } from "./traversal.mjs";
-import { normalizeLogValue } from "./values.mjs";
+import __stringsModule from "./strings.mjs";
+const { truncateLogField } = __stringsModule;
+import traverseLogValue from "./traversal.mjs";
+import normalizeLogValue from "./values.mjs";
 
 export default function sanitizeForLog(obj, seen = new WeakSet(), depth = 0, opts = {}) {
   const {

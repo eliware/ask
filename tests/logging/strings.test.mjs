@@ -1,4 +1,5 @@
-import { sanitizeLogString, truncateLogField } from "../../src/logging/strings.mjs";
+import __stringsModule from "../../src/logging/strings.mjs";
+const { sanitizeLogString, truncateLogField } = __stringsModule;
 
 test("sanitizes long and nonprintable strings", () => {
   expect(sanitizeLogString("plain", 10)).toBe("plain");

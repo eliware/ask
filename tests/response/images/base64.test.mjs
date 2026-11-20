@@ -1,4 +1,4 @@
-import { extractBase64ContentImage } from "../../../src/response/images/base64.mjs";
+import extractBase64ContentImage from "../../../src/response/images/base64.mjs";
 
 test("extracts base64 images from supported fields", () => {
   const cases = [

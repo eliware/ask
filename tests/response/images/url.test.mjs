@@ -1,4 +1,4 @@
-import { extractImageUrl } from "../../../src/response/images/url.mjs";
+import extractImageUrl from "../../../src/response/images/url.mjs";
 
 test("extracts image URLs from supported fields", () => {
   const cases = [

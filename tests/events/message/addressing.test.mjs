@@ -1,5 +1,6 @@
 import { expect, test } from "@jest/globals";
-import { isAddressedByName, removeNameAddress } from "../../../src/events/message/addressing.mjs";
+import __addressingModule from "../../../src/events/message/addressing.mjs";
+const { isAddressedByName, removeNameAddress } = __addressingModule;
 
 test.each([
   ["Ask what is here?", true],

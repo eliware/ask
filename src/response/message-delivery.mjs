@@ -1,4 +1,4 @@
-export function deliverMessageResponse(interaction, text, files, urls, deferred) {
+export default function deliverMessageResponse(interaction, text, files, urls, deferred) {
   const message = {};
   if (text) message.content = text;
   if (files.length) message.files = files;

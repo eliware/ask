@@ -1,4 +1,4 @@
-import { attachFilesToFirstChunk } from "../../src/interaction/attachments.mjs";
+import attachFilesToFirstChunk from "../../src/interaction/attachments.mjs";
 
 test("attaches files only to the first chunk", () => {
   expect(attachFilesToFirstChunk(["first", "second"], ["image"])).toEqual([

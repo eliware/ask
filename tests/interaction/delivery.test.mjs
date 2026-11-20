@@ -1,4 +1,4 @@
-import { deliverMessageChunk } from "../../src/interaction/delivery.mjs";
+import deliverMessageChunk from "../../src/interaction/delivery.mjs";
 
 test("replies when the channel cannot send messages", async () => {
   const replies = [];

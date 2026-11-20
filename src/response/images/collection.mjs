@@ -1,8 +1,10 @@
-import { extractContentImage } from "./content.mjs";
-import { extractGeneratedImage } from "./generated.mjs";
-import { getContentItems } from "../content.mjs";
+import extractContentImage from "./content.mjs";
+import __generatedModule from "./generated.mjs";
+const { extractGeneratedImage } = __generatedModule;
+import __contentModule from "../content.mjs";
+const { getContentItems } = __contentModule;
 
-export function collectResponseImages(outputs) {
+export default function collectResponseImages(outputs) {
   const images = [];
   for (const output of outputs) {
     const generatedImage = extractGeneratedImage(output);

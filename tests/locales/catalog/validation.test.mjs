@@ -1,5 +1,5 @@
 import { expect, test } from "@jest/globals";
-import { validateLocaleCatalogData } from "../../../src/locales/catalog/validation.mjs";
+import validateLocaleCatalogData from "../../../src/locales/catalog/validation.mjs";
 
 test("reports missing locales and locale key mismatches", () => {
   const catalog = {

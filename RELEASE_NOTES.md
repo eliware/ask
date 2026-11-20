@@ -1,5 +1,13 @@
 # Release Notes
 
+## 15.2.0 — 2026-11-20
+
+### Changed
+
+- Updated outdated dependencies and refreshed the lockfile.
+- Updated the package version to 15.2.0.
+- Changed the container base image to Eliware CentOS Stream 10 with Node.js 26.
+
 ## 15.1.2 — 2026-11-12
 
 ### Changed

@@ -1,4 +1,7 @@
-export function validateLocaleCatalogData({ files, names, values, reference }, supportedLocales) {
+export default function validateLocaleCatalogData(
+  { files, names, values, reference },
+  supportedLocales,
+) {
   const referenceKeys = Object.keys(reference);
   const errors = [];
   for (const locale of supportedLocales) {

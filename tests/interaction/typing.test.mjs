@@ -1,5 +1,5 @@
 import { jest } from "@jest/globals";
-import { createTypingManager } from "../../src/interaction/typing.mjs";
+import createTypingManager from "../../src/interaction/typing.mjs";
 
 test("starts, refreshes, and stops typing while handling failures", async () => {
   jest.useFakeTimers();

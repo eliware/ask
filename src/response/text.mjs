@@ -1,8 +1,11 @@
-import { extractContentText, getContentItems } from "./content.mjs";
-import { isGeneratedImageOutput } from "./images/generated.mjs";
-import { selectFallbackText } from "./outputs.mjs";
+import __contentModule from "./content.mjs";
+const { extractContentText, getContentItems } = __contentModule;
+import __generatedModule from "./images/generated.mjs";
+const { isGeneratedImageOutput } = __generatedModule;
+import __outputsModule from "./outputs.mjs";
+const { selectFallbackText } = __outputsModule;
 
-export function collectResponseText(outputs, response) {
+export default function collectResponseText(outputs, response) {
   let text = "";
   for (const output of outputs) {
     if (isGeneratedImageOutput(output)) continue;

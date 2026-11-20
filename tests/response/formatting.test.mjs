@@ -1,4 +1,5 @@
-import { addBlockquote, defaultSplit, splitBlockquoted } from "../../src/response/formatting.mjs";
+import __formattingModule from "../../src/response/formatting.mjs";
+const { addBlockquote, defaultSplit, splitBlockquoted } = __formattingModule;
 
 test("formats blockquotes including null and blank lines", () => {
   expect(addBlockquote("a\n\nb")).toBe("> a\n> \n> b");

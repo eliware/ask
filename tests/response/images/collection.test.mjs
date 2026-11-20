@@ -1,4 +1,4 @@
-import { collectResponseImages } from "../../../src/response/images/collection.mjs";
+import collectResponseImages from "../../../src/response/images/collection.mjs";
 
 test("collects generated, base64, and URL images from outputs", () => {
   expect(

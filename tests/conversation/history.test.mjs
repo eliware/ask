@@ -1,5 +1,5 @@
 import { expect, jest, test } from "@jest/globals";
-import { fetchConversationHistory } from "../../src/conversation/history.mjs";
+import fetchConversationHistory from "../../src/conversation/history.mjs";
 
 test("skips client lookup when no channel ID is available", async () => {
   const fetchChannel = jest.fn();

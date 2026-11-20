@@ -1,5 +1,5 @@
 import { expect, jest, test } from "@jest/globals";
-import { createHealthServer } from "../../src/health/server.mjs";
+import createHealthServer from "../../src/health/server.mjs";
 
 async function withLocalFetch(callback) {
   const originalFetch = globalThis.fetch;

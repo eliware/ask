@@ -1,4 +1,4 @@
-import { normalizeLogValue } from "../../src/logging/values.mjs";
+import normalizeLogValue from "../../src/logging/values.mjs";
 
 test("normalizes primitive and binary log values", () => {
   expect(normalizeLogValue(null, 10)).toEqual({ handled: true, value: null });

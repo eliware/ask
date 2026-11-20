@@ -1,4 +1,4 @@
-export function decodeBase64Image(value) {
+export default function decodeBase64Image(value) {
   try {
     if (
       typeof value !== "string" ||

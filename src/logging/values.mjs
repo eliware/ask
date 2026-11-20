@@ -1,6 +1,7 @@
-import { sanitizeLogString } from "./strings.mjs";
+import __stringsModule from "./strings.mjs";
+const { sanitizeLogString } = __stringsModule;
 
-export function normalizeLogValue(value, maxString) {
+export default function normalizeLogValue(value, maxString) {
   if (value === null || value === undefined) return { handled: true, value };
   if (typeof value === "string")
     return { handled: true, value: sanitizeLogString(value, maxString) };

@@ -1,4 +1,4 @@
-export function extractImageUrl(content) {
+export default function extractImageUrl(content) {
   const url = content?.image?.url || content?.url || content?.src || content?.href;
   let validUrl = false;
   if (typeof url === "string" && url) {

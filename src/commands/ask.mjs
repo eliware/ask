@@ -1,11 +1,11 @@
 import { safeSerialize } from "@eliware/common";
-import { getRequestContext } from "../interaction/request-context.mjs";
-import { buildConversationInput } from "../conversation/input.mjs";
-import { requestAnswer } from "../openai/request.mjs";
-import { parseResponse } from "../response/parsing.mjs";
-import { deliverResponse } from "../response/delivery.mjs";
-import { safetyMessage } from "../response/safety-message.mjs";
-import { extractViolations } from "../response/violations.mjs";
+import getRequestContext from "../interaction/request-context.mjs";
+import buildConversationInput from "../conversation/input.mjs";
+import requestAnswer from "../openai/request.mjs";
+import parseResponse from "../response/parsing.mjs";
+import deliverResponse from "../response/delivery.mjs";
+import safetyMessage from "../response/safety-message.mjs";
+import extractViolations from "../response/violations.mjs";
 
 export default async function ({ client, log, msg, openai }, interaction) {
   log.debug("ask Request");

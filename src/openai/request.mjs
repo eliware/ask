@@ -1,4 +1,4 @@
-export async function requestAnswer(openai, input) {
+export default async function requestAnswer(openai, input) {
   return openai.responses.create({
     model: "gpt-6-luna",
     input,

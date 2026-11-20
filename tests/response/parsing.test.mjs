@@ -1,4 +1,4 @@
-import { parseResponse } from "../../src/response/parsing.mjs";
+import parseResponse from "../../src/response/parsing.mjs";
 
 test("combines content text while collecting images", () => {
   expect(

@@ -1,5 +1,5 @@
 import { jest } from "@jest/globals";
-import { createMessageInteractionFactory } from "../../../src/interaction/message/factory.mjs";
+import createMessageInteractionFactory from "../../../src/interaction/message/factory.mjs";
 
 test("constructs reply and typing methods for a message interaction", async () => {
   const message = { author: {}, channel: { sendTyping: jest.fn() } };

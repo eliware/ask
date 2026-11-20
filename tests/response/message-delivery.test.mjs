@@ -1,5 +1,5 @@
-import { deliverResponse } from "../../src/response/delivery.mjs";
-import { createMessageSender } from "../../src/interaction/sender.mjs";
+import deliverResponse from "../../src/response/delivery.mjs";
+import createMessageSender from "../../src/interaction/sender.mjs";
 
 const log = { debug() {} };
 

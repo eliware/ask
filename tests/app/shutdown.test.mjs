@@ -1,5 +1,5 @@
 import { expect, jest, test } from "@jest/globals";
-import { createShutdownManager } from "../../src/app/shutdown.mjs";
+import createShutdownManager from "../../src/app/shutdown.mjs";
 
 test("shuts down the client and health server only once", async () => {
   const client = { shutdown: jest.fn() };

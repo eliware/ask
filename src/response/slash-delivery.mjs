@@ -1,6 +1,7 @@
-import { defaultSplit, splitBlockquoted } from "./formatting.mjs";
+import __formattingModule from "./formatting.mjs";
+const { defaultSplit, splitBlockquoted } = __formattingModule;
 
-export async function deliverSlashResponse(interaction, text, files, urls, deferred, log) {
+export default async function deliverSlashResponse(interaction, text, files, urls, deferred, log) {
   const chunks = [
     ...(text ? splitBlockquoted(text, 2000) : []),
     ...urls.flatMap((url) => defaultSplit(url, 2000)),

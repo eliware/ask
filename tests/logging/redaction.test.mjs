@@ -1,4 +1,4 @@
-import { defaultRedactPatterns, redactStringField } from "../../src/logging/redaction.mjs";
+import redactStringField, { defaultRedactPatterns } from "../../src/logging/redaction.mjs";
 
 test("redacts matching string fields and preserves other values", () => {
   expect(redactStringField("ImageData", "secret", defaultRedactPatterns)).toBe(

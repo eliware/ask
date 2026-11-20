@@ -1,4 +1,7 @@
-export function createHealthServerLifecycle(server, { host = "127.0.0.1", port = 3000 } = {}) {
+export default function createHealthServerLifecycle(
+  server,
+  { host = "127.0.0.1", port = 3000 } = {},
+) {
   return {
     start: () =>
       new Promise((resolve, reject) => {

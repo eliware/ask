@@ -1,4 +1,4 @@
-import { extractContentImage } from "../../../src/response/images/content.mjs";
+import extractContentImage from "../../../src/response/images/content.mjs";
 
 test("coordinates base64 and URL image extraction", () => {
   expect(extractContentImage({ b64_json: "aGVsbG8=" })).toEqual({

@@ -1,6 +1,6 @@
 # Container deployment
 
-The GHCR image runs the Ask Discord assistant as the unprivileged `node` user. The repository maintainers own the image build inputs. The publish workflow runs on `ubuntu-latest` and leaves the build platform unset, so Docker uses the runner default. It pushes a version tag and records an image digest. Publication does not deploy the bot.
+The GHCR image uses `ghcr.io/eliware/centos10-node26:latest` and runs Ask as the unprivileged `node` user. The image listens on port `3000` for health checks. The repository maintainers own the image build inputs. The publish workflow runs on `ubuntu-latest` and leaves the build platform unset, so Docker uses the runner default. It pushes a version tag and records an image digest. Publication does not deploy the bot.
 
 ## Build and run from source
 

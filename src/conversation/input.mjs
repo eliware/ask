@@ -1,6 +1,6 @@
-import { fetchConversationHistory } from "./history.mjs";
+import fetchConversationHistory from "./history.mjs";
 
-export async function buildConversationInput({
+export default async function buildConversationInput({
   client,
   interaction,
   channelId,

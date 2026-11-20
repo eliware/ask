@@ -1,4 +1,4 @@
-import { extractViolations } from "../../src/response/violations.mjs";
+import extractViolations from "../../src/response/violations.mjs";
 
 test("parses safety violations from provider objects", () => {
   expect(extractViolations({ error: { safety_violations: ["one", 2] } })).toEqual(["one", "2"]);

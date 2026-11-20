@@ -1,4 +1,4 @@
-export function extractViolations(error) {
+export default function extractViolations(error) {
   if (Array.isArray(error?.error?.safety_violations))
     return error.error.safety_violations.map(String);
   const match = String(error?.message || error || "").match(/safety_violations=\[([^\]]+)\]/i);

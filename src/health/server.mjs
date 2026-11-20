@@ -1,9 +1,9 @@
 import { createServer } from "node:http";
-import { createHealthServerLifecycle } from "./lifecycle.mjs";
-import { createReadinessState } from "./readiness.mjs";
-import { createHealthRequestHandler } from "./routes.mjs";
+import createHealthServerLifecycle from "./lifecycle.mjs";
+import createReadinessState from "./readiness.mjs";
+import createHealthRequestHandler from "./routes.mjs";
 
-export function createHealthServer({
+export default function createHealthServer({
   host = "127.0.0.1",
   port = 3000,
   serverFactory = createServer,

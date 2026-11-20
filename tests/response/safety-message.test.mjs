@@ -1,4 +1,4 @@
-import { safetyMessage } from "../../src/response/safety-message.mjs";
+import safetyMessage from "../../src/response/safety-message.mjs";
 
 test("formats safety messages with and without violations", () => {
   expect(safetyMessage()).toMatch(/content policy/);

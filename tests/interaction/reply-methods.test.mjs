@@ -1,5 +1,5 @@
 import { jest } from "@jest/globals";
-import { createMessageReplyMethods } from "../../src/interaction/reply-methods.mjs";
+import createMessageReplyMethods from "../../src/interaction/reply-methods.mjs";
 
 test("logs reply and edit failures and stops typing", async () => {
   const log = { error: jest.fn() };

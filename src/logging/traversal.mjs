@@ -1,6 +1,6 @@
-import { traverseObjectFields } from "./object-fields.mjs";
+import traverseObjectFields from "./object-fields.mjs";
 
-export function traverseLogValue(obj, sanitizeValue, seen, depth, opts, truncateLogField) {
+export default function traverseLogValue(obj, sanitizeValue, seen, depth, opts, truncateLogField) {
   const { maxArray } = opts;
   if (Array.isArray(obj)) {
     if (seen.has(obj)) return "<<circular>>";

@@ -1,4 +1,4 @@
-export function createReadinessState() {
+export default function createReadinessState() {
   let ready = false;
   return {
     isReady: () => ready,

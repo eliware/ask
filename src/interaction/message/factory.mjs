@@ -1,9 +1,9 @@
-import { createMessageReplyMethods } from "../reply-methods.mjs";
-import { createMessageSender } from "../sender.mjs";
-import { createTypingManager } from "../typing.mjs";
-import { createMessageMetadata } from "../metadata.mjs";
+import createMessageReplyMethods from "../reply-methods.mjs";
+import createMessageSender from "../sender.mjs";
+import createTypingManager from "../typing.mjs";
+import createMessageMetadata from "../metadata.mjs";
 
-export function createMessageInteractionFactory({ client, message, locale, text, log }) {
+export default function createMessageInteractionFactory({ client, message, locale, text, log }) {
   const interaction = createMessageMetadata({ client, message, locale, text });
   const send = createMessageSender(message);
   const typing = createTypingManager(message.channel);

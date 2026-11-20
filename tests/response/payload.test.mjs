@@ -1,4 +1,4 @@
-import { prepareResponsePayload } from "../../src/response/payload.mjs";
+import prepareResponsePayload from "../../src/response/payload.mjs";
 
 test("prepares text, file, and URL payload data", () => {
   const buffer = Buffer.from("image");

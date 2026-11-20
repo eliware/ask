@@ -1,11 +1,11 @@
 import { readFileSync } from "node:fs";
 import { join } from "node:path";
-import { validateConfiguration } from "../configuration/validate.mjs";
-import { loadEnvironment } from "../configuration/environment.mjs";
-import { createPresence } from "./presence.mjs";
-import { createShutdownManager } from "./shutdown.mjs";
+import validateConfiguration from "../configuration/validate.mjs";
+import loadEnvironment from "../configuration/environment.mjs";
+import createPresence from "./presence.mjs";
+import createShutdownManager from "./shutdown.mjs";
 
-export async function startApplication({
+export default async function startApplication({
   createDiscord,
   initializeOpenAI,
   log,

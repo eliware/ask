@@ -1,9 +1,11 @@
 const namePattern = /^\s*ask(?:\b\s*[,!:]?\s*|$)/i;
 
-export function isAddressedByName(content) {
+function isAddressedByName(content) {
   return namePattern.test(content || "");
 }
 
-export function removeNameAddress(content) {
+function removeNameAddress(content) {
   return content.replace(namePattern, "");
 }
+
+export default { isAddressedByName, removeNameAddress };

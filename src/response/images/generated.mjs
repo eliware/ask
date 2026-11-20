@@ -1,6 +1,6 @@
-import { decodeBase64Image } from "../image-decoding.mjs";
+import decodeBase64Image from "../image-decoding.mjs";
 
-export function isGeneratedImageOutput(output) {
+function isGeneratedImageOutput(output) {
   return Boolean(
     output &&
     (output.type === "image_generation_call" ||
@@ -9,7 +9,7 @@ export function isGeneratedImageOutput(output) {
   );
 }
 
-export function extractGeneratedImage(output) {
+function extractGeneratedImage(output) {
   const isGeneratedImage = isGeneratedImageOutput(output);
   if (!isGeneratedImage) return { handled: false, image: null };
   const buffer = decodeBase64Image(output.result);
@@ -25,3 +25,5 @@ export function extractGeneratedImage(output) {
       : null,
   };
 }
+
+export default { isGeneratedImageOutput, extractGeneratedImage };

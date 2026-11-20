@@ -1,4 +1,4 @@
-export function normalizeOutputs(response) {
+function normalizeOutputs(response) {
   if (Array.isArray(response?.outputs)) return response.outputs;
   if (Array.isArray(response?.output)) return response.output;
   if (response?.outputs && typeof response.outputs === "object")
@@ -8,7 +8,7 @@ export function normalizeOutputs(response) {
   return [];
 }
 
-export function getFallbackText(value) {
+function getFallbackText(value) {
   if (typeof value === "string") return value;
   if (!value || typeof value !== "object") return "";
   if (typeof value.text === "string") return value.text;
@@ -17,6 +17,8 @@ export function getFallbackText(value) {
   return "";
 }
 
-export function selectFallbackText(replyText, response) {
+function selectFallbackText(replyText, response) {
   return replyText || getFallbackText(response?.output_text) || getFallbackText(response?.text);
 }
+
+export default { normalizeOutputs, getFallbackText, selectFallbackText };

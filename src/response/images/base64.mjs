@@ -1,6 +1,6 @@
-import { decodeBase64Image } from "../image-decoding.mjs";
+import decodeBase64Image from "../image-decoding.mjs";
 
-export function extractBase64ContentImage(content) {
+export default function extractBase64ContentImage(content) {
   const base64 =
     content?.b64_json ||
     content?.base64 ||

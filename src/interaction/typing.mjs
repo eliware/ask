@@ -1,4 +1,4 @@
-export function createTypingManager(channel) {
+export default function createTypingManager(channel) {
   let typingInterval = null;
   const stop = () => {
     if (typingInterval) {

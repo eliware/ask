@@ -1,7 +1,7 @@
 import { safeSerialize } from "@eliware/common";
 import { createOpenAI } from "@eliware/openai";
 
-export async function initializeOpenAI({ log, factory = createOpenAI } = {}) {
+export default async function initializeOpenAI({ log, factory = createOpenAI } = {}) {
   try {
     const openai = await factory();
     log?.info?.("OpenAI client initialized");

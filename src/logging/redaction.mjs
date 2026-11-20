@@ -10,7 +10,7 @@ export const defaultRedactPatterns = [
   "blob",
 ];
 
-export function redactStringField(key, value, patterns) {
+export default function redactStringField(key, value, patterns) {
   if (typeof value !== "string") return undefined;
   const lower = String(key).toLowerCase();
   return patterns.some((pattern) => lower.includes(pattern))

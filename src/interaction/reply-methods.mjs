@@ -1,6 +1,6 @@
 import { safeSerialize } from "@eliware/common";
 
-export function createMessageReplyMethods({ send, stopTyping, log }) {
+export default function createMessageReplyMethods({ send, stopTyping, log }) {
   return {
     reply: async (response) => {
       stopTyping();

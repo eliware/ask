@@ -1,6 +1,6 @@
 import { expect, jest, test } from "@jest/globals";
 import { join } from "node:path";
-import { loadEnvironment } from "../../src/configuration/environment.mjs";
+import loadEnvironment from "../../src/configuration/environment.mjs";
 
 test("loads the environment file from the application root", () => {
   const configure = jest.fn();

@@ -1,7 +1,10 @@
 import { readFileSync, readdirSync } from "node:fs";
 import { join } from "node:path";
 
-export function loadLocaleCatalogFiles(directory, fileSystem = { readFileSync, readdirSync }) {
+export default function loadLocaleCatalogFiles(
+  directory,
+  fileSystem = { readFileSync, readdirSync },
+) {
   const files = fileSystem.readdirSync(directory).filter((file) => file.endsWith(".json"));
   const names = files.map((file) => file.slice(0, -5));
   const values = Object.fromEntries(

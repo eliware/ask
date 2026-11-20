@@ -1,5 +1,5 @@
 import { expect, jest, test } from "@jest/globals";
-import { routeMessageHelp } from "../../../src/events/message/help-routing.mjs";
+import routeMessageHelp from "../../../src/events/message/help-routing.mjs";
 
 test("replies with localized help and handles the command", async () => {
   const log = { debug: jest.fn() };

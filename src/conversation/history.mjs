@@ -1,4 +1,4 @@
-export async function fetchConversationHistory({ client, interaction, channelId, log }) {
+export default async function fetchConversationHistory({ client, interaction, channelId, log }) {
   try {
     let fetched = interaction.channel?.messages?.fetch
       ? await interaction.channel.messages.fetch({ limit: 100 }).catch(() => null)

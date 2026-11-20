@@ -1,5 +1,5 @@
 import { expect, test } from "@jest/globals";
-import { createReadinessState } from "../../src/health/readiness.mjs";
+import createReadinessState from "../../src/health/readiness.mjs";
 
 test("tracks readiness as a boolean", () => {
   const readiness = createReadinessState();

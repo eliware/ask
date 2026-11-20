@@ -1,5 +1,5 @@
 import { expect, jest, test } from "@jest/globals";
-import { createHealthRequestHandler } from "../../src/health/routes.mjs";
+import createHealthRequestHandler from "../../src/health/routes.mjs";
 
 function makeResponse() {
   return { writeHead: jest.fn(), end: jest.fn() };

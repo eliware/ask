@@ -1,4 +1,4 @@
-export function createMessageMetadata({ client, message, locale, text }) {
+export default function createMessageMetadata({ client, message, locale, text }) {
   return {
     commandName: "ask",
     locale,

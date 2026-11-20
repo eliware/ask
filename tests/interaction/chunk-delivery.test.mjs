@@ -1,4 +1,4 @@
-import { deliverMessageChunks } from "../../src/interaction/chunk-delivery.mjs";
+import deliverMessageChunks from "../../src/interaction/chunk-delivery.mjs";
 
 test("delivers the first payload as a reply and later payloads to the channel", async () => {
   const replies = [];

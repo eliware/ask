@@ -1,4 +1,4 @@
-export function createHealthRequestHandler(isReady) {
+export default function createHealthRequestHandler(isReady) {
   return (request, response) => {
     const path = request.url?.split("?", 1)[0];
     if (request.method !== "GET") {

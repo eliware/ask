@@ -1,4 +1,4 @@
-export async function getRequestContext({ client, interaction, log }) {
+export default async function getRequestContext({ client, interaction, log }) {
   const context = {
     locale:
       interaction.locale ||

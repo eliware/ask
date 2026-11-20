@@ -1,4 +1,4 @@
-import { collectResponseText } from "../../src/response/text.mjs";
+import collectResponseText from "../../src/response/text.mjs";
 
 test("collects text from response content", () => {
   expect(

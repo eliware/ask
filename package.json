@@ -1,6 +1,6 @@
 {
   "name": "@eliware/ask",
-  "version": "15.1.2",
+  "version": "15.2.0",
   "type": "module",
   "description": "A Discord assistant for short answers, web lookup, and image generation. Supports slash commands, direct-message triggers, and localization.",
   "keywords": [
@@ -36,7 +36,7 @@
     "dotenv": "^18.0.10"
   },
   "devDependencies": {
-    "@eliware/test": "^15.1.0"
+    "@eliware/test": "^15.2.0"
   },
   "jest": {
     "testEnvironment": "node",

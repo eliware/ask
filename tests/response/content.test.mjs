@@ -1,5 +1,6 @@
 import { expect, test } from "@jest/globals";
-import { extractContentText, getContentItems } from "../../src/response/content.mjs";
+import __contentModule from "../../src/response/content.mjs";
+const { extractContentText, getContentItems } = __contentModule;
 
 test("selects content items from supported shapes", () => {
   expect(getContentItems({ content: ["array"] })).toEqual(["array"]);

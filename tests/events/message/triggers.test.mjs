@@ -1,5 +1,5 @@
 import { expect, test } from "@jest/globals";
-import { isMessageTriggered } from "../../../src/events/message/triggers.mjs";
+import isMessageTriggered from "../../../src/events/message/triggers.mjs";
 
 test.each([
   [{ isDirect: true }, true],

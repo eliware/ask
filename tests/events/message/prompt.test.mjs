@@ -1,5 +1,5 @@
 import { expect, test } from "@jest/globals";
-import { extractMessagePrompt } from "../../../src/events/message/prompt.mjs";
+import extractMessagePrompt from "../../../src/events/message/prompt.mjs";
 
 test.each([
   ["Ask what is here?", true, "what is here?"],

@@ -1,4 +1,4 @@
-import { deliverSlashResponse } from "../../src/response/slash-delivery.mjs";
+import deliverSlashResponse from "../../src/response/slash-delivery.mjs";
 
 const log = { debug() {} };
 

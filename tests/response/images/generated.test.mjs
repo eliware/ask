@@ -1,4 +1,5 @@
-import { extractGeneratedImage } from "../../../src/response/images/generated.mjs";
+import __generatedModule from "../../../src/response/images/generated.mjs";
+const { extractGeneratedImage } = __generatedModule;
 
 test("extracts generated images and skips invalid or unrelated outputs", () => {
   expect(

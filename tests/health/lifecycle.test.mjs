@@ -1,5 +1,5 @@
 import { expect, jest, test } from "@jest/globals";
-import { createHealthServerLifecycle } from "../../src/health/lifecycle.mjs";
+import createHealthServerLifecycle from "../../src/health/lifecycle.mjs";
 
 function makeServer() {
   let onError;

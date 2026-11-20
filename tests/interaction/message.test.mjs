@@ -1,6 +1,6 @@
 import { jest } from "@jest/globals";
-import { createMessageInteraction } from "../../src/interaction/message.mjs";
-import { deliverResponse } from "../../src/response/delivery.mjs";
+import createMessageInteraction from "../../src/interaction/message.mjs";
+import deliverResponse from "../../src/response/delivery.mjs";
 
 jest.setTimeout(10_000);
 

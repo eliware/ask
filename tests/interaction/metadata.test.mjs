@@ -1,4 +1,4 @@
-import { createMessageMetadata } from "../../src/interaction/metadata.mjs";
+import createMessageMetadata from "../../src/interaction/metadata.mjs";
 
 test("builds metadata for a message-backed interaction", () => {
   const client = {};

@@ -1,9 +1,10 @@
 import { safeSerialize } from "@eliware/common";
-import { createMessageInteraction } from "../interaction/message.mjs";
-import { isAddressedByName } from "./message/addressing.mjs";
-import { isMessageTriggered } from "./message/triggers.mjs";
-import { extractMessagePrompt } from "./message/prompt.mjs";
-import { routeMessageHelp } from "./message/help-routing.mjs";
+import createMessageInteraction from "../interaction/message.mjs";
+import __addressingModule from "./message/addressing.mjs";
+const { isAddressedByName } = __addressingModule;
+import isMessageTriggered from "./message/triggers.mjs";
+import extractMessagePrompt from "./message/prompt.mjs";
+import routeMessageHelp from "./message/help-routing.mjs";
 
 export default async function ({ client, log, msg, commandHandlers, ...contextData }, message) {
   log.debug("messageCreate", { id: message.id });

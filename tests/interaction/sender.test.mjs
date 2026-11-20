@@ -1,4 +1,4 @@
-import { createMessageSender } from "../../src/interaction/sender.mjs";
+import createMessageSender from "../../src/interaction/sender.mjs";
 
 test("prepares and sends a message response", async () => {
   const replies = [];

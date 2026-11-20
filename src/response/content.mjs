@@ -1,4 +1,4 @@
-export function getContentItems(output) {
+function getContentItems(output) {
   if (Array.isArray(output?.content)) return output.content;
   if (output?.content && typeof output.content === "object") return Object.values(output.content);
   if (typeof output?.content === "string") return [output.content];
@@ -8,10 +8,12 @@ export function getContentItems(output) {
   return [];
 }
 
-export function extractContentText(content) {
+function extractContentText(content) {
   const text =
     typeof content === "string"
       ? content
       : content?.text || content?.output_text || content?.content;
   return typeof text === "string" ? text : "";
 }
+
+export default { getContentItems, extractContentText };

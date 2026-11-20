@@ -1,4 +1,4 @@
-export function createShutdownManager({ log, healthServer }) {
+export default function createShutdownManager({ log, healthServer }) {
   let client;
   let shuttingDown = false;
   let activeHealthServer = healthServer;

@@ -1,4 +1,4 @@
-export function prepareResponsePayload(replyText, images) {
+export default function prepareResponsePayload(replyText, images) {
   return {
     text: typeof replyText === "string" ? replyText.trim() : "",
     files: images

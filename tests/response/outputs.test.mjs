@@ -1,8 +1,5 @@
-import {
-  getFallbackText,
-  normalizeOutputs,
-  selectFallbackText,
-} from "../../src/response/outputs.mjs";
+import __outputsModule from "../../src/response/outputs.mjs";
+const { getFallbackText, normalizeOutputs, selectFallbackText } = __outputsModule;
 
 test("normalizeOutputs handles arrays, objects, and missing values", () => {
   const array = [{ content: "a" }];
