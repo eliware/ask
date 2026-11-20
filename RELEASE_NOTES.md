@@ -2,11 +2,25 @@
 
 ## 15.2.0 — 2026-11-20
 
+### Added
+
+- Expanded end-user guides for setup, commands, configuration, deployment, troubleshooting, and data handling.
+- Added message-trigger replies for responses that contain only generated image files.
+
 ### Changed
 
-- Updated outdated dependencies and refreshed the lockfile.
-- Updated the package version to 15.2.0.
-- Changed the container base image to Eliware CentOS Stream 10 with Node.js 26.
+- Updated the package version to 15.2.0 and refreshed the lockfile with current dependencies.
+- Changed the container base image to Eliware CentOS Stream 10 with Node.js 26. The container runs as the unprivileged `node` user.
+- Reorganized interaction, response, logging, configuration, and locale modules with focused tests.
+- Clarified Discord bot permissions and container setup instructions in the user guides.
+
+### Fixed
+
+- Prevented file-only message replies from turning attachment metadata into text.
+- Prevented undefined message replies from stopping chunk creation.
+- Handled rejected typing refreshes and waited for health server cleanup during startup shutdown.
+- Preserved repeated non-cyclic objects during log sanitization.
+- Sanitized generated image filenames to remove path separators and unsupported characters.
 
 ## 15.1.2 — 2026-11-12
 
