@@ -1,4 +1,5 @@
 import deliverResponse from "../../src/response/delivery.mjs";
+import createMessageInteraction from "../../src/interaction/message.mjs";
 import createMessageSender from "../../src/interaction/sender.mjs";
 
 const log = { debug() {} };
@@ -99,4 +100,28 @@ test("routes message-backed replies without blockquotes", async () => {
 
   expect(messageReply).toEqual({ content: "answer" });
   expect(slashReply).toEqual({ content: "> answer" });
+});
+
+test("splits message text before adding an image URL to the next chunk", async () => {
+  const replies = [];
+  const url = "https://example.test/image.png";
+  const message = {
+    id: "source-message",
+    author: { id: "user" },
+    channel: { id: "channel" },
+    reply: async (value) => replies.push(value),
+  };
+  const interaction = createMessageInteraction({
+    client: {},
+    message,
+    locale: "en-US",
+    text: "question",
+    log: { error() {} },
+  });
+
+  await deliverResponse(interaction, "x".repeat(2000), [{ url }], false, log);
+
+  expect(replies).toHaveLength(2);
+  expect(replies[0]).toHaveLength(2000);
+  expect(replies[1].trim()).toBe(url);
 });

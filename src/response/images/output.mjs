@@ -1,8 +1,7 @@
 import extractContentImage from "./content.mjs";
-import __generatedModule from "./generated.mjs";
+import extractGeneratedImage from "./generated.mjs";
 import __contentModule from "../content.mjs";
 
-const { extractGeneratedImage } = __generatedModule;
 const { getContentItems } = __contentModule;
 
 export default function extractOutputImages(output) {
