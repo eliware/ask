@@ -213,7 +213,7 @@ test("supports startup without a health server", async () => {
 test("shuts down a Discord client created after a stop signal", async () => {
   let resolveClient;
   const client = { shutdown: jest.fn() };
-  const { dependencies, getSignalHandlers } = makeDependencies({
+  const { dependencies, healthServer, getSignalHandlers } = makeDependencies({
     createDiscord: jest.fn(
       () =>
         new Promise((resolve) => {
@@ -237,4 +237,6 @@ test("shuts down a Discord client created after a stop signal", async () => {
   resolveClient(client);
   await expect(startup).resolves.toBeUndefined();
   expect(client.shutdown).toHaveBeenCalledTimes(1);
+  expect(healthServer.setReady).toHaveBeenCalledWith(false);
+  expect(healthServer.close).toHaveBeenCalledTimes(1);
 });

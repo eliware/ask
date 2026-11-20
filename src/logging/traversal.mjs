@@ -5,5 +5,9 @@ export default function traverseLogValue(obj, sanitizeValue, seen, depth, opts, 
   if (Array.isArray(obj)) return traverseLogArray(obj, sanitizeValue, seen, depth, opts.maxArray);
   if (seen.has(obj)) return "<<circular>>";
   seen.add(obj);
-  return traverseObjectFields(obj, sanitizeValue, seen, depth, opts, truncateLogField);
+  try {
+    return traverseObjectFields(obj, sanitizeValue, seen, depth, opts, truncateLogField);
+  } finally {
+    seen.delete(obj);
+  }
 }

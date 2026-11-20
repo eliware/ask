@@ -9,7 +9,7 @@ test("serializes response content and values without a content field", () => {
 
 test("serializes null and undefined values", () => {
   expect(serializeMessageContent(null)).toBe("null");
-  expect(serializeMessageContent(undefined)).toBeUndefined();
+  expect(serializeMessageContent(undefined)).toBe("undefined");
 });
 
 test("does not serialize file metadata as message content", () => {

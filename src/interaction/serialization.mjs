@@ -1,5 +1,7 @@
 export default function serializeMessageContent(response) {
   if (response?.files && response.content == null) return "";
   const content = response?.content ?? response;
-  return typeof content === "string" ? content : JSON.stringify(content);
+  if (typeof content === "string") return content;
+  const serialized = JSON.stringify(content);
+  return serialized === undefined ? String(content) : serialized;
 }

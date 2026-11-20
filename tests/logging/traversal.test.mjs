@@ -9,3 +9,11 @@ test("handles circular objects", () => {
   circular.self = circular;
   expect(sanitizeForLog(circular).self).toBe("<<circular>>");
 });
+
+test("preserves repeated references that are not cycles", () => {
+  const shared = { value: "present" };
+  expect(sanitizeForLog({ first: shared, second: shared })).toEqual({
+    first: { value: "present" },
+    second: { value: "present" },
+  });
+});
