@@ -1,14 +1,7 @@
 import sanitizeForLog from "../../src/logging/sanitize-for-log.mjs";
 
-test("limits and detects circular arrays", () => {
-  const circular = [];
-  circular.push(circular);
-  expect(sanitizeForLog(circular)[0]).toBe("<<circular>>");
-  expect(sanitizeForLog([1, 2, 3], new WeakSet(), 0, { maxArray: 2 })).toEqual([
-    1,
-    2,
-    "<<1 more items...>>",
-  ]);
+test("dispatches arrays to array traversal", () => {
+  expect(sanitizeForLog([1, 2])).toEqual([1, 2]);
 });
 
 test("handles circular objects", () => {

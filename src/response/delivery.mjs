@@ -1,5 +1,5 @@
 import deliverMessageResponse from "./message-delivery.mjs";
-import deliverSlashResponse from "./slash-delivery.mjs";
+import deliverSlashResponse from "./slash/delivery.mjs";
 import prepareResponsePayload from "./payload.mjs";
 export default async function deliverResponse(interaction, replyText, images, deferred, log) {
   const { text, files, urls } = prepareResponsePayload(replyText, images);
