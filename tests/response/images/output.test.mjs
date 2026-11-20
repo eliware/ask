@@ -18,13 +18,8 @@ test("does not fall back to content images for a handled generated output", () =
   ).toEqual([]);
 });
 
-test("extracts images from ordinary output content", () => {
-  expect(
-    extractOutputImages({
-      content: [{ b64_json: "aGVsbG8=" }, { url: "https://image.test/file.png" }],
-    }),
-  ).toEqual([
-    expect.objectContaining({ filename: "image.png", buffer: Buffer.from("hello") }),
+test("dispatches ordinary outputs to content image extraction", () => {
+  expect(extractOutputImages({ content: [{ url: "https://image.test/file.png" }] })).toEqual([
     expect.objectContaining({ url: "https://image.test/file.png" }),
   ]);
 });
