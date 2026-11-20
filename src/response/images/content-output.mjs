@@ -1,4 +1,4 @@
-import extractContentImage from "./content.mjs";
+import extractContentImage from "./content/dispatch.mjs";
 import __contentModule from "../content.mjs";
 
 const { getContentItems } = __contentModule;

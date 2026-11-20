@@ -1,4 +1,4 @@
-import extractOutputImages from "./output.mjs";
+import extractOutputImages from "./output/dispatch.mjs";
 
 export default function collectResponseImages(outputs) {
   const images = [];

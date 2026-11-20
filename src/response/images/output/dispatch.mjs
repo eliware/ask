@@ -1,5 +1,5 @@
-import extractContentOutputImages from "./content-output.mjs";
-import extractGeneratedImage from "./generated.mjs";
+import extractContentOutputImages from "../content-output.mjs";
+import extractGeneratedImage from "../generated.mjs";
 
 export default function extractOutputImages(output) {
   const generatedImage = extractGeneratedImage(output);

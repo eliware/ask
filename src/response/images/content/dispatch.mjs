@@ -1,5 +1,5 @@
-import extractBase64ContentImage from "./base64.mjs";
-import extractImageUrl from "./url.mjs";
+import extractBase64ContentImage from "../base64.mjs";
+import extractImageUrl from "../url.mjs";
 
 export default function extractContentImage(content) {
   const base64Image = extractBase64ContentImage(content);

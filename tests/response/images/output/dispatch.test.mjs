@@ -1,4 +1,4 @@
-import extractOutputImages from "../../../src/response/images/output.mjs";
+import extractOutputImages from "../../../../src/response/images/output/dispatch.mjs";
 
 test("extracts a generated image from an output", () => {
   expect(
