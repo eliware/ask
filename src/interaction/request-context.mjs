@@ -1,3 +1,5 @@
+import enrichRequestContext from "./context-enrichment.mjs";
+
 export default async function getRequestContext({ client, interaction, log }) {
   const context = {
     locale:
@@ -13,20 +15,5 @@ export default async function getRequestContext({ client, interaction, log }) {
     guildId: interaction.guildId || interaction.guild?.id || null,
     guildName: interaction.guild?.name || null,
   };
-  try {
-    if ((!context.channelName || !context.guildName) && client && context.channelId) {
-      const channel = await client.channels.fetch(context.channelId).catch(() => null);
-      if (channel) {
-        context.channelName ||= channel.name || null;
-        context.guildName ||= channel.guild?.name || null;
-      }
-    }
-    if (!context.guildName && client && context.guildId) {
-      const guild = await client.guilds.fetch(context.guildId).catch(() => null);
-      context.guildName ||= guild?.name || null;
-    }
-  } catch (error) {
-    log.debug("Failed to enrich request context", { error: error?.message || String(error) });
-  }
-  return context;
+  return enrichRequestContext(context, client, log);
 }
